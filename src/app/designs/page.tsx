@@ -4,6 +4,7 @@ import { Suspense } from "react";
 import { designListPromises } from "@/app/create/_modules/promises";
 import { SiteHeader } from "@/components/layout/site-header";
 import { Button } from "@/components/ui/button";
+import { PAGES } from "@/config/pages";
 import { getDictionary } from "@/lib/i18n/server";
 import { QueryProvider } from "@/providers/query.provider";
 import { DesignsGrid } from "./_components/designs-grid";
@@ -38,7 +39,7 @@ export default async function DesignsPage() {
             {dict.designs.title}
           </h1>
           <Button asChild>
-            <Link href="/create">{dict.designs.newDesign}</Link>
+            <Link href={PAGES.CREATE.INDEX}>{dict.designs.newDesign}</Link>
           </Button>
         </div>
         <Suspense

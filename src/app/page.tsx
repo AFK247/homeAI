@@ -2,6 +2,7 @@ import Link from "next/link";
 import { BeforeAfter } from "@/components/brand/before-after";
 import { SiteHeader } from "@/components/layout/site-header";
 import { Button } from "@/components/ui/button";
+import { PAGES } from "@/config/pages";
 import { toBnDigits } from "@/lib/format";
 import { getDictionary } from "@/lib/i18n/server";
 
@@ -32,7 +33,7 @@ export default async function LandingPage() {
             </p>
             <div className="mt-8 flex flex-wrap items-center gap-4">
               <Button size="lg" asChild>
-                <Link href="/create">{dict.landing.cta}</Link>
+                <Link href={PAGES.CREATE.INDEX}>{dict.landing.cta}</Link>
               </Button>
               <span className="font-semibold text-brand-gold text-sm">
                 ✓ {num(5)}

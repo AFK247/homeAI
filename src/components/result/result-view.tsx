@@ -1,6 +1,7 @@
 "use client";
 
 import { Download, Link2, RefreshCw, Share2 } from "lucide-react";
+import Image from "next/image";
 import { ImagePlaceholder } from "@/components/brand/image-placeholder";
 import { FurniturePin } from "@/components/furniture/furniture-pin";
 import { useFurnitureDetail } from "@/components/furniture/use-furniture-detail";
@@ -26,11 +27,13 @@ export function ResultView({ design }: { design: DesignWithTags }) {
       <div>
         <div className="relative h-[340px] overflow-hidden rounded-2xl lg:h-[470px]">
           {design.generatedImageUrl ? (
-            // biome-ignore lint/performance/noImgElement: external MinIO/R2 URL
-            <img
+            <Image
               src={design.generatedImageUrl}
               alt={dict.result.imageAlt}
-              className="size-full object-cover"
+              fill
+              sizes="(max-width: 1024px) 100vw, 60vw"
+              className="object-cover"
+              priority
             />
           ) : (
             <ImagePlaceholder label={dict.result.imageAlt} className="size-full" />

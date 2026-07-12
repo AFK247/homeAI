@@ -1,5 +1,7 @@
 import { BarChart3, Boxes, Image as ImageIcon, Store, Users } from "lucide-react";
+import Image from "next/image";
 import Link from "next/link";
+import { PAGES } from "@/config/pages";
 import { StatCard } from "./_components/stat-card";
 import { AdminService } from "./_modules/admin.service";
 
@@ -48,7 +50,7 @@ export default async function AdminOverviewPage() {
         <section className="rounded-2xl bg-card p-5 shadow-sm">
           <div className="mb-4 flex items-center justify-between">
             <h2 className="font-bold text-foreground">Recent designs</h2>
-            <Link href="/admin/designs" className="font-semibold text-primary text-sm">
+            <Link href={PAGES.ADMIN.DESIGNS} className="font-semibold text-primary text-sm">
               View all →
             </Link>
           </div>
@@ -56,12 +58,15 @@ export default async function AdminOverviewPage() {
             {recent.map((d) => (
               <div key={d.id} className="overflow-hidden rounded-xl border border-border">
                 {d.generatedImageUrl ? (
-                  // biome-ignore lint/performance/noImgElement: MinIO/R2 thumbnail
-                  <img
-                    src={d.generatedImageUrl}
-                    alt={`${d.style} ${d.roomType}`}
-                    className="aspect-square w-full object-cover"
-                  />
+                  <div className="relative aspect-square w-full">
+                    <Image
+                      src={d.generatedImageUrl}
+                      alt={`${d.style} ${d.roomType}`}
+                      fill
+                      sizes="(max-width: 640px) 50vw, 200px"
+                      className="object-cover"
+                    />
+                  </div>
                 ) : (
                   <div className="flex aspect-square w-full items-center justify-center bg-muted text-muted-foreground text-xs">
                     {d.status}

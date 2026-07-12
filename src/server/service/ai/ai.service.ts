@@ -3,6 +3,7 @@ import "server-only";
 import type { DesignStyle, RoomType } from "@/db/schemas/shared.schema";
 import { env } from "@/lib/env";
 import { logger } from "@/lib/logger";
+import { AI_PROVIDER } from "./provider-info";
 
 /*
  * AI redesign service — Cloudflare Workers AI, FLUX.2 [klein] 9B (img2img).
@@ -10,10 +11,11 @@ import { logger } from "@/lib/logger";
  * Synchronous: one call returns the redesigned image bytes. Provider details
  * (endpoint, multipart shape, response parsing) are isolated here — swapping to
  * Fal/Replicate later is a change to this file only. The redesign PROMPT is
- * assembled server-side and kept private (PROJECT_CONTEXT §12).
+ * assembled server-side and kept private (PROJECT_CONTEXT §12). The active
+ * provider/model is declared in provider-info.ts (also shown in admin).
  */
 
-const MODEL = "@cf/black-forest-labs/flux-2-klein-9b";
+const MODEL = AI_PROVIDER.modelId;
 
 const RULES =
   "You are redesigning THIS actual room. Preserve the existing architecture " +
@@ -66,7 +68,7 @@ export const AiService = {
 
     const form = new FormData();
     form.append("prompt", prompt);
-    form.append("steps", "4"); // distilled — fixed at 4
+    form.append("steps", String(AI_PROVIDER.steps)); // distilled — fixed
     form.append(
       "input_image_0",
       new Blob([new Uint8Array(input.imageBytes)], { type: input.imageMime }),

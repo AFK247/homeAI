@@ -5,6 +5,7 @@ import { useEffect } from "react";
 import { ImagePlaceholder } from "@/components/brand/image-placeholder";
 import { Button } from "@/components/ui/button";
 import { BUDGET_OPTIONS, STYLE_OPTIONS } from "@/config/catalog";
+import { PAGES } from "@/config/pages";
 import { useTranslation } from "@/lib/i18n/client";
 import { useCreateStore } from "../_modules/create-store";
 
@@ -25,7 +26,7 @@ export function StylePicker() {
   const setPrompt = useCreateStore((s) => s.setPrompt);
 
   useEffect(() => {
-    if (!image) router.replace("/create");
+    if (!image) router.replace(PAGES.CREATE.INDEX);
   }, [image, router]);
 
   return (
@@ -84,7 +85,7 @@ export function StylePicker() {
             className="min-h-24 w-full resize-none rounded-xl border-[1.5px] border-border p-3.5 text-foreground text-sm placeholder:text-brand-faint focus:border-primary focus:outline-none"
           />
         </div>
-        <Button size="lg" onClick={() => router.push("/create/generating")}>
+        <Button size="lg" onClick={() => router.push(PAGES.CREATE.GENERATING)}>
           {dict.style.generate}
         </Button>
       </div>

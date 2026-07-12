@@ -1,9 +1,11 @@
 "use client";
 
+import Image from "next/image";
 import Link from "next/link";
 import type { DesignListData } from "@/app/create/_modules/promises";
 import { ImagePlaceholder } from "@/components/brand/image-placeholder";
 import { ROOM_OPTIONS, STYLE_OPTIONS } from "@/config/catalog";
+import { PAGES } from "@/config/pages";
 import { useTranslation } from "@/lib/i18n/client";
 import { useDataProvider } from "@/providers/data.provider";
 
@@ -28,16 +30,19 @@ export function DesignsGrid() {
         return (
           <Link
             key={d.id}
-            href={`/result/${d.id}`}
+            href={PAGES.RESULT.VIEW(d.id)}
             className="overflow-hidden rounded-2xl bg-card shadow-sm transition-shadow hover:shadow-md"
           >
             {d.generatedImageUrl ? (
-              // biome-ignore lint/performance/noImgElement: external MinIO/R2 URL
-              <img
-                src={d.generatedImageUrl}
-                alt={`${style} · ${room}`}
-                className="h-44 w-full object-cover"
-              />
+              <div className="relative h-44 w-full">
+                <Image
+                  src={d.generatedImageUrl}
+                  alt={`${style} · ${room}`}
+                  fill
+                  sizes="(max-width: 640px) 100vw, 33vw"
+                  className="object-cover"
+                />
+              </div>
             ) : (
               <ImagePlaceholder className="h-44" />
             )}

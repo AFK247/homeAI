@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { Logo } from "@/components/brand/logo";
+import { PAGES } from "@/config/pages";
 import { AdminNav } from "./_components/admin-nav";
 
 /*
@@ -13,7 +14,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
     <div className="flex min-h-dvh">
       <aside className="hidden w-56 shrink-0 flex-col gap-6 border-border border-r bg-card px-4 py-5 md:flex">
         <div className="flex items-center gap-2 px-1">
-          <Link href="/">
+          <Link href={PAGES.HOME}>
             <Logo size="sm" />
           </Link>
           <span className="rounded bg-secondary px-1.5 py-0.5 font-bold text-[10px] text-secondary-foreground uppercase">

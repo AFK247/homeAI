@@ -4,6 +4,7 @@ import { Check } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { ROOM_OPTIONS } from "@/config/catalog";
+import { PAGES } from "@/config/pages";
 import { useTranslation } from "@/lib/i18n/client";
 import { useCreateStore } from "../_modules/create-store";
 
@@ -42,7 +43,7 @@ export function RoomPicker() {
         size="lg"
         className="mt-auto"
         disabled={!image}
-        onClick={() => router.push("/create/style")}
+        onClick={() => router.push(PAGES.CREATE.STYLE)}
       >
         {dict.common.next}
       </Button>

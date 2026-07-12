@@ -3,6 +3,7 @@
 import { createORPCClient } from "@orpc/client";
 import { RPCLink } from "@orpc/client/fetch";
 import type { RouterClient } from "@orpc/server";
+import { PAGES } from "@/config/pages";
 import type { WebRouter } from "./router";
 
 /*
@@ -11,7 +12,8 @@ import type { WebRouter } from "./router";
  */
 
 const link = new RPCLink({
-  url: () => (typeof window !== "undefined" ? `${window.location.origin}/api/rpc` : "/api/rpc"),
+  url: () =>
+    typeof window !== "undefined" ? `${window.location.origin}${PAGES.API.RPC}` : PAGES.API.RPC,
 });
 
 export const rpc: RouterClient<WebRouter> = createORPCClient(link);

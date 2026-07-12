@@ -3,6 +3,7 @@
 import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState, useTransition } from "react";
 import { Button } from "@/components/ui/button";
+import { PAGES } from "@/config/pages";
 import { useTranslation } from "@/lib/i18n/client";
 import { handleORPCError } from "@/lib/utils/error";
 import { rpc } from "@/server/rpc/client";
@@ -26,7 +27,7 @@ export function GenerationRunner() {
   function run() {
     const s = useCreateStore.getState();
     if (!s.image) {
-      router.replace("/create");
+      router.replace(PAGES.CREATE.INDEX);
       return;
     }
     const image = s.image;
@@ -42,7 +43,7 @@ export function GenerationRunner() {
           isPanorama: s.isPanorama,
         });
         reset();
-        router.replace(`/result/${design.id}`);
+        router.replace(PAGES.RESULT.VIEW(design.id));
       } catch (error) {
         setFailed(true);
         handleORPCError(error);

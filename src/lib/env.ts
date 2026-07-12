@@ -11,13 +11,14 @@ import { z } from "zod";
 const serverSchema = z.object({
   NODE_ENV: z.enum(["development", "test", "production"]).default("development"),
 
-  // Database (Supabase Postgres) — pooled at runtime, direct for migrations
-  DATABASE_URL: z.string().url().optional(),
-  DIRECT_URL: z.string().url().optional(),
+  // Database (Postgres) — pooled at runtime, direct for migrations. Required
+  // now that the backend is wired (local Docker or Supabase).
+  DATABASE_URL: z.url(),
+  DIRECT_URL: z.url(),
 
   // Better Auth
   BETTER_AUTH_SECRET: z.string().min(1).optional(),
-  BETTER_AUTH_URL: z.string().url().optional(),
+  BETTER_AUTH_URL: z.url().optional(),
   FACEBOOK_CLIENT_ID: z.string().optional(),
   FACEBOOK_CLIENT_SECRET: z.string().optional(),
   GOOGLE_CLIENT_ID: z.string().optional(),
@@ -26,12 +27,24 @@ const serverSchema = z.object({
   // AI provider (Fal now; provider-abstracted)
   FAL_KEY: z.string().optional(),
 
-  // Cloudflare R2 (S3-compatible)
+  // AI (Cloudflare Workers AI — FLUX.2 klein, img2img)
+  CLOUDFLARE_ACCOUNT_ID: z.string(),
+  CLOUDFLARE_API_TOKEN: z.string(),
+
+  // Object storage (S3-compatible: local MinIO now, R2/Supabase in prod)
+  S3_ENDPOINT: z.url(),
+  S3_REGION: z.string().default("us-east-1"),
+  S3_ACCESS_KEY_ID: z.string(),
+  S3_SECRET_ACCESS_KEY: z.string(),
+  S3_BUCKET: z.string(),
+  S3_PUBLIC_URL: z.url(),
+
+  // Cloudflare R2 (production storage — optional; unused locally)
   R2_ACCOUNT_ID: z.string().optional(),
   R2_ACCESS_KEY_ID: z.string().optional(),
   R2_SECRET_ACCESS_KEY: z.string().optional(),
   R2_BUCKET: z.string().optional(),
-  R2_PUBLIC_URL: z.string().url().optional(),
+  R2_PUBLIC_URL: z.url().optional(),
 
   // Payments (SSLCommerz)
   SSLCOMMERZ_STORE_ID: z.string().optional(),
@@ -49,13 +62,19 @@ const serverSchema = z.object({
 });
 
 const clientSchema = z.object({
-  NEXT_PUBLIC_APP_URL: z.string().url().optional(),
+  NEXT_PUBLIC_APP_URL: z.url().optional(),
   NEXT_PUBLIC_POSTHOG_KEY: z.string().optional(),
-  NEXT_PUBLIC_POSTHOG_HOST: z.string().url().optional(),
+  NEXT_PUBLIC_POSTHOG_HOST: z.url().optional(),
 });
 
 function parse<T extends z.ZodTypeAny>(schema: T, source: Record<string, unknown>): z.infer<T> {
-  const result = schema.safeParse(source);
+  // Treat blank env vars (KEY= with no value) as absent, so .optional() applies
+  // instead of failing on an empty string.
+  const cleaned: Record<string, unknown> = {};
+  for (const [k, v] of Object.entries(source)) {
+    if (v !== "") cleaned[k] = v;
+  }
+  const result = schema.safeParse(cleaned);
   if (!result.success) {
     const issues = result.error.issues
       .map((i) => `  - ${i.path.join(".")}: ${i.message}`)

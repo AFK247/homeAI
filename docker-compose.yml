@@ -1,0 +1,83 @@
+# Local infrastructure for Home AI (হোম এআই) — dedicated & isolated.
+#
+# Two services on their own `homeai` network, kept separate from any other
+# Docker projects on this machine:
+#   • postgres — the app database (Drizzle pushes the schema here)
+#   • minio    — S3-compatible object storage for room/generated images
+#
+# Ports use a distinctive homeai range to avoid ANY collision, now or later:
+#   postgres  55432 → 5432
+#   minio     9200 (S3 API), 9201 (web console)
+#
+# Bring up:   docker compose up -d
+# Tear down:  docker compose down          (keep data)
+#             docker compose down -v        (also wipe volumes)
+
+name: homeai
+
+services:
+  postgres:
+    image: postgres:17-alpine
+    container_name: homeai_postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: homeai
+      POSTGRES_PASSWORD: homeai_local_dev
+      POSTGRES_DB: homeai
+    ports:
+      - "55432:5432"
+    volumes:
+      - homeai_pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U homeai -d homeai"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+    networks:
+      - homeai
+
+  minio:
+    image: minio/minio:latest
+    container_name: homeai_minio
+    restart: unless-stopped
+    command: server /data --console-address ":9001"
+    environment:
+      MINIO_ROOT_USER: homeai
+      MINIO_ROOT_PASSWORD: homeai_local_dev
+    ports:
+      - "9200:9000" # S3 API
+      - "9201:9001" # web console (http://localhost:9201)
+    volumes:
+      - homeai_miniodata:/data
+    healthcheck:
+      test: ["CMD", "mc", "ready", "local"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+    networks:
+      - homeai
+
+  # One-shot: create the public `designs` bucket, then exit.
+  minio-init:
+    image: minio/mc:latest
+    container_name: homeai_minio_init
+    depends_on:
+      minio:
+        condition: service_healthy
+    entrypoint: >
+      /bin/sh -c "
+      mc alias set local http://minio:9000 homeai homeai_local_dev &&
+      mc mb --ignore-existing local/designs &&
+      mc anonymous set download local/designs &&
+      echo 'bucket designs ready (public read)';
+      "
+    networks:
+      - homeai
+
+volumes:
+  homeai_pgdata:
+  homeai_miniodata:
+
+networks:
+  homeai:
+    name: homeai

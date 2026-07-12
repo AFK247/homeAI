@@ -34,7 +34,7 @@ export default function RootLayout({
       lang="bn"
       className={`${hindSiliguri.variable} ${notoSerifBengali.variable} h-full antialiased`}
     >
-      <body className="flex min-h-full flex-col">
+      <body className="flex min-h-full flex-col" suppressHydrationWarning>
         <AppProviders>{children}</AppProviders>
       </body>
     </html>

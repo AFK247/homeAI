@@ -26,10 +26,17 @@ export function ResultView({ design }: { design: DesignWithTags }) {
     <div className="grid gap-6 lg:grid-cols-[1.6fr_1fr]">
       {/* Image + pins */}
       <div>
-        <ImagePlaceholder
-          label="সাজানো ঘরের ছবি / redesigned room"
-          className="relative h-[340px] rounded-2xl lg:h-[470px]"
-        >
+        <div className="relative h-[340px] overflow-hidden rounded-2xl lg:h-[470px]">
+          {design.generatedImageUrl ? (
+            // biome-ignore lint/performance/noImgElement: external MinIO/R2 URL
+            <img
+              src={design.generatedImageUrl}
+              alt="সাজানো ঘরের ছবি / redesigned room"
+              className="size-full object-cover"
+            />
+          ) : (
+            <ImagePlaceholder label="সাজানো ঘরের ছবি / redesigned room" className="size-full" />
+          )}
           <div className="absolute top-3 left-3 rounded-full bg-[rgba(22,44,36,0.72)] px-3 py-1 font-semibold text-white text-xs">
             {styleLabel} · মাঝারি বাজেট
           </div>
@@ -41,7 +48,7 @@ export function ResultView({ design }: { design: DesignWithTags }) {
               onOpen={() => openFurniture(toDetail(), i + 1)}
             />
           ))}
-        </ImagePlaceholder>
+        </div>
         <p className="mt-3 text-center text-muted-foreground text-sm">
           দাম দেখতে যেকোনো আসবাবে ট্যাপ করুন
         </p>

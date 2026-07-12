@@ -28,6 +28,13 @@ export const bn = {
     panorama: "৩৬০° প্যানোরামা",
     roomType: "ঘরের ধরন",
     imageAlt: "আপলোড করা ঘর",
+    cameraTitle: "ছবি তুলুন",
+    capture: "ছবি নিন",
+    retake: "আবার তুলুন",
+    usePhoto: "এই ছবি ব্যবহার করুন",
+    switchCamera: "ক্যামেরা বদলান",
+    cameraError: "ক্যামেরা চালু করা যায়নি। অনুমতি দিন অথবা ছবি আপলোড করুন।",
+    starting: "ক্যামেরা চালু হচ্ছে…",
   },
   style: {
     title: "স্টাইল বাছুন",

@@ -28,6 +28,13 @@ export const en: Dictionary = {
     panorama: "360° panorama",
     roomType: "Room type",
     imageAlt: "Uploaded room",
+    cameraTitle: "Take a photo",
+    capture: "Capture",
+    retake: "Retake",
+    usePhoto: "Use this photo",
+    switchCamera: "Switch camera",
+    cameraError: "Couldn't start the camera. Allow access or upload a photo instead.",
+    starting: "Starting camera…",
   },
   style: {
     title: "Choose a style",

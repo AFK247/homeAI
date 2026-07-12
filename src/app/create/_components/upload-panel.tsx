@@ -3,8 +3,10 @@
 import imageCompression from "browser-image-compression";
 import { Camera, Globe, Upload } from "lucide-react";
 import { useRef, useState } from "react";
+import { useModal } from "@/components/modal/modal.store";
 import { useTranslation } from "@/lib/i18n/client";
 import { useCreateStore } from "../_modules/create-store";
+import { CameraCapture } from "./camera-capture";
 
 /*
  * Client island: the upload column (dropzone/preview + camera + panorama toggle).
@@ -19,8 +21,16 @@ function fileToDataUrl(file: File): Promise<string> {
   });
 }
 
+async function dataUrlToFile(dataUrl: string, name: string): Promise<File> {
+  const blob = await (await fetch(dataUrl)).blob();
+  return new File([blob], name, { type: blob.type || "image/jpeg" });
+}
+
+const COMPRESS_OPTS = { maxWidthOrHeight: 1280, maxSizeMB: 1.5, useWebWorker: true };
+
 export function UploadPanel() {
   const { dict } = useTranslation();
+  const openModal = useModal((s) => s.openModal);
   const inputRef = useRef<HTMLInputElement>(null);
   const [busy, setBusy] = useState(false);
   const image = useCreateStore((s) => s.image);
@@ -28,19 +38,33 @@ export function UploadPanel() {
   const setImage = useCreateStore((s) => s.setImage);
   const setPanorama = useCreateStore((s) => s.setPanorama);
 
-  async function onPick(file: File | undefined) {
-    if (!file) return;
+  async function ingest(file: File) {
     setBusy(true);
     try {
-      const compressed = await imageCompression(file, {
-        maxWidthOrHeight: 1280,
-        maxSizeMB: 1.5,
-        useWebWorker: true,
-      });
+      const compressed = await imageCompression(file, COMPRESS_OPTS);
       setImage(await fileToDataUrl(compressed), compressed.type || "image/jpeg");
     } finally {
       setBusy(false);
     }
+  }
+
+  async function onPick(file: File | undefined) {
+    if (file) await ingest(file);
+  }
+
+  function openCamera() {
+    openModal({
+      type: "custom",
+      title: dict.upload.cameraTitle,
+      // The imperative modal types `component` loosely; CameraCapture validates
+      // its own props (onCapture + injected closeModal).
+      component: CameraCapture as never,
+      props: {
+        onCapture: async (dataUrl: string) => {
+          await ingest(await dataUrlToFile(dataUrl, "camera.jpg"));
+        },
+      },
+    });
   }
 
   return (
@@ -89,7 +113,7 @@ export function UploadPanel() {
       <div className="flex gap-3.5">
         <button
           type="button"
-          onClick={() => inputRef.current?.click()}
+          onClick={openCamera}
           className="flex flex-1 items-center gap-3 rounded-2xl border-[1.5px] border-border bg-card p-4"
         >
           <Camera className="size-6 text-foreground" />

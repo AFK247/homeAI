@@ -25,6 +25,8 @@ export const designs = pgTable(
     prompt: text("prompt"), // user free-text (server prompt stays private)
     isPanorama: boolean("is_panorama").notNull().default(false),
     jobId: text("job_id"), // Fal queue id
+    aiProvider: text("ai_provider"), // which provider produced the result
+    aiModel: text("ai_model"), // and its model id
     status: generationStatusEnum("status").notNull().default("pending"),
     isSaved: boolean("is_saved").notNull().default(false),
     expiresAt: timestamp("expires_at", { withTimezone: true, mode: "string" }),

@@ -107,6 +107,8 @@ export const mockDesign: DesignWithTags = {
   prompt: null,
   isPanorama: false,
   jobId: null,
+  aiProvider: "cloudflare",
+  aiModel: "@cf/black-forest-labs/flux-2-klein-9b",
   status: "done",
   isSaved: false,
   expiresAt: null,

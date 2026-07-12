@@ -95,14 +95,18 @@ export const DesignService = {
     anonymousId,
     generatedImageUrl,
     status,
+    aiProvider,
+    aiModel,
   }: {
     id: string;
     generatedImageUrl: string | null;
     status: "done" | "failed";
+    aiProvider?: string | null;
+    aiModel?: string | null;
   } & Scope) => {
     const [row] = await db
       .update(designs)
-      .set({ generatedImageUrl, status })
+      .set({ generatedImageUrl, status, aiProvider: aiProvider ?? null, aiModel: aiModel ?? null })
       .where(and(eq(designs.id, id), eq(designs.anonymousId, anonymousId)))
       .returning();
     return row ?? null;

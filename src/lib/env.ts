@@ -31,6 +31,10 @@ const serverSchema = z.object({
   CLOUDFLARE_ACCOUNT_ID: z.string(),
   CLOUDFLARE_API_TOKEN: z.string(),
 
+  // AI fallback (Pollinations kontext img2img). Optional publishable key from
+  // enter.pollinations.ai — free, no card. Without it the provider is skipped.
+  POLLINATIONS_API_KEY: z.string().optional(),
+
   // Object storage (S3-compatible: local MinIO now, R2/Supabase in prod)
   S3_ENDPOINT: z.url(),
   S3_REGION: z.string().default("us-east-1"),

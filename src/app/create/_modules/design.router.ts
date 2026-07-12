@@ -52,23 +52,26 @@ export const designRouter = {
     if (!design)
       throw new ORPCError("INTERNAL_SERVER_ERROR", { message: "could not create design" });
 
-    // 3. run the redesign (synchronous), store result, persist
+    // 3. run the redesign through the provider fallback chain, store result, persist
     try {
-      const generated = await AiService.redesign({
+      const result = await AiService.redesign({
         imageBytes: bytes,
         imageMime: input.imageMime,
+        imageUrl: originalImageUrl,
         style: input.style,
         roomType: input.roomType,
         userPrompt: input.prompt,
       });
       const generatedKey = `generated/${context.anonymousId}/${design.id}.png`;
-      const generatedImageUrl = await StorageService.put(generatedKey, generated, "image/png");
+      const generatedImageUrl = await StorageService.put(generatedKey, result.bytes, "image/png");
 
       const done = await DesignService.setResult({
         id: design.id,
         anonymousId: context.anonymousId,
         generatedImageUrl,
         status: "done",
+        aiProvider: result.provider,
+        aiModel: result.model,
       });
 
       // Place furniture pins for this room type (heuristic "find similar").

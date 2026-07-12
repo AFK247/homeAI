@@ -1,32 +1,14 @@
-import { Check, Cpu, ExternalLink } from "lucide-react";
+import { Check, Cpu, X } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
-import { env } from "@/lib/env";
-import { AI_PROVIDER } from "@/server/service/ai/provider-info";
+import { providerChainStatus } from "@/server/service/ai/providers/status";
 
 /*
- * Admin — AI provider / model info. Reads the single source of truth
- * (provider-info.ts) so it always reflects what's actually running.
+ * Admin — AI provider chain. Shows the ordered fallback list and each provider's
+ * readiness. Generation tries them top-to-bottom until one succeeds; the winner
+ * is persisted on each design (ai_provider / ai_model).
  */
 export default function AdminProviderPage() {
-  const configured = Boolean(env.CLOUDFLARE_ACCOUNT_ID && env.CLOUDFLARE_API_TOKEN);
-
-  const rows: { label: string; value: React.ReactNode }[] = [
-    { label: "Provider", value: AI_PROVIDER.provider },
-    { label: "Model", value: AI_PROVIDER.model },
-    {
-      label: "Model ID",
-      value: <code className="rounded bg-muted px-1.5 py-0.5 text-xs">{AI_PROVIDER.modelId}</code>,
-    },
-    { label: "Vendor", value: AI_PROVIDER.vendor },
-    { label: "Mode", value: AI_PROVIDER.mode },
-    { label: "Inference steps", value: String(AI_PROVIDER.steps) },
-    {
-      label: "Response",
-      value: AI_PROVIDER.sync ? "Synchronous (single request)" : "Async (job + polling)",
-    },
-    { label: "Free tier", value: AI_PROVIDER.freeTier },
-    { label: "Released", value: String(AI_PROVIDER.releaseYear) },
-  ];
+  const chain = providerChainStatus();
 
   return (
     <div className="flex flex-col gap-6">
@@ -35,47 +17,55 @@ export default function AdminProviderPage() {
           <Cpu className="size-5" />
         </div>
         <div>
-          <h1 className="font-serif font-extrabold text-3xl text-foreground">AI Provider</h1>
-          <p className="text-brand-body text-sm">Image-generation model in use</p>
+          <h1 className="font-serif font-extrabold text-3xl text-foreground">AI Providers</h1>
+          <p className="text-brand-body text-sm">
+            Image generation tries these in order until one succeeds (fallback chain).
+          </p>
         </div>
-        <Badge variant={configured ? "default" : "destructive"} className="ml-auto">
-          {configured ? "Configured" : "Not configured"}
-        </Badge>
       </div>
 
-      <div className="overflow-hidden rounded-2xl bg-card shadow-sm">
+      <div className="overflow-hidden rounded-xl border border-border bg-card">
         <table className="w-full text-left text-sm">
+          <thead className="[&_tr]:border-border [&_tr]:border-b">
+            <tr>
+              <th className="px-4 py-3 font-semibold text-[#6B7280]">Order</th>
+              <th className="px-4 py-3 font-semibold text-[#6B7280]">Provider</th>
+              <th className="px-4 py-3 font-semibold text-[#6B7280]">Model</th>
+              <th className="px-4 py-3 font-semibold text-[#6B7280]">Status</th>
+            </tr>
+          </thead>
           <tbody>
-            {rows.map((r) => (
-              <tr key={r.label} className="border-border border-b last:border-0">
-                <td className="w-48 px-5 py-3 font-semibold text-brand-body">{r.label}</td>
-                <td className="px-5 py-3 text-foreground">{r.value}</td>
+            {chain.map((p) => (
+              <tr key={p.key} className="border-border border-b last:border-b-0">
+                <td className="px-4 py-3 font-medium text-foreground">{p.order}</td>
+                <td className="px-4 py-3 text-foreground">{p.label}</td>
+                <td className="px-4 py-3">
+                  <code className="rounded bg-muted px-1.5 py-0.5 text-xs">{p.model}</code>
+                </td>
+                <td className="px-4 py-3">
+                  {p.ready ? (
+                    <Badge variant="default" className="gap-1">
+                      <Check className="size-3" /> Ready
+                    </Badge>
+                  ) : (
+                    <Badge variant="secondary" className="gap-1">
+                      <X className="size-3" /> Not configured
+                    </Badge>
+                  )}
+                </td>
               </tr>
             ))}
           </tbody>
         </table>
       </div>
 
-      <section className="rounded-2xl bg-card p-5 shadow-sm">
-        <h2 className="mb-3 font-bold text-foreground">How it works</h2>
-        <ul className="flex flex-col gap-2">
-          {AI_PROVIDER.notes.map((note) => (
-            <li key={note} className="flex items-start gap-2 text-brand-body text-sm">
-              <Check className="mt-0.5 size-4 shrink-0 text-primary" />
-              {note}
-            </li>
-          ))}
-        </ul>
-      </section>
-
-      <a
-        href={AI_PROVIDER.docsUrl}
-        target="_blank"
-        rel="noopener noreferrer"
-        className="inline-flex w-fit items-center gap-1.5 font-semibold text-primary text-sm hover:underline"
-      >
-        Model documentation <ExternalLink className="size-3.5" />
-      </a>
+      <p className="text-brand-body text-sm">
+        To reorder, swap the primary, or add a provider, edit{" "}
+        <code className="rounded bg-muted px-1.5 py-0.5 text-xs">
+          src/server/service/ai/providers/registry.ts
+        </code>
+        . The provider that produced each image is saved on the design.
+      </p>
     </div>
   );
 }

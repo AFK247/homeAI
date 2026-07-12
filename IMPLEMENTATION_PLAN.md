@@ -514,10 +514,10 @@ POSTHOG_KEY= / POSTHOG_HOST=
 
 > **⚠️ Frontend-first build order (user decision).** Screens are built BEFORE the backend, against a **typed-contract layer** so nothing gets reworked when the backend lands:
 >
-> **Stage A — Scaffold** (above).
-> **Stage B — Type contracts only:** `db/schemas/*` (Drizzle tables) + `db/validations/*` (Zod, `createInsertSchema` + refine) + inferred types (`$inferSelect`, `z.infer`, `Awaited<ReturnType>`). **No client, no routers, no services** — just the shapes.
-> **Stage C — All screens** (real routes in the real app, mobile + desktop), rendering **typed mock data** that satisfies Stage B's types. Order: core flow (upload→style→generating→result→furniture) → landing → auth + pricing → saved gallery + admin.
-> **Stage D — Backend:** oRPC wiring (`router`, `server`, `client`, `query`, `procedures`) + Better Auth + services. Swap mock → real `rpc`/`serverRpc` behind the existing types (no component rework).
+> **Stage A — Scaffold** ✅ DONE (commit 75aa6a0).
+> **Stage B — Type contracts only** ✅ DONE (commit 0c2890c): `db/schemas/*` + `db/validations/*` + inferred types. No client/routers/services — shapes only.
+> **Stage C — All screens** ✅ DONE (commit b8918ba): all real routes, mobile + desktop, rendering **typed mock data**. Core flow + landing + auth + pricing + gallery + admin.
+> **Stage D — Backend** ⏭️ NOT STARTED (paused by user): oRPC wiring + Better Auth + services. Swap mock → real behind existing types. **See `BUILD_STATUS.md` for the exact resume steps + mock→real swap points.**
 >
 > Phases 2–6 below describe Stage D's per-feature backend work.
 

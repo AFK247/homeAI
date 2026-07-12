@@ -1,0 +1,126 @@
+@import "tailwindcss";
+@import "tw-animate-css";
+
+/*
+ * Home AI design system — extracted from /design/Home AI Screens.dc.html (§7b of IMPLEMENTATION_PLAN.md).
+ * Bangla-first. Warm, homey, trustworthy — deep green primary, off-white surfaces,
+ * gold accent reserved for used/second-hand (Bikroy) pricing.
+ * Palette mapped to shadcn CSS-variable convention so shadcn/ui picks it up automatically.
+ */
+
+@custom-variant dark (&:is(.dark *));
+
+:root {
+  --radius: 0.875rem; /* 14px — buttons/cards baseline from design */
+
+  /* Base surfaces */
+  --background: #f5f6ef; /* screen background */
+  --foreground: #16352b; /* ink / headings */
+
+  --card: #ffffff;
+  --card-foreground: #16352b;
+  --popover: #fbfbf5; /* sheet / modal surface */
+  --popover-foreground: #16352b;
+
+  /* Brand green */
+  --primary: #1c4e3f;
+  --primary-foreground: #ffffff;
+
+  /* Soft green fill — chips, selected tiles, credit badge */
+  --secondary: #e6ede4;
+  --secondary-foreground: #123a2e;
+
+  --muted: #ebeee4;
+  --muted-foreground: #707b70;
+
+  --accent: #e6ede4;
+  --accent-foreground: #123a2e;
+
+  /* Destructive */
+  --destructive: #e06b5e;
+  --destructive-foreground: #ffffff;
+
+  --border: rgba(22, 44, 36, 0.12);
+  --input: rgba(22, 44, 36, 0.15);
+  --ring: #1c4e3f;
+
+  /* Custom brand tokens (not part of shadcn defaults) */
+  --brand-green-dark: #123a2e; /* link hover, dark accents */
+  --brand-page: #e8ebe2; /* outermost canvas bg */
+  --brand-faint: #98a093; /* placeholders, captions */
+  --brand-body: #47514a; /* body text */
+  --brand-gold: #a9791f; /* USED / second-hand price emphasis (Bikroy) */
+  --brand-gold-dark: #6e4e12;
+  --brand-whatsapp: #25d366; /* share */
+
+  --chart-1: #1c4e3f;
+  --chart-2: #7fb37a;
+  --chart-3: #a9791f;
+  --chart-4: #e6b24a;
+  --chart-5: #e06b5e;
+}
+
+@theme inline {
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+
+  /* brand tokens as Tailwind colors: bg-brand-gold, text-brand-faint, etc. */
+  --color-brand-green-dark: var(--brand-green-dark);
+  --color-brand-page: var(--brand-page);
+  --color-brand-faint: var(--brand-faint);
+  --color-brand-body: var(--brand-body);
+  --color-brand-gold: var(--brand-gold);
+  --color-brand-gold-dark: var(--brand-gold-dark);
+  --color-brand-whatsapp: var(--brand-whatsapp);
+
+  --color-chart-1: var(--chart-1);
+  --color-chart-2: var(--chart-2);
+  --color-chart-3: var(--chart-3);
+  --color-chart-4: var(--chart-4);
+  --color-chart-5: var(--chart-5);
+
+  /* Fonts — set as CSS vars by next/font in layout.tsx */
+  --font-sans: var(--font-hind-siliguri); /* body / UI */
+  --font-serif: var(--font-noto-serif-bengali); /* headings / numerals */
+}
+
+@layer base {
+  * {
+    border-color: var(--border);
+  }
+  body {
+    background: var(--background);
+    color: var(--brand-body);
+    font-family: var(--font-sans), sans-serif;
+    -webkit-font-smoothing: antialiased;
+  }
+  h1,
+  h2,
+  h3,
+  h4 {
+    font-family: var(--font-serif), serif;
+    color: var(--foreground);
+  }
+}

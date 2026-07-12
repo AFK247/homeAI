@@ -1,0 +1,1009 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<meta name="design_doc_mode" content="canvas">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+Bengali:wght@500;600;700;800&family=Hind+Siliguri:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  * { box-sizing: border-box; -webkit-font-smoothing: antialiased; }
+  body { margin: 0; background: #E8EBE2; font-family: 'Hind Siliguri', sans-serif; }
+  a { color: #1C4E3F; text-decoration: none; }
+  a:hover { color: #123A2E; }
+  @keyframes homeai-spin { to { transform: rotate(360deg); } }
+  @keyframes homeai-pulse { 0%,100% { transform: scale(1); opacity: 1; } 50% { transform: scale(1.12); opacity: .7; } }
+</style>
+</helmet>
+
+<div style="min-width:100%;padding:48px 56px 80px;font-family:'Hind Siliguri',sans-serif;">
+
+  <div style="max-width:1100px;margin:0 auto 44px;">
+    <div style="display:flex;align-items:center;gap:14px;">
+      <div style="width:46px;height:46px;border-radius:13px;background:#1C4E3F;display:flex;align-items:center;justify-content:center;color:#fff;font:800 24px 'Noto Serif Bengali';box-shadow:0 8px 22px rgba(28,78,63,.32);">H</div>
+      <div>
+        <div style="font:800 30px 'Noto Serif Bengali';color:#16352B;line-height:1;">হোম এআই · Home AI</div>
+        <div style="font:500 15px 'Hind Siliguri';color:#707B70;margin-top:5px;">এআই দিয়ে ঘর সাজানোর অ্যাপ — বাংলাদেশের জন্য · মোবাইল স্ক্রিন ডিজাইন</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============ DESKTOP ============ -->
+  <div style="max-width:1180px;margin:0 auto 14px;display:flex;align-items:center;gap:12px;">
+    <div style="width:9px;height:9px;border-radius:50%;background:#1C4E3F;"></div>
+    <div style="font:700 15px 'Hind Siliguri';color:#16352B;letter-spacing:.4px;text-transform:uppercase;">ডেস্কটপ ভিউ · Desktop</div>
+    <div style="flex:1;height:1px;background:rgba(22,44,36,.12);"></div>
+  </div>
+
+  <div style="display:flex;flex-direction:column;gap:52px;align-items:center;margin-bottom:72px;">
+
+    <!-- DESKTOP LANDING -->
+    <div style="display:flex;flex-direction:column;gap:14px;align-items:center;">
+      <div style="font:600 13px 'Hind Siliguri';color:#707B70;">ল্যান্ডিং · Desktop landing</div>
+      <div style="width:1180px;background:#fff;border-radius:16px;overflow:hidden;box-shadow:0 34px 80px rgba(24,44,34,.18);border:1px solid rgba(22,44,36,.06);">
+        <div style="display:flex;align-items:center;gap:10px;padding:12px 18px;background:#EBEEE4;border-bottom:1px solid rgba(22,44,36,.07);">
+          <div style="display:flex;gap:7px;"><span style="width:12px;height:12px;border-radius:50%;background:#E06B5E;display:block;"></span><span style="width:12px;height:12px;border-radius:50%;background:#E6B24A;display:block;"></span><span style="width:12px;height:12px;border-radius:50%;background:#7FB37A;display:block;"></span></div>
+          <div style="flex:1;max-width:420px;margin:0 auto;background:#fff;border-radius:8px;padding:7px 14px;font:500 12px 'Hind Siliguri';color:#98A093;text-align:center;">homeai.com.bd</div>
+        </div>
+        <div style="background:#F5F6EF;">
+          <div style="display:flex;align-items:center;justify-content:space-between;padding:20px 44px;border-bottom:1px solid rgba(22,44,36,.06);background:#fff;">
+            <div style="display:flex;align-items:center;gap:11px;">
+              <div style="width:34px;height:34px;border-radius:10px;background:#1C4E3F;display:flex;align-items:center;justify-content:center;color:#fff;font:800 18px 'Noto Serif Bengali';">H</div>
+              <span style="font:700 22px 'Noto Serif Bengali';color:#16352B;">হোম এআই</span>
+            </div>
+            <div style="display:flex;align-items:center;gap:34px;font:600 15px 'Hind Siliguri';color:#47514A;">
+              <span>কীভাবে কাজ করে</span><span>উদাহরণ</span><span>দাম</span>
+            </div>
+            <div style="display:flex;align-items:center;gap:16px;">
+              <div style="display:flex;border:1px solid rgba(22,44,36,.15);border-radius:999px;overflow:hidden;font:600 12px 'Hind Siliguri';"><span style="padding:6px 12px;background:#1C4E3F;color:#fff;">বাংলা</span><span style="padding:6px 12px;color:#707B70;">EN</span></div>
+              <span style="font:700 15px 'Hind Siliguri';color:#1C4E3F;">লগ ইন</span>
+            </div>
+          </div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:52px;align-items:center;padding:60px 44px;">
+            <div>
+              <div style="font:800 46px 'Noto Serif Bengali';color:#16352B;line-height:1.18;">একটি টাকা খরচের আগেই দেখুন আপনার ঘরের নতুন রূপ</div>
+              <div style="font:500 18px 'Hind Siliguri';color:#707B70;margin-top:20px;line-height:1.6;max-width:480px;">ঘরের ছবি তুলুন, পছন্দের স্টাইল বাছুন — এআই মুহূর্তেই সাজিয়ে দেবে, প্রতিটি আসবাবের দামসহ।</div>
+              <div style="display:flex;align-items:center;gap:16px;margin-top:30px;">
+                <div style="background:#1C4E3F;color:#fff;border-radius:14px;padding:17px 30px;font:700 17px 'Hind Siliguri';box-shadow:0 12px 26px rgba(28,78,63,.28);">ছবি দিয়ে শুরু করুন</div>
+                <span style="font:600 15px 'Hind Siliguri';color:#A9791F;">✓ ৫টি ডিজাইন ফ্রি</span>
+              </div>
+              <div style="display:flex;align-items:center;gap:10px;margin-top:34px;">
+                <span style="font:600 13px 'Hind Siliguri';color:#98A093;">আসবাব:</span>
+                <div style="display:flex;gap:8px;">
+                  <span style="border:1px solid rgba(22,44,36,.12);border-radius:99px;padding:5px 13px;font:700 13px 'Hind Siliguri';color:#47514A;background:#fff;">Hatil</span>
+                  <span style="border:1px solid rgba(22,44,36,.12);border-radius:99px;padding:5px 13px;font:700 13px 'Hind Siliguri';color:#47514A;background:#fff;">Otobi</span>
+                  <span style="border:1px solid rgba(22,44,36,.12);border-radius:99px;padding:5px 13px;font:700 13px 'Hind Siliguri';color:#47514A;background:#fff;">Regal</span>
+                  <span style="border:1px solid rgba(22,44,36,.12);border-radius:99px;padding:5px 13px;font:700 13px 'Hind Siliguri';color:#47514A;background:#fff;">Bikroy</span>
+                </div>
+              </div>
+            </div>
+            <div style="position:relative;border-radius:20px;overflow:hidden;height:380px;display:flex;box-shadow:0 24px 50px rgba(24,44,34,.16);">
+              <div style="flex:1;background:repeating-linear-gradient(45deg,#E5E8DD,#E5E8DD 14px,#D7DCCC 14px,#D7DCCC 28px);position:relative;"><span style="position:absolute;top:14px;left:14px;background:rgba(22,44,36,.72);color:#fff;border-radius:99px;padding:5px 14px;font:600 13px 'Hind Siliguri';">আগে</span></div>
+              <div style="flex:1;background:repeating-linear-gradient(45deg,#E5E8DD,#E5E8DD 14px,#D7DCCC 14px,#D7DCCC 28px);position:relative;"><span style="position:absolute;top:14px;right:14px;background:#1C4E3F;color:#fff;border-radius:99px;padding:5px 14px;font:600 13px 'Hind Siliguri';">পরে</span></div>
+              <div style="position:absolute;top:0;bottom:0;left:50%;width:3px;background:#fff;transform:translateX(-50%);"></div>
+              <div style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:42px;height:42px;border-radius:50%;background:#fff;box-shadow:0 4px 14px rgba(0,0,0,.22);display:flex;align-items:center;justify-content:center;color:#1C4E3F;font:700 17px 'Hind Siliguri';">↔</div>
+            </div>
+          </div>
+          <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:22px;padding:0 44px 60px;">
+            <div style="background:#fff;border-radius:18px;padding:26px;box-shadow:0 8px 22px rgba(24,44,34,.06);"><div style="width:40px;height:40px;border-radius:11px;background:#E6EDE4;color:#123A2E;display:flex;align-items:center;justify-content:center;font:800 19px 'Noto Serif Bengali';margin-bottom:15px;">১</div><div style="font:700 19px 'Noto Serif Bengali';color:#16352B;">ছবি তুলুন</div><div style="font:500 14.5px 'Hind Siliguri';color:#707B70;margin-top:6px;line-height:1.5;">ঘরের একটি ছবি তুলুন বা আপলোড করুন</div></div>
+            <div style="background:#fff;border-radius:18px;padding:26px;box-shadow:0 8px 22px rgba(24,44,34,.06);"><div style="width:40px;height:40px;border-radius:11px;background:#E6EDE4;color:#123A2E;display:flex;align-items:center;justify-content:center;font:800 19px 'Noto Serif Bengali';margin-bottom:15px;">২</div><div style="font:700 19px 'Noto Serif Bengali';color:#16352B;">স্টাইল বাছুন</div><div style="font:500 14.5px 'Hind Siliguri';color:#707B70;margin-top:6px;line-height:1.5;">পছন্দের ডিজাইন নির্বাচন করুন</div></div>
+            <div style="background:#fff;border-radius:18px;padding:26px;box-shadow:0 8px 22px rgba(24,44,34,.06);"><div style="width:40px;height:40px;border-radius:11px;background:#E6EDE4;color:#123A2E;display:flex;align-items:center;justify-content:center;font:800 19px 'Noto Serif Bengali';margin-bottom:15px;">৩</div><div style="font:700 19px 'Noto Serif Bengali';color:#16352B;">নতুন ঘর দেখুন</div><div style="font:500 14.5px 'Hind Siliguri';color:#707B70;margin-top:6px;line-height:1.5;">আসবাবের দামসহ সাজানো ঘর পান</div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- DESKTOP RESULT -->
+    <div style="display:flex;flex-direction:column;gap:14px;align-items:center;">
+      <div style="font:600 13px 'Hind Siliguri';color:#707B70;">নতুন ঘর · Desktop result</div>
+      <div style="width:1180px;background:#fff;border-radius:16px;overflow:hidden;box-shadow:0 34px 80px rgba(24,44,34,.18);border:1px solid rgba(22,44,36,.06);">
+        <div style="display:flex;align-items:center;gap:10px;padding:12px 18px;background:#EBEEE4;border-bottom:1px solid rgba(22,44,36,.07);">
+          <div style="display:flex;gap:7px;"><span style="width:12px;height:12px;border-radius:50%;background:#E06B5E;display:block;"></span><span style="width:12px;height:12px;border-radius:50%;background:#E6B24A;display:block;"></span><span style="width:12px;height:12px;border-radius:50%;background:#7FB37A;display:block;"></span></div>
+          <div style="flex:1;max-width:420px;margin:0 auto;background:#fff;border-radius:8px;padding:7px 14px;font:500 12px 'Hind Siliguri';color:#98A093;text-align:center;">homeai.com.bd/design/a3f9</div>
+        </div>
+        <div style="background:#F5F6EF;">
+          <div style="display:flex;align-items:center;justify-content:space-between;padding:16px 40px;border-bottom:1px solid rgba(22,44,36,.06);background:#fff;">
+            <div style="display:flex;align-items:center;gap:11px;">
+              <div style="width:32px;height:32px;border-radius:9px;background:#1C4E3F;display:flex;align-items:center;justify-content:center;color:#fff;font:800 17px 'Noto Serif Bengali';">H</div>
+              <span style="font:700 20px 'Noto Serif Bengali';color:#16352B;">হোম এআই</span>
+            </div>
+            <div style="display:flex;align-items:center;gap:5px;background:#E6EDE4;border-radius:99px;padding:6px 14px;">
+              <div style="display:flex;gap:3px;"><div style="width:7px;height:7px;border-radius:50%;background:#1C4E3F;"></div><div style="width:7px;height:7px;border-radius:50%;background:#1C4E3F;"></div><div style="width:7px;height:7px;border-radius:50%;background:#1C4E3F;"></div><div style="width:7px;height:7px;border-radius:50%;background:#1C4E3F;"></div><div style="width:7px;height:7px;border-radius:50%;background:rgba(28,78,63,.28);"></div></div>
+              <span style="font:700 12px 'Hind Siliguri';color:#123A2E;">৫টির মধ্যে ৪টি ফ্রি ডিজাইন বাকি</span>
+            </div>
+          </div>
+          <div style="display:grid;grid-template-columns:1.62fr 1fr;gap:26px;padding:28px 40px 40px;">
+            <div>
+              <div style="position:relative;border-radius:20px;overflow:hidden;height:470px;background:repeating-linear-gradient(45deg,#E5E8DD,#E5E8DD 15px,#D7DCCC 15px,#D7DCCC 30px);box-shadow:0 20px 44px rgba(24,44,34,.14);">
+                <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;"><span style="font:600 13px 'Courier New',monospace;color:#8C9285;">[ সাজানো ঘরের ছবি / redesigned room ]</span></div>
+                <div style="position:absolute;top:16px;left:16px;background:rgba(22,44,36,.72);color:#fff;border-radius:99px;padding:6px 15px;font:600 13px 'Hind Siliguri';">আধুনিক · মাঝারি বাজেট</div>
+                <div style="position:absolute;top:40%;left:24%;transform:translate(-50%,-50%);display:flex;align-items:center;gap:7px;background:#fff;border-radius:99px;padding:6px 12px 6px 7px;box-shadow:0 6px 18px rgba(0,0,0,.24);"><div style="width:22px;height:22px;border-radius:50%;background:#1C4E3F;display:flex;align-items:center;justify-content:center;color:#fff;font:700 12px 'Hind Siliguri';">১</div><span style="font:700 13px 'Hind Siliguri';color:#16352B;">৳৪২,০০০</span></div>
+                <div style="position:absolute;top:66%;left:58%;transform:translate(-50%,-50%);display:flex;align-items:center;gap:7px;background:#fff;border-radius:99px;padding:6px 12px 6px 7px;box-shadow:0 6px 18px rgba(0,0,0,.24);"><div style="width:22px;height:22px;border-radius:50%;background:#1C4E3F;display:flex;align-items:center;justify-content:center;color:#fff;font:700 12px 'Hind Siliguri';">২</div><span style="font:700 13px 'Hind Siliguri';color:#16352B;">৳৮,৫০০</span></div>
+                <div style="position:absolute;top:28%;left:76%;transform:translate(-50%,-50%);display:flex;align-items:center;gap:7px;background:#fff;border-radius:99px;padding:6px 12px 6px 7px;box-shadow:0 6px 18px rgba(0,0,0,.24);"><div style="width:22px;height:22px;border-radius:50%;background:#1C4E3F;display:flex;align-items:center;justify-content:center;color:#fff;font:700 12px 'Hind Siliguri';">৩</div><span style="font:700 13px 'Hind Siliguri';color:#16352B;">৳৩,২০০</span></div>
+              </div>
+              <div style="display:flex;gap:12px;margin-top:16px;">
+                <div style="width:96px;height:68px;border-radius:12px;background:repeating-linear-gradient(45deg,#E5E8DD,#E5E8DD 10px,#D7DCCC 10px,#D7DCCC 20px);border:2.5px solid #1C4E3F;"></div>
+                <div style="width:96px;height:68px;border-radius:12px;background:repeating-linear-gradient(45deg,#E5E8DD,#E5E8DD 10px,#D7DCCC 10px,#D7DCCC 20px);"></div>
+                <div style="width:96px;height:68px;border-radius:12px;background:repeating-linear-gradient(45deg,#E5E8DD,#E5E8DD 10px,#D7DCCC 10px,#D7DCCC 20px);"></div>
+                <div style="width:96px;height:68px;border-radius:12px;border:1.5px dashed #C4CCBF;display:flex;align-items:center;justify-content:center;color:#98A093;font:700 22px 'Hind Siliguri';">+</div>
+              </div>
+            </div>
+            <div style="display:flex;flex-direction:column;gap:16px;">
+              <div style="font:700 22px 'Noto Serif Bengali';color:#16352B;">এই ঘরের আসবাব</div>
+              <div style="display:flex;flex-direction:column;gap:12px;">
+                <div style="display:flex;gap:13px;background:#fff;border-radius:15px;padding:13px;box-shadow:0 6px 16px rgba(24,44,34,.06);align-items:center;">
+                  <div style="width:64px;height:64px;flex:0 0 auto;border-radius:11px;background:repeating-linear-gradient(45deg,#E5E8DD,#E5E8DD 8px,#D7DCCC 8px,#D7DCCC 16px);"></div>
+                  <div style="flex:1;"><div style="font:700 15px 'Hind Siliguri';color:#16352B;">কাঠের সোফা সেট</div><div style="font:500 12px 'Hind Siliguri';color:#707B70;">Hatil · নতুন ৳৪২,০০০</div><div style="font:600 12px 'Hind Siliguri';color:#A9791F;margin-top:2px;">Bikroy · ব্যবহৃত ৳২৪,০০০</div></div>
+                  <span style="font:700 20px 'Hind Siliguri';color:#98A093;">›</span>
+                </div>
+                <div style="display:flex;gap:13px;background:#fff;border-radius:15px;padding:13px;box-shadow:0 6px 16px rgba(24,44,34,.06);align-items:center;">
+                  <div style="width:64px;height:64px;flex:0 0 auto;border-radius:11px;background:repeating-linear-gradient(45deg,#E5E8DD,#E5E8DD 8px,#D7DCCC 8px,#D7DCCC 16px);"></div>
+                  <div style="flex:1;"><div style="font:700 15px 'Hind Siliguri';color:#16352B;">সেন্টার টেবিল</div><div style="font:500 12px 'Hind Siliguri';color:#707B70;">Otobi · নতুন ৳৮,৫০০</div><div style="font:600 12px 'Hind Siliguri';color:#A9791F;margin-top:2px;">Bikroy · ব্যবহৃত ৳৪,২০০</div></div>
+                  <span style="font:700 20px 'Hind Siliguri';color:#98A093;">›</span>
+                </div>
+                <div style="display:flex;gap:13px;background:#fff;border-radius:15px;padding:13px;box-shadow:0 6px 16px rgba(24,44,34,.06);align-items:center;">
+                  <div style="width:64px;height:64px;flex:0 0 auto;border-radius:11px;background:repeating-linear-gradient(45deg,#E5E8DD,#E5E8DD 8px,#D7DCCC 8px,#D7DCCC 16px);"></div>
+                  <div style="flex:1;"><div style="font:700 15px 'Hind Siliguri';color:#16352B;">ফ্লোর ল্যাম্প</div><div style="font:500 12px 'Hind Siliguri';color:#707B70;">Regal · নতুন ৳৩,২০০</div><div style="font:600 12px 'Hind Siliguri';color:#A9791F;margin-top:2px;">Bikroy · ব্যবহৃত ৳১,৮০০</div></div>
+                  <span style="font:700 20px 'Hind Siliguri';color:#98A093;">›</span>
+                </div>
+              </div>
+              <div style="height:1px;background:rgba(22,44,36,.08);margin:2px 0;"></div>
+              <div style="display:grid;grid-template-columns:1fr 1fr;gap:11px;">
+                <div style="display:flex;align-items:center;justify-content:center;gap:8px;background:#1C4E3F;color:#fff;border-radius:13px;padding:14px;font:700 15px 'Hind Siliguri';box-shadow:0 10px 22px rgba(28,78,63,.26);">আবার তৈরি করুন</div>
+                <div style="display:flex;align-items:center;justify-content:center;gap:8px;background:#fff;color:#16352B;border:1.5px solid rgba(22,44,36,.14);border-radius:13px;padding:14px;font:700 15px 'Hind Siliguri';">অন্য স্টাইল</div>
+                <div style="display:flex;align-items:center;justify-content:center;gap:8px;background:#fff;color:#16352B;border:1.5px solid rgba(22,44,36,.14);border-radius:13px;padding:14px;font:600 14px 'Hind Siliguri';">সংরক্ষণ</div>
+                <div style="display:flex;align-items:center;justify-content:center;gap:8px;background:#25D366;color:#fff;border-radius:13px;padding:14px;font:600 14px 'Hind Siliguri';">শেয়ার</div>
+              </div>
+              <div style="display:flex;gap:22px;justify-content:center;font:600 13px 'Hind Siliguri';color:#707B70;">
+                <span>🔗&nbsp;লিংক কপি</span><span>⬇&nbsp;ডাউনলোড</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- DESKTOP STYLE -->
+    <div style="display:flex;flex-direction:column;gap:14px;align-items:center;">
+      <div style="font:600 13px 'Hind Siliguri';color:#707B70;">স্টাইল বাছুন · Desktop style</div>
+      <div style="width:1180px;background:#fff;border-radius:16px;overflow:hidden;box-shadow:0 34px 80px rgba(24,44,34,.18);border:1px solid rgba(22,44,36,.06);">
+        <div style="display:flex;align-items:center;gap:10px;padding:12px 18px;background:#EBEEE4;border-bottom:1px solid rgba(22,44,36,.07);">
+          <div style="display:flex;gap:7px;"><span style="width:12px;height:12px;border-radius:50%;background:#E06B5E;display:block;"></span><span style="width:12px;height:12px;border-radius:50%;background:#E6B24A;display:block;"></span><span style="width:12px;height:12px;border-radius:50%;background:#7FB37A;display:block;"></span></div>
+          <div style="flex:1;max-width:420px;margin:0 auto;background:#fff;border-radius:8px;padding:7px 14px;font:500 12px 'Hind Siliguri';color:#98A093;text-align:center;">homeai.com.bd/style</div>
+        </div>
+        <div style="background:#F5F6EF;padding:36px 40px 44px;">
+          <div style="font:800 30px 'Noto Serif Bengali';color:#16352B;">স্টাইল বাছুন</div>
+          <div style="font:500 16px 'Hind Siliguri';color:#707B70;margin-top:6px;">পছন্দের ডিজাইন বেছে নিন — পরে যেকোনো সময় বদলাতে পারবেন।</div>
+          <div style="display:grid;grid-template-columns:2fr 1fr;gap:30px;margin-top:26px;align-items:start;">
+            <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px;">
+              <div style="border-radius:16px;overflow:hidden;border:2.5px solid #1C4E3F;box-shadow:0 8px 20px rgba(24,44,34,.08);"><div style="height:130px;background:repeating-linear-gradient(45deg,#E5E8DD,#E5E8DD 12px,#D7DCCC 12px,#D7DCCC 24px);"></div><div style="padding:12px 14px;background:#fff;"><div style="font:700 15px 'Hind Siliguri';color:#16352B;">আধুনিক</div><div style="font:500 12px 'Hind Siliguri';color:#707B70;">Modern</div></div></div>
+              <div style="border-radius:16px;overflow:hidden;border:1.5px solid rgba(22,44,36,.12);"><div style="height:130px;background:repeating-linear-gradient(45deg,#E5E8DD,#E5E8DD 12px,#D7DCCC 12px,#D7DCCC 24px);"></div><div style="padding:12px 14px;background:#fff;"><div style="font:700 15px 'Hind Siliguri';color:#16352B;">ঐতিহ্যবাহী বাংলা</div><div style="font:500 12px 'Hind Siliguri';color:#707B70;">Traditional</div></div></div>
+              <div style="border-radius:16px;overflow:hidden;border:1.5px solid rgba(22,44,36,.12);"><div style="height:130px;background:repeating-linear-gradient(45deg,#E5E8DD,#E5E8DD 12px,#D7DCCC 12px,#D7DCCC 24px);"></div><div style="padding:12px 14px;background:#fff;"><div style="font:700 15px 'Hind Siliguri';color:#16352B;">মিনিমাল</div><div style="font:500 12px 'Hind Siliguri';color:#707B70;">Minimal</div></div></div>
+              <div style="border-radius:16px;overflow:hidden;border:1.5px solid rgba(22,44,36,.12);"><div style="height:130px;background:repeating-linear-gradient(45deg,#E5E8DD,#E5E8DD 12px,#D7DCCC 12px,#D7DCCC 24px);"></div><div style="padding:12px 14px;background:#fff;"><div style="font:700 15px 'Hind Siliguri';color:#16352B;">বিলাসবহুল</div><div style="font:500 12px 'Hind Siliguri';color:#707B70;">Luxury</div></div></div>
+              <div style="border-radius:16px;overflow:hidden;border:1.5px solid rgba(22,44,36,.12);"><div style="height:130px;background:repeating-linear-gradient(45deg,#E5E8DD,#E5E8DD 12px,#D7DCCC 12px,#D7DCCC 24px);"></div><div style="padding:12px 14px;background:#fff;"><div style="font:700 15px 'Hind Siliguri';color:#16352B;">স্ক্যান্ডিনেভিয়ান</div><div style="font:500 12px 'Hind Siliguri';color:#707B70;">Scandinavian</div></div></div>
+              <div style="border-radius:16px;overflow:hidden;border:1.5px solid rgba(22,44,36,.12);"><div style="height:130px;background:repeating-linear-gradient(45deg,#E5E8DD,#E5E8DD 12px,#D7DCCC 12px,#D7DCCC 24px);"></div><div style="padding:12px 14px;background:#fff;"><div style="font:700 15px 'Hind Siliguri';color:#16352B;">ক্লাসিক</div><div style="font:500 12px 'Hind Siliguri';color:#707B70;">Classic</div></div></div>
+            </div>
+            <div style="background:#fff;border-radius:18px;padding:24px;box-shadow:0 8px 22px rgba(24,44,34,.07);display:flex;flex-direction:column;gap:20px;">
+              <div>
+                <div style="font:700 16px 'Hind Siliguri';color:#16352B;margin-bottom:11px;">বাজেট</div>
+                <div style="display:flex;gap:8px;">
+                  <div style="flex:1;text-align:center;border:1.5px solid rgba(22,44,36,.13);border-radius:11px;padding:10px 4px;font:600 13px 'Hind Siliguri';color:#16352B;">কম</div>
+                  <div style="flex:1;text-align:center;border:1.5px solid #1C4E3F;background:#E6EDE4;border-radius:11px;padding:10px 4px;font:600 13px 'Hind Siliguri';color:#123A2E;">মাঝারি</div>
+                  <div style="flex:1;text-align:center;border:1.5px solid rgba(22,44,36,.13);border-radius:11px;padding:10px 4px;font:600 13px 'Hind Siliguri';color:#16352B;">প্রিমিয়াম</div>
+                </div>
+              </div>
+              <div>
+                <div style="font:700 16px 'Hind Siliguri';color:#16352B;margin-bottom:11px;">নিজের মতো বলুন <span style="font-weight:500;color:#707B70;">(ঐচ্ছিক)</span></div>
+                <div style="border:1.5px solid rgba(22,44,36,.13);border-radius:13px;padding:14px;font:500 14px 'Hind Siliguri';color:#98A093;min-height:96px;">যেমন: হালকা রঙ, কাঠের আসবাব, বেশি আলো...</div>
+              </div>
+              <div style="background:#1C4E3F;color:#fff;border-radius:14px;padding:16px;text-align:center;font:700 16px 'Hind Siliguri';box-shadow:0 12px 26px rgba(28,78,63,.28);">ঘর সাজান ✦</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- DESKTOP UPLOAD -->
+    <div style="display:flex;flex-direction:column;gap:14px;align-items:center;">
+      <div style="font:600 13px 'Hind Siliguri';color:#707B70;">ঘরের ছবি দিন · Desktop upload</div>
+      <div style="width:1180px;background:#fff;border-radius:16px;overflow:hidden;box-shadow:0 34px 80px rgba(24,44,34,.18);border:1px solid rgba(22,44,36,.06);">
+        <div style="display:flex;align-items:center;gap:10px;padding:12px 18px;background:#EBEEE4;border-bottom:1px solid rgba(22,44,36,.07);">
+          <div style="display:flex;gap:7px;"><span style="width:12px;height:12px;border-radius:50%;background:#E06B5E;display:block;"></span><span style="width:12px;height:12px;border-radius:50%;background:#E6B24A;display:block;"></span><span style="width:12px;height:12px;border-radius:50%;background:#7FB37A;display:block;"></span></div>
+          <div style="flex:1;max-width:420px;margin:0 auto;background:#fff;border-radius:8px;padding:7px 14px;font:500 12px 'Hind Siliguri';color:#98A093;text-align:center;">homeai.com.bd/upload</div>
+        </div>
+        <div style="background:#F5F6EF;padding:36px 40px 44px;">
+          <div style="display:flex;align-items:center;gap:10px;font:600 14px 'Hind Siliguri';color:#707B70;margin-bottom:20px;">
+            <span style="color:#1C4E3F;font-weight:700;">১ ছবি</span><span>›</span><span>২ স্টাইল</span><span>›</span><span>৩ নতুন ঘর</span>
+          </div>
+          <div style="font:800 30px 'Noto Serif Bengali';color:#16352B;">আপনার ঘরের একটি ছবি দিন</div>
+          <div style="font:500 16px 'Hind Siliguri';color:#707B70;margin-top:6px;">স্পষ্ট আলোতে তোলা ছবি হলে সবচেয়ে ভালো ফল পাবেন।</div>
+          <div style="display:grid;grid-template-columns:1.4fr 1fr;gap:30px;margin-top:26px;align-items:start;">
+            <div style="display:flex;flex-direction:column;gap:16px;">
+              <div style="border:2px dashed #C4CCBF;border-radius:20px;background:repeating-linear-gradient(45deg,#EDEFE6,#EDEFE6 13px,#E0E5D8 13px,#E0E5D8 26px);padding:64px 20px;display:flex;flex-direction:column;align-items:center;gap:16px;text-align:center;">
+                <div style="width:64px;height:64px;border-radius:18px;background:#fff;display:flex;align-items:center;justify-content:center;box-shadow:0 8px 20px rgba(24,44,34,.1);"><svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="#1C4E3F" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 16V4M12 4l-4 4M12 4l4 4"/><path d="M4 16v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-2"/></svg></div>
+                <div><div style="font:700 19px 'Hind Siliguri';color:#16352B;">ছবি টেনে আনুন বা বাছাই করুন</div><div style="font:500 14px 'Hind Siliguri';color:#707B70;margin-top:4px;">JPG, PNG · সর্বোচ্চ ১০ MB</div></div>
+              </div>
+              <div style="display:flex;gap:14px;">
+                <div style="flex:1;border:1.5px solid rgba(22,44,36,.14);border-radius:15px;padding:18px;display:flex;align-items:center;gap:12px;background:#fff;"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#16352B" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M4 8a2 2 0 0 1 2-2h1l1.5-2h7L18 6h1a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2Z"/><circle cx="12" cy="12.5" r="3.2"/></svg><span style="font:600 15px 'Hind Siliguri';color:#16352B;">ক্যামেরা দিয়ে তুলুন</span></div>
+                <div style="flex:1;border:1.5px solid rgba(22,44,36,.14);border-radius:15px;padding:18px;display:flex;align-items:center;gap:12px;background:#fff;"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#16352B" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3a14 14 0 0 1 0 18M12 3a14 14 0 0 0 0 18"/></svg><span style="font:600 15px 'Hind Siliguri';color:#16352B;">৩৬০° প্যানোরামা</span></div>
+              </div>
+            </div>
+            <div style="background:#fff;border-radius:18px;padding:24px;box-shadow:0 8px 22px rgba(24,44,34,.07);display:flex;flex-direction:column;gap:18px;">
+              <div style="font:700 17px 'Hind Siliguri';color:#16352B;">ঘরের ধরন</div>
+              <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
+                <div style="border:1.5px solid #1C4E3F;background:#E6EDE4;border-radius:12px;padding:13px 14px;font:600 14px 'Hind Siliguri';color:#123A2E;">বসার ঘর</div>
+                <div style="border:1.5px solid rgba(22,44,36,.13);border-radius:12px;padding:13px 14px;font:600 14px 'Hind Siliguri';color:#16352B;">শোবার ঘর</div>
+                <div style="border:1.5px solid rgba(22,44,36,.13);border-radius:12px;padding:13px 14px;font:600 14px 'Hind Siliguri';color:#16352B;">খাবার ঘর</div>
+                <div style="border:1.5px solid rgba(22,44,36,.13);border-radius:12px;padding:13px 14px;font:600 14px 'Hind Siliguri';color:#16352B;">রান্নাঘর</div>
+                <div style="border:1.5px solid rgba(22,44,36,.13);border-radius:12px;padding:13px 14px;font:600 14px 'Hind Siliguri';color:#16352B;">নামাজের কোণ</div>
+                <div style="border:1.5px solid rgba(22,44,36,.13);border-radius:12px;padding:13px 14px;font:600 14px 'Hind Siliguri';color:#16352B;">বাচ্চাদের ঘর</div>
+              </div>
+              <div style="background:#1C4E3F;color:#fff;border-radius:14px;padding:16px;text-align:center;font:700 16px 'Hind Siliguri';box-shadow:0 12px 26px rgba(28,78,63,.28);margin-top:auto;">পরবর্তী ধাপ</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- DESKTOP GENERATING -->
+    <div style="display:flex;flex-direction:column;gap:14px;align-items:center;">
+      <div style="font:600 13px 'Hind Siliguri';color:#707B70;">সাজানো হচ্ছে · Desktop generating</div>
+      <div style="width:1180px;background:#fff;border-radius:16px;overflow:hidden;box-shadow:0 34px 80px rgba(24,44,34,.18);border:1px solid rgba(22,44,36,.06);">
+        <div style="display:flex;align-items:center;gap:10px;padding:12px 18px;background:#EBEEE4;border-bottom:1px solid rgba(22,44,36,.07);">
+          <div style="display:flex;gap:7px;"><span style="width:12px;height:12px;border-radius:50%;background:#E06B5E;display:block;"></span><span style="width:12px;height:12px;border-radius:50%;background:#E6B24A;display:block;"></span><span style="width:12px;height:12px;border-radius:50%;background:#7FB37A;display:block;"></span></div>
+          <div style="flex:1;max-width:420px;margin:0 auto;background:#fff;border-radius:8px;padding:7px 14px;font:500 12px 'Hind Siliguri';color:#98A093;text-align:center;">homeai.com.bd/generating</div>
+        </div>
+        <div style="background:linear-gradient(180deg,#F5F6EF,#EBEFE3);padding:80px 40px;display:flex;flex-direction:column;align-items:center;text-align:center;gap:28px;">
+          <div style="position:relative;width:130px;height:130px;">
+            <div style="position:absolute;inset:0;border-radius:50%;border:6px solid rgba(28,78,63,.16);"></div>
+            <div style="position:absolute;inset:0;border-radius:50%;border:6px solid transparent;border-top-color:#1C4E3F;animation:homeai-spin 1s linear infinite;"></div>
+            <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;"><div style="width:52px;height:52px;border-radius:15px;background:#1C4E3F;display:flex;align-items:center;justify-content:center;color:#fff;font:800 26px 'Noto Serif Bengali';animation:homeai-pulse 1.8s ease-in-out infinite;">H</div></div>
+          </div>
+          <div><div style="font:800 30px 'Noto Serif Bengali';color:#16352B;">আপনার ঘর সাজানো হচ্ছে</div><div style="font:500 16px 'Hind Siliguri';color:#707B70;margin-top:10px;">একটু অপেক্ষা করুন — সাধারণত ১৫–৩০ সেকেন্ড সময় লাগে।</div></div>
+          <div style="width:100%;max-width:420px;"><div style="height:9px;border-radius:99px;background:rgba(22,44,36,.1);overflow:hidden;"><div style="width:62%;height:100%;background:#1C4E3F;border-radius:99px;"></div></div><div style="font:600 14px 'Hind Siliguri';color:#123A2E;margin-top:11px;">আসবাব বসানো হচ্ছে...</div></div>
+          <div style="background:#fff;border-radius:16px;padding:18px 22px;display:flex;align-items:center;gap:13px;box-shadow:0 8px 22px rgba(24,44,34,.08);max-width:460px;"><div style="width:30px;height:30px;border-radius:9px;background:#E6EDE4;flex:0 0 auto;display:flex;align-items:center;justify-content:center;color:#1C4E3F;font:700 16px 'Noto Serif Bengali';">i</div><div style="font:500 14.5px 'Hind Siliguri';color:#47514A;line-height:1.5;text-align:left;">জানেন কি? প্রতিটি আসবাবের সাথে দেশি ব্র্যান্ড ও পুরনো বাজারের দাম দেখাবে।</div></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- DESKTOP FURNITURE DETAIL (modal) -->
+    <div style="display:flex;flex-direction:column;gap:14px;align-items:center;">
+      <div style="font:600 13px 'Hind Siliguri';color:#707B70;">আসবাবের বিস্তারিত · Desktop furniture</div>
+      <div style="width:1180px;background:#fff;border-radius:16px;overflow:hidden;box-shadow:0 34px 80px rgba(24,44,34,.18);border:1px solid rgba(22,44,36,.06);">
+        <div style="display:flex;align-items:center;gap:10px;padding:12px 18px;background:#EBEEE4;border-bottom:1px solid rgba(22,44,36,.07);">
+          <div style="display:flex;gap:7px;"><span style="width:12px;height:12px;border-radius:50%;background:#E06B5E;display:block;"></span><span style="width:12px;height:12px;border-radius:50%;background:#E6B24A;display:block;"></span><span style="width:12px;height:12px;border-radius:50%;background:#7FB37A;display:block;"></span></div>
+          <div style="flex:1;max-width:420px;margin:0 auto;background:#fff;border-radius:8px;padding:7px 14px;font:500 12px 'Hind Siliguri';color:#98A093;text-align:center;">homeai.com.bd/design/a3f9</div>
+        </div>
+        <div style="position:relative;background:repeating-linear-gradient(45deg,#E5E8DD,#E5E8DD 15px,#D7DCCC 15px,#D7DCCC 30px);height:560px;display:flex;align-items:center;justify-content:center;">
+          <span style="font:600 13px 'Courier New',monospace;color:#8C9285;">[ সাজানো ঘরের ছবি ]</span>
+          <div style="position:absolute;inset:0;background:rgba(16,32,24,.5);"></div>
+          <div style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:620px;background:#FBFBF5;border-radius:22px;overflow:hidden;box-shadow:0 30px 70px rgba(0,0,0,.35);">
+            <div style="display:flex;">
+              <div style="width:280px;flex:0 0 auto;background:repeating-linear-gradient(45deg,#E5E8DD,#E5E8DD 11px,#D7DCCC 11px,#D7DCCC 22px);display:flex;align-items:center;justify-content:center;"><span style="font:600 11px 'Courier New',monospace;color:#8C9285;">product shot</span></div>
+              <div style="flex:1;padding:28px;display:flex;flex-direction:column;gap:16px;">
+                <div style="display:flex;justify-content:space-between;align-items:flex-start;">
+                  <span style="display:inline-flex;background:#E6EDE4;color:#123A2E;border-radius:99px;padding:4px 12px;font:700 12px 'Hind Siliguri';">১ · সোফা</span>
+                  <span style="width:28px;height:28px;border-radius:50%;background:#EEF0E7;display:flex;align-items:center;justify-content:center;color:#707B70;font:600 16px 'Hind Siliguri';">✕</span>
+                </div>
+                <div><div style="font:700 24px 'Noto Serif Bengali';color:#16352B;line-height:1.2;">কাঠের সোফা সেট (৩ সিটার)</div><div style="font:500 14px 'Hind Siliguri';color:#707B70;margin-top:6px;">মাপ: ৮৪″ × ৩৬″ × ৩২″ · সেগুন কাঠ</div></div>
+                <div style="display:flex;align-items:baseline;gap:10px;"><span style="font:800 32px 'Noto Serif Bengali';color:#16352B;">৳ ৪২,০০০</span><span style="font:500 13px 'Hind Siliguri';color:#707B70;">নতুন · Hatil অনুযায়ী</span></div>
+                <div style="display:flex;flex-direction:column;gap:11px;">
+                  <div style="display:flex;align-items:center;justify-content:space-between;background:#1C4E3F;color:#fff;border-radius:14px;padding:15px 18px;box-shadow:0 10px 22px rgba(28,78,63,.26);"><div style="display:flex;flex-direction:column;"><span style="font:700 15px 'Hind Siliguri';">নতুন কিনুন</span><span style="font:500 12px 'Hind Siliguri';opacity:.88;">Hatil · অফিসিয়াল স্টোর</span></div><span style="font:700 15px 'Hind Siliguri';">৳ ৪২,০০০ →</span></div>
+                  <div style="display:flex;align-items:center;justify-content:space-between;background:#fff;border:1.5px solid #A9791F;border-radius:14px;padding:15px 18px;"><div style="display:flex;flex-direction:column;"><span style="font:700 15px 'Hind Siliguri';color:#6E4E12;">ব্যবহৃত কিনুন</span><span style="font:500 12px 'Hind Siliguri';color:#A9791F;">Bikroy · ৩টি বিজ্ঞাপন</span></div><span style="font:700 15px 'Hind Siliguri';color:#6E4E12;">৳ ২৪,০০০ →</span></div>
+                </div>
+                <div><div style="font:600 12px 'Hind Siliguri';color:#707B70;margin-bottom:8px;">একই রকম অন্য ব্র্যান্ডে</div><div style="display:flex;gap:8px;flex-wrap:wrap;"><span style="border:1.5px solid rgba(22,44,36,.13);border-radius:99px;padding:6px 13px;font:600 12px 'Hind Siliguri';color:#16352B;">Otobi ৳৩৮,৫০০</span><span style="border:1.5px solid rgba(22,44,36,.13);border-radius:99px;padding:6px 13px;font:600 12px 'Hind Siliguri';color:#16352B;">Regal ৳৩৫,০০০</span><span style="border:1.5px solid rgba(22,44,36,.13);border-radius:99px;padding:6px 13px;font:600 12px 'Hind Siliguri';color:#16352B;">Partex ৳৪০,০০০</span></div></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- DESKTOP GALLERY -->
+    <div style="display:flex;flex-direction:column;gap:14px;align-items:center;">
+      <div style="font:600 13px 'Hind Siliguri';color:#707B70;">আমার ডিজাইন · Desktop gallery</div>
+      <div style="width:1180px;background:#fff;border-radius:16px;overflow:hidden;box-shadow:0 34px 80px rgba(24,44,34,.18);border:1px solid rgba(22,44,36,.06);">
+        <div style="display:flex;align-items:center;gap:10px;padding:12px 18px;background:#EBEEE4;border-bottom:1px solid rgba(22,44,36,.07);">
+          <div style="display:flex;gap:7px;"><span style="width:12px;height:12px;border-radius:50%;background:#E06B5E;display:block;"></span><span style="width:12px;height:12px;border-radius:50%;background:#E6B24A;display:block;"></span><span style="width:12px;height:12px;border-radius:50%;background:#7FB37A;display:block;"></span></div>
+          <div style="flex:1;max-width:420px;margin:0 auto;background:#fff;border-radius:8px;padding:7px 14px;font:500 12px 'Hind Siliguri';color:#98A093;text-align:center;">homeai.com.bd/my-designs</div>
+        </div>
+        <div style="background:#F5F6EF;padding:36px 40px 44px;">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:24px;">
+            <div><div style="font:800 30px 'Noto Serif Bengali';color:#16352B;">আমার ডিজাইন</div><div style="font:500 15px 'Hind Siliguri';color:#707B70;margin-top:4px;">৬টি সংরক্ষিত ডিজাইন</div></div>
+            <div style="display:flex;align-items:center;gap:9px;background:#1C4E3F;color:#fff;border-radius:13px;padding:13px 20px;font:700 15px 'Hind Siliguri';box-shadow:0 10px 22px rgba(28,78,63,.26);"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.4" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>নতুন ডিজাইন</div>
+          </div>
+          <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:18px;">
+            <div style="border-radius:16px;overflow:hidden;background:#fff;box-shadow:0 6px 16px rgba(24,44,34,.07);"><div style="height:150px;background:repeating-linear-gradient(45deg,#E5E8DD,#E5E8DD 11px,#D7DCCC 11px,#D7DCCC 22px);position:relative;"><span style="position:absolute;top:9px;right:9px;width:28px;height:28px;border-radius:50%;background:rgba(255,255,255,.92);display:flex;align-items:center;justify-content:center;"><svg width="15" height="15" viewBox="0 0 24 24" fill="#1C4E3F" stroke="#1C4E3F" stroke-width="2"><path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.6l-1-1a5.5 5.5 0 0 0-7.8 7.8l1 1L12 21l7.8-7.6 1-1a5.5 5.5 0 0 0 0-7.8z"/></svg></span></div><div style="padding:12px 13px;"><div style="font:700 15px 'Hind Siliguri';color:#16352B;">বসার ঘর</div><div style="font:500 12px 'Hind Siliguri';color:#707B70;">আধুনিক · ৮ জুলাই</div></div></div>
+            <div style="border-radius:16px;overflow:hidden;background:#fff;box-shadow:0 6px 16px rgba(24,44,34,.07);"><div style="height:150px;background:repeating-linear-gradient(45deg,#E5E8DD,#E5E8DD 11px,#D7DCCC 11px,#D7DCCC 22px);position:relative;"><span style="position:absolute;top:9px;right:9px;width:28px;height:28px;border-radius:50%;background:rgba(255,255,255,.92);display:flex;align-items:center;justify-content:center;"><svg width="15" height="15" viewBox="0 0 24 24" fill="#1C4E3F" stroke="#1C4E3F" stroke-width="2"><path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.6l-1-1a5.5 5.5 0 0 0-7.8 7.8l1 1L12 21l7.8-7.6 1-1a5.5 5.5 0 0 0 0-7.8z"/></svg></span></div><div style="padding:12px 13px;"><div style="font:700 15px 'Hind Siliguri';color:#16352B;">শোবার ঘর</div><div style="font:500 12px 'Hind Siliguri';color:#707B70;">মিনিমাল · ৬ জুলাই</div></div></div>
+            <div style="border-radius:16px;overflow:hidden;background:#fff;box-shadow:0 6px 16px rgba(24,44,34,.07);"><div style="height:150px;background:repeating-linear-gradient(45deg,#E5E8DD,#E5E8DD 11px,#D7DCCC 11px,#D7DCCC 22px);position:relative;"><span style="position:absolute;top:9px;right:9px;width:28px;height:28px;border-radius:50%;background:rgba(255,255,255,.92);display:flex;align-items:center;justify-content:center;"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#707B70" stroke-width="2"><path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.6l-1-1a5.5 5.5 0 0 0-7.8 7.8l1 1L12 21l7.8-7.6 1-1a5.5 5.5 0 0 0 0-7.8z"/></svg></span></div><div style="padding:12px 13px;"><div style="font:700 15px 'Hind Siliguri';color:#16352B;">খাবার ঘর</div><div style="font:500 12px 'Hind Siliguri';color:#707B70;">ঐতিহ্যবাহী · ৩ জুলাই</div></div></div>
+            <div style="border-radius:16px;overflow:hidden;background:#fff;box-shadow:0 6px 16px rgba(24,44,34,.07);"><div style="height:150px;background:repeating-linear-gradient(45deg,#E5E8DD,#E5E8DD 11px,#D7DCCC 11px,#D7DCCC 22px);position:relative;"><span style="position:absolute;top:9px;right:9px;width:28px;height:28px;border-radius:50%;background:rgba(255,255,255,.92);display:flex;align-items:center;justify-content:center;"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#707B70" stroke-width="2"><path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.6l-1-1a5.5 5.5 0 0 0-7.8 7.8l1 1L12 21l7.8-7.6 1-1a5.5 5.5 0 0 0 0-7.8z"/></svg></span></div><div style="padding:12px 13px;"><div style="font:700 15px 'Hind Siliguri';color:#16352B;">নামাজের কোণ</div><div style="font:500 12px 'Hind Siliguri';color:#707B70;">মিনিমাল · ১ জুলাই</div></div></div>
+            <div style="border-radius:16px;overflow:hidden;background:#fff;box-shadow:0 6px 16px rgba(24,44,34,.07);"><div style="height:150px;background:repeating-linear-gradient(45deg,#E5E8DD,#E5E8DD 11px,#D7DCCC 11px,#D7DCCC 22px);position:relative;"><span style="position:absolute;top:9px;right:9px;width:28px;height:28px;border-radius:50%;background:rgba(255,255,255,.92);display:flex;align-items:center;justify-content:center;"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#707B70" stroke-width="2"><path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.6l-1-1a5.5 5.5 0 0 0-7.8 7.8l1 1L12 21l7.8-7.6 1-1a5.5 5.5 0 0 0 0-7.8z"/></svg></span></div><div style="padding:12px 13px;"><div style="font:700 15px 'Hind Siliguri';color:#16352B;">বাচ্চাদের ঘর</div><div style="font:500 12px 'Hind Siliguri';color:#707B70;">স্ক্যান্ডিনেভিয়ান · ২৮ জুন</div></div></div>
+            <div style="border-radius:16px;overflow:hidden;background:#fff;box-shadow:0 6px 16px rgba(24,44,34,.07);"><div style="height:150px;background:repeating-linear-gradient(45deg,#E5E8DD,#E5E8DD 11px,#D7DCCC 11px,#D7DCCC 22px);position:relative;"><span style="position:absolute;top:9px;right:9px;width:28px;height:28px;border-radius:50%;background:rgba(255,255,255,.92);display:flex;align-items:center;justify-content:center;"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#707B70" stroke-width="2"><path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.6l-1-1a5.5 5.5 0 0 0-7.8 7.8l1 1L12 21l7.8-7.6 1-1a5.5 5.5 0 0 0 0-7.8z"/></svg></span></div><div style="padding:12px 13px;"><div style="font:700 15px 'Hind Siliguri';color:#16352B;">রান্নাঘর</div><div style="font:500 12px 'Hind Siliguri';color:#707B70;">আধুনিক · ২৫ জুন</div></div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- DESKTOP AUTH -->
+    <div style="display:flex;flex-direction:column;gap:14px;align-items:center;">
+      <div style="font:600 13px 'Hind Siliguri';color:#707B70;">লগ ইন · Desktop auth</div>
+      <div style="width:1180px;background:#fff;border-radius:16px;overflow:hidden;box-shadow:0 34px 80px rgba(24,44,34,.18);border:1px solid rgba(22,44,36,.06);">
+        <div style="display:flex;align-items:center;gap:10px;padding:12px 18px;background:#EBEEE4;border-bottom:1px solid rgba(22,44,36,.07);">
+          <div style="display:flex;gap:7px;"><span style="width:12px;height:12px;border-radius:50%;background:#E06B5E;display:block;"></span><span style="width:12px;height:12px;border-radius:50%;background:#E6B24A;display:block;"></span><span style="width:12px;height:12px;border-radius:50%;background:#7FB37A;display:block;"></span></div>
+          <div style="flex:1;max-width:420px;margin:0 auto;background:#fff;border-radius:8px;padding:7px 14px;font:500 12px 'Hind Siliguri';color:#98A093;text-align:center;">homeai.com.bd/login</div>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;min-height:560px;">
+          <div style="background:linear-gradient(160deg,#1C4E3F,#123A2E);padding:56px 48px;display:flex;flex-direction:column;justify-content:space-between;color:#fff;">
+            <div style="display:flex;align-items:center;gap:11px;"><div style="width:36px;height:36px;border-radius:10px;background:rgba(255,255,255,.16);display:flex;align-items:center;justify-content:center;font:800 19px 'Noto Serif Bengali';">H</div><span style="font:700 22px 'Noto Serif Bengali';">হোম এআই</span></div>
+            <div><div style="font:800 34px 'Noto Serif Bengali';line-height:1.3;">আপনার ঘরের নতুন রূপ, এক ক্লিকে সংরক্ষণ করুন</div><div style="font:500 16px 'Hind Siliguri';opacity:.85;margin-top:16px;line-height:1.6;">লগ ইন করে সব ডিজাইন এক জায়গায় রাখুন এবং পরিবারের সাথে শেয়ার করুন।</div></div>
+            <div style="display:flex;gap:8px;flex-wrap:wrap;"><span style="border:1px solid rgba(255,255,255,.25);border-radius:99px;padding:5px 13px;font:600 13px 'Hind Siliguri';">Hatil</span><span style="border:1px solid rgba(255,255,255,.25);border-radius:99px;padding:5px 13px;font:600 13px 'Hind Siliguri';">Otobi</span><span style="border:1px solid rgba(255,255,255,.25);border-radius:99px;padding:5px 13px;font:600 13px 'Hind Siliguri';">Regal</span><span style="border:1px solid rgba(255,255,255,.25);border-radius:99px;padding:5px 13px;font:600 13px 'Hind Siliguri';">Bikroy</span></div>
+          </div>
+          <div style="background:#F5F6EF;padding:56px 60px;display:flex;flex-direction:column;justify-content:center;gap:22px;">
+            <div><div style="font:800 28px 'Noto Serif Bengali';color:#16352B;">স্বাগতম</div><div style="font:500 15px 'Hind Siliguri';color:#707B70;margin-top:5px;">লগ ইন করে আপনার ডিজাইন সংরক্ষণ করুন</div></div>
+            <div style="display:flex;flex-direction:column;gap:11px;">
+              <div style="display:flex;align-items:center;justify-content:center;gap:10px;background:#1877F2;color:#fff;border-radius:14px;padding:15px;font:700 15.5px 'Hind Siliguri';box-shadow:0 10px 22px rgba(24,119,242,.26);"><svg width="20" height="20" viewBox="0 0 24 24" fill="#fff"><path d="M22 12a10 10 0 1 0-11.6 9.9v-7H8v-2.9h2.4V9.8c0-2.4 1.4-3.7 3.6-3.7 1 0 2.1.2 2.1.2v2.3h-1.2c-1.2 0-1.5.7-1.5 1.5v1.8h2.6l-.4 2.9h-2.2v7A10 10 0 0 0 22 12z"/></svg>ফেসবুক দিয়ে চালিয়ে যান</div>
+              <div style="display:flex;align-items:center;justify-content:center;gap:10px;background:#fff;color:#16352B;border:1.5px solid rgba(22,44,36,.16);border-radius:14px;padding:15px;font:700 15.5px 'Hind Siliguri';"><svg width="19" height="19" viewBox="0 0 24 24"><path fill="#4285F4" d="M23 12.3c0-.8-.1-1.6-.2-2.3H12v4.5h6.2a5.3 5.3 0 0 1-2.3 3.5v2.9h3.7C21.7 19 23 15.9 23 12.3z"/><path fill="#34A853" d="M12 24c3.1 0 5.7-1 7.6-2.8l-3.7-2.9c-1 .7-2.3 1.1-3.9 1.1-3 0-5.5-2-6.4-4.7H1.7v3C3.6 21.4 7.5 24 12 24z"/><path fill="#FBBC05" d="M5.6 14.7a7.2 7.2 0 0 1 0-4.6V7.1H1.7a12 12 0 0 0 0 10.6z"/><path fill="#EA4335" d="M12 4.8c1.7 0 3.2.6 4.4 1.7l3.3-3.3C17.7 1.2 15.1 0 12 0 7.5 0 3.6 2.6 1.7 6.4l3.9 3C6.5 6.7 9 4.8 12 4.8z"/></svg>গুগল দিয়ে চালিয়ে যান</div>
+            </div>
+            <div style="display:flex;align-items:center;gap:12px;"><div style="flex:1;height:1px;background:rgba(22,44,36,.12);"></div><span style="font:500 13px 'Hind Siliguri';color:#98A093;">অথবা</span><div style="flex:1;height:1px;background:rgba(22,44,36,.12);"></div></div>
+            <div style="display:flex;flex-direction:column;gap:11px;">
+              <div style="border:1.5px solid rgba(22,44,36,.14);border-radius:13px;padding:15px;background:#fff;font:500 14px 'Hind Siliguri';color:#98A093;">ইমেইল ঠিকানা</div>
+              <div style="border:1.5px solid rgba(22,44,36,.14);border-radius:13px;padding:15px;background:#fff;font:500 14px 'Hind Siliguri';color:#98A093;">পাসওয়ার্ড</div>
+            </div>
+            <div style="background:#1C4E3F;color:#fff;border-radius:14px;padding:16px;text-align:center;font:700 16px 'Hind Siliguri';box-shadow:0 10px 22px rgba(28,78,63,.26);">চালিয়ে যান</div>
+            <div style="text-align:center;font:500 14px 'Hind Siliguri';color:#707B70;">নতুন এখানে? <span style="color:#1C4E3F;font-weight:700;">অ্যাকাউন্ট খুলুন</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- DESKTOP PRICING -->
+    <div style="display:flex;flex-direction:column;gap:14px;align-items:center;">
+      <div style="font:600 13px 'Hind Siliguri';color:#707B70;">প্রাইসিং ও ক্রেডিট · Desktop pricing</div>
+      <div style="width:1180px;background:#fff;border-radius:16px;overflow:hidden;box-shadow:0 34px 80px rgba(24,44,34,.18);border:1px solid rgba(22,44,36,.06);">
+        <div style="display:flex;align-items:center;gap:10px;padding:12px 18px;background:#EBEEE4;border-bottom:1px solid rgba(22,44,36,.07);">
+          <div style="display:flex;gap:7px;"><span style="width:12px;height:12px;border-radius:50%;background:#E06B5E;display:block;"></span><span style="width:12px;height:12px;border-radius:50%;background:#E6B24A;display:block;"></span><span style="width:12px;height:12px;border-radius:50%;background:#7FB37A;display:block;"></span></div>
+          <div style="flex:1;max-width:420px;margin:0 auto;background:#fff;border-radius:8px;padding:7px 14px;font:500 12px 'Hind Siliguri';color:#98A093;text-align:center;">homeai.com.bd/pricing</div>
+        </div>
+        <div style="background:#F5F6EF;padding:44px 40px;text-align:center;">
+          <div style="font:800 32px 'Noto Serif Bengali';color:#16352B;">ক্রেডিট কিনুন</div>
+          <div style="font:500 16px 'Hind Siliguri';color:#707B70;margin-top:6px;">যত খুশি ঘর সাজান — সাশ্রয়ী দামে</div>
+          <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:20px;margin-top:32px;text-align:left;align-items:stretch;">
+            <div style="border:1.5px solid rgba(22,44,36,.12);border-radius:20px;padding:28px;background:#fff;display:flex;flex-direction:column;">
+              <div style="font:700 19px 'Noto Serif Bengali';color:#16352B;">ফ্রি</div><div style="font:500 13px 'Hind Siliguri';color:#707B70;">শুরু করার জন্য</div>
+              <div style="font:800 34px 'Noto Serif Bengali';color:#16352B;margin:16px 0;">৳ ০</div>
+              <div style="height:1px;background:rgba(22,44,36,.08);margin-bottom:16px;"></div>
+              <div style="display:flex;flex-direction:column;gap:10px;font:500 14px 'Hind Siliguri';color:#47514A;"><div>✓ ৫টি ডিজাইন ফ্রি</div><div>✓ সব স্টাইল ব্যবহার</div><div>✓ আসবাবের দাম দেখা</div></div>
+              <div style="margin-top:auto;padding-top:22px;"><div style="border:1.5px solid rgba(22,44,36,.16);border-radius:12px;padding:13px;text-align:center;font:700 15px 'Hind Siliguri';color:#16352B;">চলছে</div></div>
+            </div>
+            <div style="border:2px solid #1C4E3F;border-radius:20px;padding:28px;background:#FBFBF5;position:relative;box-shadow:0 16px 40px rgba(28,78,63,.14);display:flex;flex-direction:column;">
+              <div style="position:absolute;top:-12px;left:50%;transform:translateX(-50%);background:#1C4E3F;color:#fff;border-radius:99px;padding:5px 16px;font:700 12px 'Hind Siliguri';">সবচেয়ে জনপ্রিয়</div>
+              <div style="font:700 19px 'Noto Serif Bengali';color:#16352B;">৫০ ক্রেডিট</div><div style="font:500 13px 'Hind Siliguri';color:#707B70;">৫০টি ডিজাইন</div>
+              <div style="display:flex;align-items:baseline;gap:10px;margin:16px 0;"><span style="font:800 34px 'Noto Serif Bengali';color:#123A2E;">৳ ৪৫০</span><span style="font:500 13px 'Hind Siliguri';color:#707B70;text-decoration:line-through;">৳ ৫০০</span></div>
+              <div style="height:1px;background:rgba(22,44,36,.08);margin-bottom:16px;"></div>
+              <div style="display:flex;flex-direction:column;gap:10px;font:500 14px 'Hind Siliguri';color:#47514A;"><div>✓ ৫০টি ডিজাইন</div><div>✓ প্যানোরামা সাপোর্ট</div><div>✓ HD ডাউনলোড</div><div>✓ কোনো মেয়াদ নেই</div></div>
+              <div style="margin-top:auto;padding-top:22px;"><div style="background:#1C4E3F;color:#fff;border-radius:12px;padding:14px;text-align:center;font:700 15px 'Hind Siliguri';box-shadow:0 10px 22px rgba(28,78,63,.26);">কিনুন</div></div>
+            </div>
+            <div style="border:1.5px solid rgba(22,44,36,.12);border-radius:20px;padding:28px;background:#fff;display:flex;flex-direction:column;">
+              <div style="font:700 19px 'Noto Serif Bengali';color:#16352B;">২০ ক্রেডিট</div><div style="font:500 13px 'Hind Siliguri';color:#707B70;">২০টি ডিজাইন</div>
+              <div style="font:800 34px 'Noto Serif Bengali';color:#16352B;margin:16px 0;">৳ ২০০</div>
+              <div style="height:1px;background:rgba(22,44,36,.08);margin-bottom:16px;"></div>
+              <div style="display:flex;flex-direction:column;gap:10px;font:500 14px 'Hind Siliguri';color:#47514A;"><div>✓ ২০টি ডিজাইন</div><div>✓ প্যানোরামা সাপোর্ট</div><div>✓ HD ডাউনলোড</div></div>
+              <div style="margin-top:auto;padding-top:22px;"><div style="border:1.5px solid #1C4E3F;border-radius:12px;padding:13px;text-align:center;font:700 15px 'Hind Siliguri';color:#1C4E3F;">কিনুন</div></div>
+            </div>
+          </div>
+          <div style="display:flex;align-items:center;justify-content:center;gap:14px;margin-top:30px;">
+            <span style="font:600 14px 'Hind Siliguri';color:#707B70;">পেমেন্ট:</span>
+            <div style="display:flex;align-items:center;gap:9px;background:#E2136E;color:#fff;border-radius:12px;padding:11px 20px;font:700 15px 'Hind Siliguri';"><div style="width:20px;height:20px;border-radius:6px;background:rgba(255,255,255,.22);display:flex;align-items:center;justify-content:center;font:800 11px 'Noto Serif Bengali';">b</div>bKash</div>
+            <div style="display:flex;align-items:center;gap:9px;background:#EE7623;color:#fff;border-radius:12px;padding:11px 20px;font:700 15px 'Hind Siliguri';"><div style="width:20px;height:20px;border-radius:6px;background:rgba(255,255,255,.22);display:flex;align-items:center;justify-content:center;font:800 11px 'Noto Serif Bengali';">N</div>Nagad</div>
+            <span style="display:flex;align-items:center;gap:6px;font:500 13px 'Hind Siliguri';color:#A9791F;"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#A9791F" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2l8 4v6c0 5-3.4 8.5-8 10-4.6-1.5-8-5-8-10V6z"/><path d="M9 12l2 2 4-4"/></svg>নিরাপদ</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ============ CORE FLOW ============ -->
+  <div style="max-width:1100px;margin:0 auto 14px;display:flex;align-items:center;gap:12px;">
+    <div style="width:9px;height:9px;border-radius:50%;background:#1C4E3F;"></div>
+    <div style="font:700 15px 'Hind Siliguri';color:#16352B;letter-spacing:.4px;text-transform:uppercase;">মূল অভিজ্ঞতা · Core flow</div>
+    <div style="flex:1;height:1px;background:rgba(22,44,36,.12);"></div>
+  </div>
+
+  <div style="display:flex;flex-wrap:wrap;gap:44px;align-items:flex-start;justify-content:center;margin-bottom:72px;">
+
+    <!-- ========== 1 · UPLOAD ========== -->
+    <div style="display:flex;flex-direction:column;gap:14px;align-items:center;flex:0 0 auto;">
+      <div style="font:600 13px 'Hind Siliguri';color:#707B70;">১ · ঘরের ছবি দিন · Upload</div>
+      <div style="width:410px;background:#fff;border-radius:40px;padding:11px;box-shadow:0 26px 60px rgba(24,44,34,.14);border:1px solid rgba(24,44,34,.05);">
+        <div style="border-radius:31px;overflow:hidden;background:#F5F6EF;min-height:820px;display:flex;flex-direction:column;">
+
+          <div style="display:flex;justify-content:space-between;align-items:center;padding:15px 24px 4px;font:600 14px 'Hind Siliguri';color:#16352B;">
+            <span>৯:৪১</span>
+            <div style="width:20px;height:11px;border:1.5px solid #16352B;border-radius:3px;position:relative;"><div style="position:absolute;right:-3px;top:3px;width:2px;height:5px;background:#16352B;border-radius:1px;"></div></div>
+          </div>
+
+          <div style="display:flex;justify-content:space-between;align-items:center;padding:10px 22px 16px;">
+            <div style="display:flex;align-items:center;gap:9px;">
+              <div style="width:30px;height:30px;border-radius:9px;background:#1C4E3F;display:flex;align-items:center;justify-content:center;color:#fff;font:800 16px 'Noto Serif Bengali';">H</div>
+              <span style="font:700 19px 'Noto Serif Bengali';color:#16352B;">হোম এআই</span>
+            </div>
+            <div style="display:flex;border:1px solid rgba(22,44,36,.15);border-radius:999px;overflow:hidden;font:600 12px 'Hind Siliguri';">
+              <span style="padding:6px 12px;background:#1C4E3F;color:#fff;">বাংলা</span>
+              <span style="padding:6px 12px;color:#707B70;">EN</span>
+            </div>
+          </div>
+
+          <div style="padding:6px 22px 26px;display:flex;flex-direction:column;gap:22px;">
+            <div>
+              <div style="font:700 25px 'Noto Serif Bengali';color:#16352B;line-height:1.25;">আপনার ঘরের একটি ছবি দিন</div>
+              <div style="font:500 15px 'Hind Siliguri';color:#707B70;margin-top:6px;line-height:1.5;">স্পষ্ট আলোতে তোলা ছবি হলে সবচেয়ে ভালো ফল পাবেন।</div>
+            </div>
+
+            <div style="border:2px dashed #C4CCBF;border-radius:22px;background:repeating-linear-gradient(45deg,#EDEFE6,#EDEFE6 11px,#E0E5D8 11px,#E0E5D8 22px);padding:40px 20px;display:flex;flex-direction:column;align-items:center;gap:14px;text-align:center;">
+              <div style="width:56px;height:56px;border-radius:16px;background:#fff;display:flex;align-items:center;justify-content:center;box-shadow:0 6px 16px rgba(24,44,34,.1);">
+                <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#1C4E3F" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 16V4M12 4l-4 4M12 4l4 4"/><path d="M4 16v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-2"/></svg>
+              </div>
+              <div>
+                <div style="font:700 16px 'Hind Siliguri';color:#16352B;">ছবি টেনে আনুন বা বাছাই করুন</div>
+                <div style="font:500 13px 'Hind Siliguri';color:#707B70;margin-top:3px;">JPG, PNG · সর্বোচ্চ ১০ MB</div>
+              </div>
+            </div>
+
+            <div style="display:flex;gap:12px;">
+              <div style="flex:1;border:1.5px solid rgba(22,44,36,.14);border-radius:16px;padding:16px 12px;display:flex;flex-direction:column;align-items:center;gap:9px;background:#fff;">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#16352B" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M4 8a2 2 0 0 1 2-2h1l1.5-2h7L18 6h1a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2Z"/><circle cx="12" cy="12.5" r="3.2"/></svg>
+                <span style="font:600 14px 'Hind Siliguri';color:#16352B;">ক্যামেরা</span>
+              </div>
+              <div style="flex:1;border:1.5px solid rgba(22,44,36,.14);border-radius:16px;padding:16px 12px;display:flex;flex-direction:column;align-items:center;gap:9px;background:#fff;">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#16352B" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3a14 14 0 0 1 0 18M12 3a14 14 0 0 0 0 18"/></svg>
+                <span style="font:600 14px 'Hind Siliguri';color:#16352B;">৩৬০° প্যানোরামা</span>
+              </div>
+            </div>
+
+            <div>
+              <div style="font:700 16px 'Hind Siliguri';color:#16352B;margin-bottom:12px;">ঘরের ধরন</div>
+              <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
+                <div style="border:1.5px solid #1C4E3F;background:#E6EDE4;border-radius:14px;padding:13px 14px;font:600 14px 'Hind Siliguri';color:#123A2E;">বসার ঘর</div>
+                <div style="border:1.5px solid rgba(22,44,36,.13);border-radius:14px;padding:13px 14px;font:600 14px 'Hind Siliguri';color:#16352B;background:#fff;">শোবার ঘর</div>
+                <div style="border:1.5px solid rgba(22,44,36,.13);border-radius:14px;padding:13px 14px;font:600 14px 'Hind Siliguri';color:#16352B;background:#fff;">খাবার ঘর</div>
+                <div style="border:1.5px solid rgba(22,44,36,.13);border-radius:14px;padding:13px 14px;font:600 14px 'Hind Siliguri';color:#16352B;background:#fff;">রান্নাঘর</div>
+                <div style="border:1.5px solid rgba(22,44,36,.13);border-radius:14px;padding:13px 14px;font:600 14px 'Hind Siliguri';color:#16352B;background:#fff;">নামাজের কোণ</div>
+                <div style="border:1.5px solid rgba(22,44,36,.13);border-radius:14px;padding:13px 14px;font:600 14px 'Hind Siliguri';color:#16352B;background:#fff;">বাচ্চাদের ঘর</div>
+              </div>
+            </div>
+
+            <div style="background:#1C4E3F;color:#fff;border-radius:16px;padding:17px;text-align:center;font:700 17px 'Hind Siliguri';box-shadow:0 12px 26px rgba(28,78,63,.32);">পরবর্তী ধাপ</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ========== 2 · STYLE ========== -->
+    <div style="display:flex;flex-direction:column;gap:14px;align-items:center;flex:0 0 auto;">
+      <div style="font:600 13px 'Hind Siliguri';color:#707B70;">২ · স্টাইল বাছুন · Style</div>
+      <div style="width:410px;background:#fff;border-radius:40px;padding:11px;box-shadow:0 26px 60px rgba(24,44,34,.14);border:1px solid rgba(24,44,34,.05);">
+        <div style="border-radius:31px;overflow:hidden;background:#F5F6EF;min-height:820px;display:flex;flex-direction:column;">
+
+          <div style="display:flex;justify-content:space-between;align-items:center;padding:15px 24px 4px;font:600 14px 'Hind Siliguri';color:#16352B;">
+            <span>৯:৪১</span>
+            <div style="width:20px;height:11px;border:1.5px solid #16352B;border-radius:3px;position:relative;"><div style="position:absolute;right:-3px;top:3px;width:2px;height:5px;background:#16352B;border-radius:1px;"></div></div>
+          </div>
+
+          <div style="display:flex;align-items:center;gap:12px;padding:10px 22px 16px;">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#16352B" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg>
+            <span style="font:700 20px 'Noto Serif Bengali';color:#16352B;">স্টাইল বাছুন</span>
+          </div>
+
+          <div style="padding:2px 22px 26px;display:flex;flex-direction:column;gap:20px;">
+            <div style="font:500 15px 'Hind Siliguri';color:#707B70;line-height:1.5;">পছন্দের ডিজাইন বেছে নিন। পরে যেকোনো সময় বদলাতে পারবেন।</div>
+
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+              <div style="border-radius:16px;overflow:hidden;border:2px solid #1C4E3F;">
+                <div style="height:96px;background:repeating-linear-gradient(45deg,#E5E8DD,#E5E8DD 10px,#D7DCCC 10px,#D7DCCC 20px);"></div>
+                <div style="padding:9px 11px;background:#fff;">
+                  <div style="font:700 14px 'Hind Siliguri';color:#16352B;">আধুনিক</div>
+                  <div style="font:500 11px 'Hind Siliguri';color:#707B70;">Modern</div>
+                </div>
+              </div>
+              <div style="border-radius:16px;overflow:hidden;border:1.5px solid rgba(22,44,36,.12);">
+                <div style="height:96px;background:repeating-linear-gradient(45deg,#E5E8DD,#E5E8DD 10px,#D7DCCC 10px,#D7DCCC 20px);"></div>
+                <div style="padding:9px 11px;background:#fff;">
+                  <div style="font:700 14px 'Hind Siliguri';color:#16352B;">ঐতিহ্যবাহী বাংলা</div>
+                  <div style="font:500 11px 'Hind Siliguri';color:#707B70;">Traditional</div>
+                </div>
+              </div>
+              <div style="border-radius:16px;overflow:hidden;border:1.5px solid rgba(22,44,36,.12);">
+                <div style="height:96px;background:repeating-linear-gradient(45deg,#E5E8DD,#E5E8DD 10px,#D7DCCC 10px,#D7DCCC 20px);"></div>
+                <div style="padding:9px 11px;background:#fff;">
+                  <div style="font:700 14px 'Hind Siliguri';color:#16352B;">মিনিমাল</div>
+                  <div style="font:500 11px 'Hind Siliguri';color:#707B70;">Minimal</div>
+                </div>
+              </div>
+              <div style="border-radius:16px;overflow:hidden;border:1.5px solid rgba(22,44,36,.12);">
+                <div style="height:96px;background:repeating-linear-gradient(45deg,#E5E8DD,#E5E8DD 10px,#D7DCCC 10px,#D7DCCC 20px);"></div>
+                <div style="padding:9px 11px;background:#fff;">
+                  <div style="font:700 14px 'Hind Siliguri';color:#16352B;">বিলাসবহুল</div>
+                  <div style="font:500 11px 'Hind Siliguri';color:#707B70;">Luxury</div>
+                </div>
+              </div>
+              <div style="border-radius:16px;overflow:hidden;border:1.5px solid rgba(22,44,36,.12);">
+                <div style="height:96px;background:repeating-linear-gradient(45deg,#E5E8DD,#E5E8DD 10px,#D7DCCC 10px,#D7DCCC 20px);"></div>
+                <div style="padding:9px 11px;background:#fff;">
+                  <div style="font:700 14px 'Hind Siliguri';color:#16352B;">স্ক্যান্ডিনেভিয়ান</div>
+                  <div style="font:500 11px 'Hind Siliguri';color:#707B70;">Scandinavian</div>
+                </div>
+              </div>
+              <div style="border-radius:16px;overflow:hidden;border:1.5px solid rgba(22,44,36,.12);">
+                <div style="height:96px;background:repeating-linear-gradient(45deg,#E5E8DD,#E5E8DD 10px,#D7DCCC 10px,#D7DCCC 20px);"></div>
+                <div style="padding:9px 11px;background:#fff;">
+                  <div style="font:700 14px 'Hind Siliguri';color:#16352B;">ক্লাসিক</div>
+                  <div style="font:500 11px 'Hind Siliguri';color:#707B70;">Classic</div>
+                </div>
+              </div>
+            </div>
+
+            <div>
+              <div style="font:700 15px 'Hind Siliguri';color:#16352B;margin-bottom:10px;">বাজেট</div>
+              <div style="display:flex;gap:9px;">
+                <div style="flex:1;text-align:center;border:1.5px solid rgba(22,44,36,.13);border-radius:12px;padding:10px 6px;font:600 13px 'Hind Siliguri';color:#16352B;background:#fff;">কম</div>
+                <div style="flex:1;text-align:center;border:1.5px solid #1C4E3F;background:#E6EDE4;border-radius:12px;padding:10px 6px;font:600 13px 'Hind Siliguri';color:#123A2E;">মাঝারি</div>
+                <div style="flex:1;text-align:center;border:1.5px solid rgba(22,44,36,.13);border-radius:12px;padding:10px 6px;font:600 13px 'Hind Siliguri';color:#16352B;background:#fff;">প্রিমিয়াম</div>
+              </div>
+            </div>
+
+            <div>
+              <div style="font:700 15px 'Hind Siliguri';color:#16352B;margin-bottom:10px;">নিজের মতো বলুন <span style="font-weight:500;color:#707B70;">(ঐচ্ছিক)</span></div>
+              <div style="border:1.5px solid rgba(22,44,36,.13);border-radius:14px;padding:14px;background:#fff;font:500 14px 'Hind Siliguri';color:#98A093;min-height:64px;">যেমন: হালকা রঙ, কাঠের আসবাব, বেশি আলো...</div>
+            </div>
+
+            <div style="background:#1C4E3F;color:#fff;border-radius:16px;padding:17px;text-align:center;font:700 17px 'Hind Siliguri';box-shadow:0 12px 26px rgba(28,78,63,.32);">ঘর সাজান ✦</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ========== 3 · GENERATING ========== -->
+    <div style="display:flex;flex-direction:column;gap:14px;align-items:center;flex:0 0 auto;">
+      <div style="font:600 13px 'Hind Siliguri';color:#707B70;">৩ · সাজানো হচ্ছে · Generating</div>
+      <div style="width:410px;background:#fff;border-radius:40px;padding:11px;box-shadow:0 26px 60px rgba(24,44,34,.14);border:1px solid rgba(24,44,34,.05);">
+        <div style="border-radius:31px;overflow:hidden;background:linear-gradient(180deg,#F5F6EF,#F3E7D8);min-height:820px;display:flex;flex-direction:column;">
+
+          <div style="display:flex;justify-content:space-between;align-items:center;padding:15px 24px 4px;font:600 14px 'Hind Siliguri';color:#16352B;">
+            <span>৯:৪১</span>
+            <div style="width:20px;height:11px;border:1.5px solid #16352B;border-radius:3px;position:relative;"><div style="position:absolute;right:-3px;top:3px;width:2px;height:5px;background:#16352B;border-radius:1px;"></div></div>
+          </div>
+
+          <div style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:40px 34px;text-align:center;gap:26px;">
+            <div style="position:relative;width:110px;height:110px;">
+              <div style="position:absolute;inset:0;border-radius:50%;border:5px solid rgba(28,78,63,.16);"></div>
+              <div style="position:absolute;inset:0;border-radius:50%;border:5px solid transparent;border-top-color:#1C4E3F;animation:homeai-spin 1s linear infinite;"></div>
+              <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;">
+                <div style="width:44px;height:44px;border-radius:13px;background:#1C4E3F;display:flex;align-items:center;justify-content:center;color:#fff;font:800 22px 'Noto Serif Bengali';animation:homeai-pulse 1.8s ease-in-out infinite;">H</div>
+              </div>
+            </div>
+
+            <div>
+              <div style="font:700 24px 'Noto Serif Bengali';color:#16352B;">আপনার ঘর সাজানো হচ্ছে</div>
+              <div style="font:500 15px 'Hind Siliguri';color:#707B70;margin-top:8px;line-height:1.55;">একটু অপেক্ষা করুন — সাধারণত ১৫–৩০ সেকেন্ড সময় লাগে।</div>
+            </div>
+
+            <div style="width:100%;max-width:280px;">
+              <div style="height:8px;border-radius:99px;background:rgba(22,44,36,.1);overflow:hidden;">
+                <div style="width:62%;height:100%;background:#1C4E3F;border-radius:99px;"></div>
+              </div>
+              <div style="font:600 13px 'Hind Siliguri';color:#123A2E;margin-top:9px;">আসবাব বসানো হচ্ছে...</div>
+            </div>
+
+            <div style="background:#fff;border-radius:16px;padding:16px 18px;display:flex;align-items:flex-start;gap:11px;text-align:right;box-shadow:0 8px 22px rgba(24,44,34,.08);max-width:300px;">
+              <div style="width:26px;height:26px;border-radius:8px;background:#E6EDE4;flex:0 0 auto;display:flex;align-items:center;justify-content:center;color:#1C4E3F;font:700 15px 'Noto Serif Bengali';">i</div>
+              <div style="font:500 13.5px 'Hind Siliguri';color:#47514A;line-height:1.5;text-align:left;">জানেন কি? প্রতিটি আসবাবের সাথে দেশি ব্র্যান্ড ও পুরনো বাজারের দাম দেখাবে।</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ========== 4 · RESULT ========== -->
+    <div style="display:flex;flex-direction:column;gap:14px;align-items:center;flex:0 0 auto;">
+      <div style="font:600 13px 'Hind Siliguri';color:#707B70;">৪ · নতুন ঘর · Result</div>
+      <div style="width:410px;background:#fff;border-radius:40px;padding:11px;box-shadow:0 26px 60px rgba(24,44,34,.14);border:1px solid rgba(24,44,34,.05);">
+        <div style="border-radius:31px;overflow:hidden;background:#F5F6EF;min-height:820px;display:flex;flex-direction:column;">
+
+          <div style="display:flex;justify-content:space-between;align-items:center;padding:15px 24px 4px;font:600 14px 'Hind Siliguri';color:#16352B;">
+            <span>৯:৪১</span>
+            <div style="width:20px;height:11px;border:1.5px solid #16352B;border-radius:3px;position:relative;"><div style="position:absolute;right:-3px;top:3px;width:2px;height:5px;background:#16352B;border-radius:1px;"></div></div>
+          </div>
+
+          <div style="display:flex;justify-content:space-between;align-items:center;padding:8px 22px 12px;">
+            <div style="display:flex;align-items:center;gap:9px;">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#16352B" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg>
+              <span style="font:700 18px 'Noto Serif Bengali';color:#16352B;">আপনার নতুন ঘর</span>
+            </div>
+            <div style="display:flex;align-items:center;gap:5px;background:#E6EDE4;border-radius:99px;padding:5px 11px;">
+              <div style="display:flex;gap:3px;">
+                <div style="width:6px;height:6px;border-radius:50%;background:#1C4E3F;"></div>
+                <div style="width:6px;height:6px;border-radius:50%;background:#1C4E3F;"></div>
+                <div style="width:6px;height:6px;border-radius:50%;background:#1C4E3F;"></div>
+                <div style="width:6px;height:6px;border-radius:50%;background:#1C4E3F;"></div>
+                <div style="width:6px;height:6px;border-radius:50%;background:rgba(28,78,63,.28);"></div>
+              </div>
+              <span style="font:700 11px 'Hind Siliguri';color:#123A2E;">৪ ফ্রি বাকি</span>
+            </div>
+          </div>
+
+          <div style="padding:0 16px;">
+            <div style="position:relative;border-radius:20px;overflow:hidden;height:340px;background:repeating-linear-gradient(45deg,#E5E8DD,#E5E8DD 13px,#D7DCCC 13px,#D7DCCC 26px);">
+              <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;"><span style="font:600 12px 'Courier New',monospace;color:#8C9285;">[ সাজানো ঘরের ছবি / redesigned room ]</span></div>
+              <div style="position:absolute;top:12px;left:12px;background:rgba(22,44,36,.72);color:#fff;border-radius:99px;padding:5px 12px;font:600 12px 'Hind Siliguri';">আধুনিক · মাঝারি বাজেট</div>
+
+              <!-- pins -->
+              <div style="position:absolute;top:44%;left:26%;transform:translate(-50%,-50%);display:flex;align-items:center;gap:6px;background:#fff;border-radius:99px;padding:5px 10px 5px 6px;box-shadow:0 6px 16px rgba(0,0,0,.22);">
+                <div style="width:20px;height:20px;border-radius:50%;background:#1C4E3F;display:flex;align-items:center;justify-content:center;color:#fff;font:700 11px 'Hind Siliguri';">১</div>
+                <span style="font:700 12px 'Hind Siliguri';color:#16352B;">৳৪২,০০০</span>
+              </div>
+              <div style="position:absolute;top:68%;left:60%;transform:translate(-50%,-50%);display:flex;align-items:center;gap:6px;background:#fff;border-radius:99px;padding:5px 10px 5px 6px;box-shadow:0 6px 16px rgba(0,0,0,.22);">
+                <div style="width:20px;height:20px;border-radius:50%;background:#1C4E3F;display:flex;align-items:center;justify-content:center;color:#fff;font:700 11px 'Hind Siliguri';">২</div>
+                <span style="font:700 12px 'Hind Siliguri';color:#16352B;">৳৮,৫০০</span>
+              </div>
+              <div style="position:absolute;top:30%;left:78%;transform:translate(-50%,-50%);display:flex;align-items:center;gap:6px;background:#fff;border-radius:99px;padding:5px 10px 5px 6px;box-shadow:0 6px 16px rgba(0,0,0,.22);">
+                <div style="width:20px;height:20px;border-radius:50%;background:#1C4E3F;display:flex;align-items:center;justify-content:center;color:#fff;font:700 11px 'Hind Siliguri';">৩</div>
+                <span style="font:700 12px 'Hind Siliguri';color:#16352B;">৳৩,২০০</span>
+              </div>
+            </div>
+            <div style="display:flex;align-items:center;gap:7px;justify-content:center;margin-top:11px;font:500 13px 'Hind Siliguri';color:#707B70;">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#1C4E3F" stroke-width="2.2" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M12 8v4M12 16h.01"/></svg>
+              দাম দেখতে যেকোনো আসবাবে ট্যাপ করুন
+            </div>
+          </div>
+
+          <div style="padding:20px 16px 24px;display:flex;flex-direction:column;gap:12px;">
+            <div style="display:flex;gap:10px;">
+              <div style="flex:1;display:flex;align-items:center;justify-content:center;gap:8px;background:#1C4E3F;color:#fff;border-radius:14px;padding:14px;font:700 15px 'Hind Siliguri';box-shadow:0 10px 22px rgba(28,78,63,.3);">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 3-6.7L3 8"/><path d="M3 3v5h5"/></svg>
+                আবার তৈরি করুন
+              </div>
+              <div style="flex:1;display:flex;align-items:center;justify-content:center;gap:8px;background:#fff;color:#16352B;border:1.5px solid rgba(22,44,36,.14);border-radius:14px;padding:14px;font:700 15px 'Hind Siliguri';">
+                অন্য স্টাইল
+              </div>
+            </div>
+            <div style="display:flex;gap:10px;">
+              <div style="flex:1;display:flex;align-items:center;justify-content:center;gap:8px;background:#fff;color:#16352B;border:1.5px solid rgba(22,44,36,.14);border-radius:14px;padding:13px;font:600 14px 'Hind Siliguri';">
+                <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#1C4E3F" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/></svg>
+                সংরক্ষণ
+              </div>
+              <div style="flex:1;display:flex;align-items:center;justify-content:center;gap:8px;background:#25D366;color:#fff;border-radius:14px;padding:13px;font:600 14px 'Hind Siliguri';">
+                <svg width="17" height="17" viewBox="0 0 24 24" fill="#fff"><path d="M12 2a10 10 0 0 0-8.5 15.2L2 22l4.9-1.3A10 10 0 1 0 12 2zm5.3 14.1c-.2.6-1.3 1.2-1.8 1.2-.5.1-1 .1-1.7-.1-1.6-.6-3.7-2.6-4.8-4.6-.3-.5-.6-1.2-.6-1.9 0-.7.4-1.1.6-1.3.2-.2.4-.2.5-.2h.4c.2 0 .3 0 .5.4l.6 1.5c.1.2 0 .4-.1.5l-.3.4c-.1.2-.2.3 0 .5.5.9 1.1 1.5 2 1.9.2.1.3.1.4 0l.6-.7c.2-.2.3-.2.5-.1l1.4.7c.2.1.3.2.3.3.1.1.1.6-.1 1.1z"/></svg>
+                শেয়ার
+              </div>
+            </div>
+            <div style="display:flex;gap:20px;justify-content:center;padding-top:2px;font:600 13px 'Hind Siliguri';color:#707B70;">
+              <span>🔗&nbsp;লিংক কপি</span>
+              <span>⬇&nbsp;ডাউনলোড</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ========== 5 · FURNITURE DETAIL ========== -->
+    <div style="display:flex;flex-direction:column;gap:14px;align-items:center;flex:0 0 auto;">
+      <div style="font:600 13px 'Hind Siliguri';color:#707B70;">৫ · আসবাবের বিস্তারিত · Furniture tag</div>
+      <div style="width:410px;background:#fff;border-radius:40px;padding:11px;box-shadow:0 26px 60px rgba(24,44,34,.14);border:1px solid rgba(24,44,34,.05);">
+        <div style="border-radius:31px;overflow:hidden;background:#F5F6EF;min-height:820px;display:flex;flex-direction:column;position:relative;">
+
+          <div style="filter:brightness(.82);pointer-events:none;">
+            <div style="display:flex;justify-content:space-between;align-items:center;padding:15px 24px 4px;font:600 14px 'Hind Siliguri';color:#16352B;">
+              <span>৯:৪১</span>
+              <div style="width:20px;height:11px;border:1.5px solid #16352B;border-radius:3px;position:relative;"><div style="position:absolute;right:-3px;top:3px;width:2px;height:5px;background:#16352B;border-radius:1px;"></div></div>
+            </div>
+            <div style="padding:14px 16px 0;">
+              <div style="border-radius:20px;overflow:hidden;height:300px;background:repeating-linear-gradient(45deg,#E5E8DD,#E5E8DD 13px,#D7DCCC 13px,#D7DCCC 26px);display:flex;align-items:center;justify-content:center;"><span style="font:600 12px 'Courier New',monospace;color:#8C9285;">[ সাজানো ঘরের ছবি ]</span></div>
+            </div>
+          </div>
+          <div style="position:absolute;inset:0;background:rgba(16,32,24,.42);"></div>
+
+          <!-- bottom sheet -->
+          <div style="position:absolute;left:0;right:0;bottom:0;background:#FBFBF5;border-radius:26px 26px 0 0;padding:14px 22px 26px;box-shadow:0 -14px 40px rgba(0,0,0,.2);display:flex;flex-direction:column;gap:18px;">
+            <div style="width:44px;height:5px;border-radius:99px;background:rgba(22,44,36,.16);margin:0 auto;"></div>
+
+            <div style="display:flex;gap:14px;">
+              <div style="width:104px;height:104px;flex:0 0 auto;border-radius:16px;background:repeating-linear-gradient(45deg,#E5E8DD,#E5E8DD 9px,#D7DCCC 9px,#D7DCCC 18px);display:flex;align-items:center;justify-content:center;"><span style="font:600 10px 'Courier New',monospace;color:#8C9285;text-align:center;">product<br>shot</span></div>
+              <div style="flex:1;display:flex;flex-direction:column;gap:6px;">
+                <div style="display:inline-flex;align-self:flex-start;background:#E6EDE4;color:#123A2E;border-radius:99px;padding:3px 10px;font:700 11px 'Hind Siliguri';">১ · সোফা</div>
+                <div style="font:700 19px 'Noto Serif Bengali';color:#16352B;line-height:1.2;">কাঠের সোফা সেট (৩ সিটার)</div>
+                <div style="font:500 13px 'Hind Siliguri';color:#707B70;">মাপ: ৮৪″ × ৩৬″ × ৩২″ · সেগুন কাঠ</div>
+              </div>
+            </div>
+
+            <div style="display:flex;align-items:baseline;gap:10px;">
+              <span style="font:800 28px 'Noto Serif Bengali';color:#16352B;">৳ ৪২,০০০</span>
+              <span style="font:500 13px 'Hind Siliguri';color:#707B70;">নতুন · Hatil অনুযায়ী</span>
+            </div>
+
+            <div style="display:flex;flex-direction:column;gap:10px;">
+              <div style="display:flex;align-items:center;justify-content:space-between;background:#1C4E3F;color:#fff;border-radius:14px;padding:15px 18px;box-shadow:0 10px 22px rgba(28,78,63,.3);">
+                <div style="display:flex;flex-direction:column;">
+                  <span style="font:700 15px 'Hind Siliguri';">নতুন কিনুন</span>
+                  <span style="font:500 12px 'Hind Siliguri';opacity:.88;">Hatil · অফিসিয়াল স্টোর</span>
+                </div>
+                <span style="font:700 15px 'Hind Siliguri';">৳ ৪২,০০০ →</span>
+              </div>
+              <div style="display:flex;align-items:center;justify-content:space-between;background:#fff;border:1.5px solid #A9791F;border-radius:14px;padding:15px 18px;">
+                <div style="display:flex;flex-direction:column;">
+                  <span style="font:700 15px 'Hind Siliguri';color:#6E4E12;">ব্যবহৃত কিনুন</span>
+                  <span style="font:500 12px 'Hind Siliguri';color:#A9791F;">Bikroy · ৩টি বিজ্ঞাপন</span>
+                </div>
+                <span style="font:700 15px 'Hind Siliguri';color:#6E4E12;">৳ ২৪,০০০ →</span>
+              </div>
+            </div>
+
+            <div>
+              <div style="font:600 13px 'Hind Siliguri';color:#707B70;margin-bottom:9px;">একই রকম অন্য ব্র্যান্ডে</div>
+              <div style="display:flex;gap:8px;flex-wrap:wrap;">
+                <span style="border:1.5px solid rgba(22,44,36,.13);border-radius:99px;padding:7px 15px;font:600 13px 'Hind Siliguri';color:#16352B;background:#fff;">Otobi ৳৩৮,৫০০</span>
+                <span style="border:1.5px solid rgba(22,44,36,.13);border-radius:99px;padding:7px 15px;font:600 13px 'Hind Siliguri';color:#16352B;background:#fff;">Regal ৳৩৫,০০০</span>
+                <span style="border:1.5px solid rgba(22,44,36,.13);border-radius:99px;padding:7px 15px;font:600 13px 'Hind Siliguri';color:#16352B;background:#fff;">Partex ৳৪০,০০০</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ============ SUPPORTING SCREENS ============ -->
+  <div style="max-width:1100px;margin:0 auto 14px;display:flex;align-items:center;gap:12px;">
+    <div style="width:9px;height:9px;border-radius:50%;background:#A9791F;"></div>
+    <div style="font:700 15px 'Hind Siliguri';color:#16352B;letter-spacing:.4px;text-transform:uppercase;">বাকি স্ক্রিন · Supporting</div>
+    <div style="flex:1;height:1px;background:rgba(22,44,36,.12);"></div>
+  </div>
+
+  <div style="display:flex;flex-wrap:wrap;gap:44px;align-items:flex-start;justify-content:center;">
+
+    <!-- ========== LANDING ========== -->
+    <div style="display:flex;flex-direction:column;gap:14px;align-items:center;flex:0 0 auto;">
+      <div style="font:600 13px 'Hind Siliguri';color:#707B70;">ল্যান্ডিং · Landing</div>
+      <div style="width:410px;background:#fff;border-radius:40px;padding:11px;box-shadow:0 26px 60px rgba(24,44,34,.14);border:1px solid rgba(24,44,34,.05);">
+        <div style="border-radius:31px;overflow:hidden;background:#F5F6EF;min-height:820px;display:flex;flex-direction:column;">
+
+          <div style="display:flex;justify-content:space-between;align-items:center;padding:15px 24px 4px;font:600 14px 'Hind Siliguri';color:#16352B;">
+            <span>৯:৪১</span>
+            <div style="width:20px;height:11px;border:1.5px solid #16352B;border-radius:3px;position:relative;"><div style="position:absolute;right:-3px;top:3px;width:2px;height:5px;background:#16352B;border-radius:1px;"></div></div>
+          </div>
+
+          <div style="display:flex;justify-content:space-between;align-items:center;padding:10px 22px 6px;">
+            <div style="display:flex;align-items:center;gap:9px;">
+              <div style="width:30px;height:30px;border-radius:9px;background:#1C4E3F;display:flex;align-items:center;justify-content:center;color:#fff;font:800 16px 'Noto Serif Bengali';">H</div>
+              <span style="font:700 19px 'Noto Serif Bengali';color:#16352B;">হোম এআই</span>
+            </div>
+            <div style="display:flex;border:1px solid rgba(22,44,36,.15);border-radius:999px;overflow:hidden;font:600 12px 'Hind Siliguri';">
+              <span style="padding:6px 12px;background:#1C4E3F;color:#fff;">বাংলা</span>
+              <span style="padding:6px 12px;color:#707B70;">EN</span>
+            </div>
+          </div>
+
+          <div style="padding:18px 22px 8px;">
+            <div style="font:800 30px 'Noto Serif Bengali';color:#16352B;line-height:1.2;">একটি টাকা খরচের আগেই দেখুন আপনার ঘরের নতুন রূপ</div>
+            <div style="font:500 15.5px 'Hind Siliguri';color:#707B70;margin-top:12px;line-height:1.55;">ঘরের ছবি তুলুন, পছন্দের স্টাইল বাছুন — এআই মুহূর্তেই সাজিয়ে দেবে, আসবাবের দামসহ।</div>
+            <div style="background:#1C4E3F;color:#fff;border-radius:16px;padding:17px;text-align:center;font:700 17px 'Hind Siliguri';box-shadow:0 12px 26px rgba(28,78,63,.32);margin-top:20px;">ছবি দিয়ে শুরু করুন</div>
+            <div style="text-align:center;font:600 13px 'Hind Siliguri';color:#A9791F;margin-top:11px;">✓ ৫টি ডিজাইন সম্পূর্ণ ফ্রি · কার্ড লাগবে না</div>
+          </div>
+
+          <div style="padding:22px 22px 8px;">
+            <div style="position:relative;border-radius:18px;overflow:hidden;height:190px;display:flex;">
+              <div style="flex:1;background:repeating-linear-gradient(45deg,#E5E8DD,#E5E8DD 12px,#D7DCCC 12px,#D7DCCC 24px);position:relative;"><span style="position:absolute;top:10px;left:10px;background:rgba(22,44,36,.7);color:#fff;border-radius:99px;padding:3px 11px;font:600 11px 'Hind Siliguri';">আগে</span></div>
+              <div style="flex:1;background:repeating-linear-gradient(45deg,#E5E8DD,#E5E8DD 12px,#D7DCCC 12px,#D7DCCC 24px);position:relative;"><span style="position:absolute;top:10px;right:10px;background:#1C4E3F;color:#fff;border-radius:99px;padding:3px 11px;font:600 11px 'Hind Siliguri';">পরে</span></div>
+              <div style="position:absolute;top:0;bottom:0;left:50%;width:3px;background:#fff;transform:translateX(-50%);"></div>
+              <div style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:34px;height:34px;border-radius:50%;background:#fff;box-shadow:0 4px 12px rgba(0,0,0,.2);display:flex;align-items:center;justify-content:center;color:#1C4E3F;font:700 14px 'Hind Siliguri';">↔</div>
+            </div>
+            <div style="text-align:center;font:500 13px 'Hind Siliguri';color:#707B70;margin-top:9px;">সত্যিকারের ঘর, এআই দিয়ে সাজানো</div>
+          </div>
+
+          <div style="padding:20px 22px 8px;">
+            <div style="font:700 18px 'Noto Serif Bengali';color:#16352B;margin-bottom:14px;">কীভাবে কাজ করে</div>
+            <div style="display:flex;flex-direction:column;gap:14px;">
+              <div style="display:flex;gap:13px;align-items:center;">
+                <div style="width:34px;height:34px;flex:0 0 auto;border-radius:10px;background:#E6EDE4;color:#123A2E;display:flex;align-items:center;justify-content:center;font:800 16px 'Noto Serif Bengali';">১</div>
+                <div><div style="font:700 15px 'Hind Siliguri';color:#16352B;">ছবি তুলুন</div><div style="font:500 13px 'Hind Siliguri';color:#707B70;">ঘরের একটি ছবি তুলুন বা আপলোড করুন</div></div>
+              </div>
+              <div style="display:flex;gap:13px;align-items:center;">
+                <div style="width:34px;height:34px;flex:0 0 auto;border-radius:10px;background:#E6EDE4;color:#123A2E;display:flex;align-items:center;justify-content:center;font:800 16px 'Noto Serif Bengali';">২</div>
+                <div><div style="font:700 15px 'Hind Siliguri';color:#16352B;">স্টাইল বাছুন</div><div style="font:500 13px 'Hind Siliguri';color:#707B70;">পছন্দের ডিজাইন নির্বাচন করুন</div></div>
+              </div>
+              <div style="display:flex;gap:13px;align-items:center;">
+                <div style="width:34px;height:34px;flex:0 0 auto;border-radius:10px;background:#E6EDE4;color:#123A2E;display:flex;align-items:center;justify-content:center;font:800 16px 'Noto Serif Bengali';">৩</div>
+                <div><div style="font:700 15px 'Hind Siliguri';color:#16352B;">নতুন ঘর দেখুন</div><div style="font:500 13px 'Hind Siliguri';color:#707B70;">আসবাবের দামসহ সাজানো ঘর পান</div></div>
+              </div>
+            </div>
+          </div>
+
+          <div style="padding:22px 22px 12px;">
+            <div style="font:600 12px 'Hind Siliguri';color:#707B70;text-align:center;margin-bottom:11px;">যেসব ব্র্যান্ড ও বাজার থেকে আসবাব</div>
+            <div style="display:flex;flex-wrap:wrap;gap:8px;justify-content:center;">
+              <span style="border:1px solid rgba(22,44,36,.12);border-radius:99px;padding:6px 14px;font:700 13px 'Hind Siliguri';color:#47514A;background:#fff;">Hatil</span>
+              <span style="border:1px solid rgba(22,44,36,.12);border-radius:99px;padding:6px 14px;font:700 13px 'Hind Siliguri';color:#47514A;background:#fff;">Otobi</span>
+              <span style="border:1px solid rgba(22,44,36,.12);border-radius:99px;padding:6px 14px;font:700 13px 'Hind Siliguri';color:#47514A;background:#fff;">Regal</span>
+              <span style="border:1px solid rgba(22,44,36,.12);border-radius:99px;padding:6px 14px;font:700 13px 'Hind Siliguri';color:#47514A;background:#fff;">Partex</span>
+              <span style="border:1px solid rgba(22,44,36,.12);border-radius:99px;padding:6px 14px;font:700 13px 'Hind Siliguri';color:#47514A;background:#fff;">Bikroy</span>
+            </div>
+          </div>
+
+          <div style="margin-top:auto;display:flex;justify-content:space-around;align-items:center;padding:13px 22px;border-top:1px solid rgba(22,44,36,.08);background:#fff;">
+            <div style="display:flex;flex-direction:column;align-items:center;gap:4px;color:#1C4E3F;"><svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="#1C4E3F" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 10l9-7 9 7v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg><span style="font:700 11px 'Hind Siliguri';">হোম</span></div>
+            <div style="display:flex;flex-direction:column;align-items:center;gap:4px;color:#98A093;"><svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="#98A093" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/></svg><span style="font:600 11px 'Hind Siliguri';">সংরক্ষিত</span></div>
+            <div style="display:flex;flex-direction:column;align-items:center;gap:4px;color:#98A093;"><svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="#98A093" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/></svg><span style="font:600 11px 'Hind Siliguri';">প্রোফাইল</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ========== SAVED GALLERY ========== -->
+    <div style="display:flex;flex-direction:column;gap:14px;align-items:center;flex:0 0 auto;">
+      <div style="font:600 13px 'Hind Siliguri';color:#707B70;">সংরক্ষিত · Saved gallery</div>
+      <div style="width:410px;background:#fff;border-radius:40px;padding:11px;box-shadow:0 26px 60px rgba(24,44,34,.14);border:1px solid rgba(24,44,34,.05);">
+        <div style="border-radius:31px;overflow:hidden;background:#F5F6EF;min-height:820px;display:flex;flex-direction:column;position:relative;">
+
+          <div style="display:flex;justify-content:space-between;align-items:center;padding:15px 24px 4px;font:600 14px 'Hind Siliguri';color:#16352B;">
+            <span>৯:৪১</span>
+            <div style="width:20px;height:11px;border:1.5px solid #16352B;border-radius:3px;position:relative;"><div style="position:absolute;right:-3px;top:3px;width:2px;height:5px;background:#16352B;border-radius:1px;"></div></div>
+          </div>
+
+          <div style="padding:12px 22px 16px;">
+            <div style="font:700 22px 'Noto Serif Bengali';color:#16352B;">আমার ডিজাইন</div>
+            <div style="font:500 14px 'Hind Siliguri';color:#707B70;margin-top:3px;">৬টি সংরক্ষিত ডিজাইন</div>
+          </div>
+
+          <div style="padding:0 18px;display:grid;grid-template-columns:1fr 1fr;gap:14px;">
+            <div style="border-radius:16px;overflow:hidden;background:#fff;box-shadow:0 6px 16px rgba(24,44,34,.07);">
+              <div style="height:118px;background:repeating-linear-gradient(45deg,#E5E8DD,#E5E8DD 11px,#D7DCCC 11px,#D7DCCC 22px);position:relative;"><span style="position:absolute;top:8px;right:8px;width:26px;height:26px;border-radius:50%;background:rgba(255,255,255,.9);display:flex;align-items:center;justify-content:center;"><svg width="14" height="14" viewBox="0 0 24 24" fill="#1C4E3F" stroke="#1C4E3F" stroke-width="2"><path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.6l-1-1a5.5 5.5 0 0 0-7.8 7.8l1 1L12 21l7.8-7.6 1-1a5.5 5.5 0 0 0 0-7.8z"/></svg></span></div>
+              <div style="padding:10px 11px;"><div style="font:700 14px 'Hind Siliguri';color:#16352B;">বসার ঘর</div><div style="font:500 11px 'Hind Siliguri';color:#707B70;">আধুনিক · ৮ জুলাই</div></div>
+            </div>
+            <div style="border-radius:16px;overflow:hidden;background:#fff;box-shadow:0 6px 16px rgba(24,44,34,.07);">
+              <div style="height:118px;background:repeating-linear-gradient(45deg,#E5E8DD,#E5E8DD 11px,#D7DCCC 11px,#D7DCCC 22px);position:relative;"><span style="position:absolute;top:8px;right:8px;width:26px;height:26px;border-radius:50%;background:rgba(255,255,255,.9);display:flex;align-items:center;justify-content:center;"><svg width="14" height="14" viewBox="0 0 24 24" fill="#1C4E3F" stroke="#1C4E3F" stroke-width="2"><path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.6l-1-1a5.5 5.5 0 0 0-7.8 7.8l1 1L12 21l7.8-7.6 1-1a5.5 5.5 0 0 0 0-7.8z"/></svg></span></div>
+              <div style="padding:10px 11px;"><div style="font:700 14px 'Hind Siliguri';color:#16352B;">শোবার ঘর</div><div style="font:500 11px 'Hind Siliguri';color:#707B70;">মিনিমাল · ৬ জুলাই</div></div>
+            </div>
+            <div style="border-radius:16px;overflow:hidden;background:#fff;box-shadow:0 6px 16px rgba(24,44,34,.07);">
+              <div style="height:118px;background:repeating-linear-gradient(45deg,#E5E8DD,#E5E8DD 11px,#D7DCCC 11px,#D7DCCC 22px);position:relative;"><span style="position:absolute;top:8px;right:8px;width:26px;height:26px;border-radius:50%;background:rgba(255,255,255,.9);display:flex;align-items:center;justify-content:center;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#707B70" stroke-width="2"><path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.6l-1-1a5.5 5.5 0 0 0-7.8 7.8l1 1L12 21l7.8-7.6 1-1a5.5 5.5 0 0 0 0-7.8z"/></svg></span></div>
+              <div style="padding:10px 11px;"><div style="font:700 14px 'Hind Siliguri';color:#16352B;">খাবার ঘর</div><div style="font:500 11px 'Hind Siliguri';color:#707B70;">ঐতিহ্যবাহী · ৩ জুলাই</div></div>
+            </div>
+            <div style="border-radius:16px;overflow:hidden;background:#fff;box-shadow:0 6px 16px rgba(24,44,34,.07);">
+              <div style="height:118px;background:repeating-linear-gradient(45deg,#E5E8DD,#E5E8DD 11px,#D7DCCC 11px,#D7DCCC 22px);position:relative;"><span style="position:absolute;top:8px;right:8px;width:26px;height:26px;border-radius:50%;background:rgba(255,255,255,.9);display:flex;align-items:center;justify-content:center;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#707B70" stroke-width="2"><path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.6l-1-1a5.5 5.5 0 0 0-7.8 7.8l1 1L12 21l7.8-7.6 1-1a5.5 5.5 0 0 0 0-7.8z"/></svg></span></div>
+              <div style="padding:10px 11px;"><div style="font:700 14px 'Hind Siliguri';color:#16352B;">নামাজের কোণ</div><div style="font:500 11px 'Hind Siliguri';color:#707B70;">মিনিমাল · ১ জুলাই</div></div>
+            </div>
+          </div>
+
+          <div style="position:absolute;right:20px;bottom:22px;display:flex;align-items:center;gap:9px;background:#1C4E3F;color:#fff;border-radius:99px;padding:14px 20px;font:700 15px 'Hind Siliguri';box-shadow:0 12px 26px rgba(28,78,63,.4);">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.4" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>
+            নতুন ডিজাইন
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ========== AUTH ========== -->
+    <div style="display:flex;flex-direction:column;gap:14px;align-items:center;flex:0 0 auto;">
+      <div style="font:600 13px 'Hind Siliguri';color:#707B70;">লগ ইন · Auth</div>
+      <div style="width:410px;background:#fff;border-radius:40px;padding:11px;box-shadow:0 26px 60px rgba(24,44,34,.14);border:1px solid rgba(24,44,34,.05);">
+        <div style="border-radius:31px;overflow:hidden;background:#F5F6EF;min-height:820px;display:flex;flex-direction:column;">
+
+          <div style="display:flex;justify-content:space-between;align-items:center;padding:15px 24px 4px;font:600 14px 'Hind Siliguri';color:#16352B;">
+            <span>৯:৪১</span>
+            <div style="width:20px;height:11px;border:1.5px solid #16352B;border-radius:3px;position:relative;"><div style="position:absolute;right:-3px;top:3px;width:2px;height:5px;background:#16352B;border-radius:1px;"></div></div>
+          </div>
+
+          <div style="flex:1;display:flex;flex-direction:column;justify-content:center;padding:0 26px 26px;gap:22px;">
+            <div style="display:flex;flex-direction:column;align-items:center;gap:14px;">
+              <div style="width:58px;height:58px;border-radius:17px;background:#1C4E3F;display:flex;align-items:center;justify-content:center;color:#fff;font:800 30px 'Noto Serif Bengali';box-shadow:0 12px 28px rgba(28,78,63,.32);">H</div>
+              <div style="text-align:center;">
+                <div style="font:800 25px 'Noto Serif Bengali';color:#16352B;">স্বাগতম</div>
+                <div style="font:500 14.5px 'Hind Siliguri';color:#707B70;margin-top:5px;">লগ ইন করে আপনার ডিজাইন সংরক্ষণ করুন</div>
+              </div>
+            </div>
+
+            <div style="display:flex;flex-direction:column;gap:11px;">
+              <div style="display:flex;align-items:center;justify-content:center;gap:10px;background:#1877F2;color:#fff;border-radius:14px;padding:15px;font:700 15.5px 'Hind Siliguri';box-shadow:0 10px 22px rgba(24,119,242,.28);">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="#fff"><path d="M22 12a10 10 0 1 0-11.6 9.9v-7H8v-2.9h2.4V9.8c0-2.4 1.4-3.7 3.6-3.7 1 0 2.1.2 2.1.2v2.3h-1.2c-1.2 0-1.5.7-1.5 1.5v1.8h2.6l-.4 2.9h-2.2v7A10 10 0 0 0 22 12z"/></svg>
+                ফেসবুক দিয়ে চালিয়ে যান
+              </div>
+              <div style="display:flex;align-items:center;justify-content:center;gap:10px;background:#fff;color:#16352B;border:1.5px solid rgba(22,44,36,.16);border-radius:14px;padding:15px;font:700 15.5px 'Hind Siliguri';">
+                <svg width="19" height="19" viewBox="0 0 24 24"><path fill="#4285F4" d="M23 12.3c0-.8-.1-1.6-.2-2.3H12v4.5h6.2a5.3 5.3 0 0 1-2.3 3.5v2.9h3.7C21.7 19 23 15.9 23 12.3z"/><path fill="#34A853" d="M12 24c3.1 0 5.7-1 7.6-2.8l-3.7-2.9c-1 .7-2.3 1.1-3.9 1.1-3 0-5.5-2-6.4-4.7H1.7v3C3.6 21.4 7.5 24 12 24z"/><path fill="#FBBC05" d="M5.6 14.7a7.2 7.2 0 0 1 0-4.6V7.1H1.7a12 12 0 0 0 0 10.6z"/><path fill="#EA4335" d="M12 4.8c1.7 0 3.2.6 4.4 1.7l3.3-3.3C17.7 1.2 15.1 0 12 0 7.5 0 3.6 2.6 1.7 6.4l3.9 3C6.5 6.7 9 4.8 12 4.8z"/></svg>
+                গুগল দিয়ে চালিয়ে যান
+              </div>
+            </div>
+
+            <div style="display:flex;align-items:center;gap:12px;"><div style="flex:1;height:1px;background:rgba(22,44,36,.12);"></div><span style="font:500 13px 'Hind Siliguri';color:#98A093;">অথবা</span><div style="flex:1;height:1px;background:rgba(22,44,36,.12);"></div></div>
+
+            <div style="display:flex;flex-direction:column;gap:11px;">
+              <div style="border:1.5px solid rgba(22,44,36,.14);border-radius:13px;padding:15px;background:#fff;font:500 14px 'Hind Siliguri';color:#98A093;">ইমেইল ঠিকানা</div>
+              <div style="border:1.5px solid rgba(22,44,36,.14);border-radius:13px;padding:15px;background:#fff;font:500 14px 'Hind Siliguri';color:#98A093;">পাসওয়ার্ড</div>
+            </div>
+
+            <div style="background:#1C4E3F;color:#fff;border-radius:14px;padding:16px;text-align:center;font:700 16px 'Hind Siliguri';box-shadow:0 10px 22px rgba(28,78,63,.3);">চালিয়ে যান</div>
+
+            <div style="text-align:center;font:500 14px 'Hind Siliguri';color:#707B70;">নতুন এখানে? <span style="color:#1C4E3F;font-weight:700;">অ্যাকাউন্ট খুলুন</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ========== PRICING ========== -->
+    <div style="display:flex;flex-direction:column;gap:14px;align-items:center;flex:0 0 auto;">
+      <div style="font:600 13px 'Hind Siliguri';color:#707B70;">প্রাইসিং ও ক্রেডিট · Pricing</div>
+      <div style="width:410px;background:#fff;border-radius:40px;padding:11px;box-shadow:0 26px 60px rgba(24,44,34,.14);border:1px solid rgba(24,44,34,.05);">
+        <div style="border-radius:31px;overflow:hidden;background:#F5F6EF;min-height:820px;display:flex;flex-direction:column;">
+
+          <div style="display:flex;justify-content:space-between;align-items:center;padding:15px 24px 4px;font:600 14px 'Hind Siliguri';color:#16352B;">
+            <span>৯:৪১</span>
+            <div style="width:20px;height:11px;border:1.5px solid #16352B;border-radius:3px;position:relative;"><div style="position:absolute;right:-3px;top:3px;width:2px;height:5px;background:#16352B;border-radius:1px;"></div></div>
+          </div>
+
+          <div style="padding:14px 24px 8px;">
+            <div style="font:700 23px 'Noto Serif Bengali';color:#16352B;">ক্রেডিট কিনুন</div>
+            <div style="font:500 14px 'Hind Siliguri';color:#707B70;margin-top:4px;">যত খুশি ঘর সাজান — সাশ্রয়ী দামে</div>
+          </div>
+
+          <div style="padding:12px 22px;display:flex;flex-direction:column;gap:14px;">
+            <div style="border:1.5px solid rgba(22,44,36,.12);border-radius:18px;padding:18px;background:#fff;">
+              <div style="display:flex;justify-content:space-between;align-items:center;">
+                <div><div style="font:700 17px 'Noto Serif Bengali';color:#16352B;">ফ্রি</div><div style="font:500 13px 'Hind Siliguri';color:#707B70;">শুরু করার জন্য</div></div>
+                <div style="font:800 20px 'Noto Serif Bengali';color:#16352B;">৳ ০</div>
+              </div>
+              <div style="height:1px;background:rgba(22,44,36,.08);margin:13px 0;"></div>
+              <div style="display:flex;flex-direction:column;gap:8px;font:500 13.5px 'Hind Siliguri';color:#47514A;">
+                <div>✓ ৫টি ডিজাইন ফ্রি</div>
+                <div>✓ সব স্টাইল ব্যবহার</div>
+                <div>✓ আসবাবের দাম দেখা</div>
+              </div>
+            </div>
+
+            <div style="border:2px solid #1C4E3F;border-radius:18px;padding:18px;background:#FBFBF5;position:relative;box-shadow:0 12px 30px rgba(28,78,63,.14);">
+              <div style="position:absolute;top:-11px;right:18px;background:#1C4E3F;color:#fff;border-radius:99px;padding:4px 13px;font:700 11px 'Hind Siliguri';">সবচেয়ে জনপ্রিয়</div>
+              <div style="display:flex;justify-content:space-between;align-items:center;">
+                <div><div style="font:700 17px 'Noto Serif Bengali';color:#16352B;">৫০ ক্রেডিট</div><div style="font:500 13px 'Hind Siliguri';color:#707B70;">৫০টি ডিজাইন</div></div>
+                <div style="text-align:right;"><div style="font:800 22px 'Noto Serif Bengali';color:#123A2E;">৳ ৪৫০</div><div style="font:500 11px 'Hind Siliguri';color:#707B70;text-decoration:line-through;">৳ ৫০০</div></div>
+              </div>
+            </div>
+
+            <div style="border:1.5px solid rgba(22,44,36,.12);border-radius:18px;padding:18px;background:#fff;">
+              <div style="display:flex;justify-content:space-between;align-items:center;">
+                <div><div style="font:700 17px 'Noto Serif Bengali';color:#16352B;">২০ ক্রেডিট</div><div style="font:500 13px 'Hind Siliguri';color:#707B70;">২০টি ডিজাইন</div></div>
+                <div style="font:800 20px 'Noto Serif Bengali';color:#16352B;">৳ ২০০</div>
+              </div>
+            </div>
+          </div>
+
+          <div style="padding:8px 22px 26px;margin-top:auto;">
+            <div style="font:600 13px 'Hind Siliguri';color:#707B70;margin-bottom:11px;">পেমেন্ট মাধ্যম</div>
+            <div style="display:flex;gap:11px;">
+              <div style="flex:1;display:flex;align-items:center;justify-content:center;gap:9px;background:#E2136E;color:#fff;border-radius:14px;padding:15px;font:700 15px 'Hind Siliguri';box-shadow:0 8px 18px rgba(226,19,110,.28);">
+                <div style="width:22px;height:22px;border-radius:6px;background:rgba(255,255,255,.22);display:flex;align-items:center;justify-content:center;font:800 12px 'Noto Serif Bengali';">b</div>
+                bKash
+              </div>
+              <div style="flex:1;display:flex;align-items:center;justify-content:center;gap:9px;background:#EE7623;color:#fff;border-radius:14px;padding:15px;font:700 15px 'Hind Siliguri';box-shadow:0 8px 18px rgba(238,118,35,.28);">
+                <div style="width:22px;height:22px;border-radius:6px;background:rgba(255,255,255,.22);display:flex;align-items:center;justify-content:center;font:800 12px 'Noto Serif Bengali';">N</div>
+                Nagad
+              </div>
+            </div>
+            <div style="display:flex;align-items:center;justify-content:center;gap:7px;margin-top:13px;font:500 12.5px 'Hind Siliguri';color:#A9791F;">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#A9791F" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2l8 4v6c0 5-3.4 8.5-8 10-4.6-1.5-8-5-8-10V6z"/><path d="M9 12l2 2 4-4"/></svg>
+              সম্পূর্ণ নিরাপদ পেমেন্ট
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+</div>
+</x-dc>
+</body>
+</html>

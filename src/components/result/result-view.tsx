@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button";
 import { STYLE_OPTIONS } from "@/config/catalog";
 import type { DesignWithTags, FurnitureDetail } from "@/db/types";
 import { formatBdt } from "@/lib/format";
+import { useTranslation } from "@/lib/i18n/client";
 import { mockFurnitureDetail } from "@/lib/mock-data";
 
 /*
@@ -16,8 +17,9 @@ import { mockFurnitureDetail } from "@/lib/mock-data";
  * mobile, image + side list on desktop.
  */
 export function ResultView({ design }: { design: DesignWithTags }) {
+  const { dict, locale } = useTranslation();
   const openFurniture = useFurnitureDetail();
-  const styleLabel = STYLE_OPTIONS.find((s) => s.value === design.style)?.bn ?? design.style;
+  const styleLabel = STYLE_OPTIONS.find((s) => s.value === design.style)?.[locale] ?? design.style;
 
   // Stage D resolves each tag to a full FurnitureDetail; for now reuse the mock detail.
   const toDetail = (): FurnitureDetail => mockFurnitureDetail;
@@ -31,14 +33,14 @@ export function ResultView({ design }: { design: DesignWithTags }) {
             // biome-ignore lint/performance/noImgElement: external MinIO/R2 URL
             <img
               src={design.generatedImageUrl}
-              alt="সাজানো ঘরের ছবি / redesigned room"
+              alt={dict.result.imageAlt}
               className="size-full object-cover"
             />
           ) : (
-            <ImagePlaceholder label="সাজানো ঘরের ছবি / redesigned room" className="size-full" />
+            <ImagePlaceholder label={dict.result.imageAlt} className="size-full" />
           )}
           <div className="absolute top-3 left-3 rounded-full bg-[rgba(22,44,36,0.72)] px-3 py-1 font-semibold text-white text-xs">
-            {styleLabel} · মাঝারি বাজেট
+            {styleLabel} · {dict.result.budgetMedium}
           </div>
           {design.tags.map((tag, i) => (
             <FurniturePin
@@ -49,14 +51,14 @@ export function ResultView({ design }: { design: DesignWithTags }) {
             />
           ))}
         </div>
-        <p className="mt-3 text-center text-muted-foreground text-sm">
-          দাম দেখতে যেকোনো আসবাবে ট্যাপ করুন
-        </p>
+        <p className="mt-3 text-center text-muted-foreground text-sm">{dict.result.tapHint}</p>
       </div>
 
       {/* Furniture list + actions */}
       <div className="flex flex-col gap-4">
-        <h2 className="font-serif font-bold text-foreground text-xl">এই ঘরের আসবাব</h2>
+        <h2 className="font-serif font-bold text-foreground text-xl">
+          {dict.result.furnitureHeading}
+        </h2>
         <div className="flex flex-col gap-3">
           {design.tags.map((tag, i) => {
             const item = tag.furnitureItem;
@@ -72,10 +74,11 @@ export function ResultView({ design }: { design: DesignWithTags }) {
                 <div className="flex-1">
                   <div className="font-bold text-foreground text-sm">{item.name}</div>
                   <div className="text-muted-foreground text-xs">
-                    {item.brand} · নতুন {item.priceBdt !== null ? formatBdt(item.priceBdt) : ""}
+                    {item.brand} · {dict.result.conditionNew}{" "}
+                    {item.priceBdt !== null ? formatBdt(item.priceBdt, locale) : ""}
                   </div>
                   <div className="font-semibold text-brand-gold text-xs">
-                    Bikroy · ব্যবহৃত {formatBdt(24000)}
+                    Bikroy · {dict.result.conditionUsed} {formatBdt(24000, locale)}
                   </div>
                 </div>
                 <span className="text-brand-faint text-xl">›</span>
@@ -86,24 +89,24 @@ export function ResultView({ design }: { design: DesignWithTags }) {
 
         <div className="grid grid-cols-2 gap-2.5">
           <Button className="gap-2">
-            <RefreshCw className="size-4" /> আবার তৈরি করুন
+            <RefreshCw className="size-4" /> {dict.result.regenerate}
           </Button>
           <Button variant="outline" className="gap-2">
-            অন্য স্টাইল
+            {dict.result.otherStyle}
           </Button>
           <Button variant="outline" className="gap-2">
-            সংরক্ষণ
+            {dict.result.save}
           </Button>
           <Button className="gap-2 bg-brand-whatsapp text-white hover:bg-brand-whatsapp/90">
-            <Share2 className="size-4" /> শেয়ার
+            <Share2 className="size-4" /> {dict.result.share}
           </Button>
         </div>
         <div className="flex justify-center gap-6 text-muted-foreground text-sm">
           <span className="flex items-center gap-1.5">
-            <Link2 className="size-4" /> লিংক কপি
+            <Link2 className="size-4" /> {dict.result.copyLink}
           </span>
           <span className="flex items-center gap-1.5">
-            <Download className="size-4" /> ডাউনলোড
+            <Download className="size-4" /> {dict.result.download}
           </span>
         </div>
       </div>

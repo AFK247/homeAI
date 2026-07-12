@@ -123,4 +123,17 @@
     font-family: var(--font-serif), serif;
     color: var(--foreground);
   }
+  /* Interactive elements get a pointer cursor (Tailwind v4 no longer sets this
+     on <button> by default). Covers buttons, links-as-buttons, and elements
+     with role="button". Disabled controls show not-allowed. */
+  button:not(:disabled),
+  [role="button"]:not([aria-disabled="true"]),
+  label[for],
+  summary {
+    cursor: pointer;
+  }
+  button:disabled,
+  [role="button"][aria-disabled="true"] {
+    cursor: not-allowed;
+  }
 }

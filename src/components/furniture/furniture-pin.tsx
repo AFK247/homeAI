@@ -1,7 +1,8 @@
 "use client";
 
 import type { ResolvedDesignTag } from "@/db/types";
-import { formatBdt, toBnDigits } from "@/lib/format";
+import { formatBdt, localeDigits } from "@/lib/format";
+import { useTranslation } from "@/lib/i18n/client";
 
 /*
  * A clickable furniture price pin overlaid on the generated image (design §7b).
@@ -16,6 +17,7 @@ export function FurniturePin({
   index: number;
   onOpen: (tag: ResolvedDesignTag) => void;
 }) {
+  const { locale } = useTranslation();
   const price = tag.furnitureItem?.priceBdt ?? null;
   return (
     <button
@@ -25,10 +27,10 @@ export function FurniturePin({
       style={{ top: `${tag.yCoord * 100}%`, left: `${tag.xCoord * 100}%` }}
     >
       <span className="flex h-5 w-5 items-center justify-center rounded-full bg-primary font-bold text-[11px] text-primary-foreground">
-        {toBnDigits(index)}
+        {localeDigits(index, locale)}
       </span>
       {price !== null ? (
-        <span className="font-bold text-foreground text-xs">{formatBdt(price, false)}</span>
+        <span className="font-bold text-foreground text-xs">{formatBdt(price, locale, false)}</span>
       ) : null}
     </button>
   );

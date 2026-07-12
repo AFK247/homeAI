@@ -4,6 +4,7 @@ import { Check } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { ROOM_OPTIONS } from "@/config/catalog";
+import { useTranslation } from "@/lib/i18n/client";
 import { useCreateStore } from "../_modules/create-store";
 
 /*
@@ -11,6 +12,7 @@ import { useCreateStore } from "../_modules/create-store";
  * chosen. Kept in one island because both read the same store state.
  */
 export function RoomPicker() {
+  const { dict, locale } = useTranslation();
   const router = useRouter();
   const image = useCreateStore((s) => s.image);
   const roomType = useCreateStore((s) => s.roomType);
@@ -18,7 +20,7 @@ export function RoomPicker() {
 
   return (
     <div className="flex flex-col gap-4 rounded-2xl bg-card p-6 shadow-sm">
-      <h2 className="font-bold text-foreground">ঘরের ধরন</h2>
+      <h2 className="font-bold text-foreground">{dict.upload.roomType}</h2>
       <div className="grid grid-cols-2 gap-2.5">
         {ROOM_OPTIONS.map((room) => (
           <button
@@ -31,7 +33,7 @@ export function RoomPicker() {
                 : "rounded-xl border-[1.5px] border-border px-3.5 py-3 text-left font-semibold text-foreground text-sm"
             }
           >
-            {room.bn}
+            {room[locale]}
             {roomType === room.value && <Check className="size-4" />}
           </button>
         ))}
@@ -42,7 +44,7 @@ export function RoomPicker() {
         disabled={!image}
         onClick={() => router.push("/create/style")}
       >
-        পরবর্তী ধাপ
+        {dict.common.next}
       </Button>
     </div>
   );

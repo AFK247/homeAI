@@ -1,60 +1,106 @@
 import { Check } from "lucide-react";
 import { SiteHeader } from "@/components/layout/site-header";
 import { Button } from "@/components/ui/button";
-import { formatBdt, toBnDigits } from "@/lib/format";
+import { formatBdt, localeDigits } from "@/lib/format";
+import { getDictionary } from "@/lib/i18n/server";
 import { cn } from "@/lib/utils";
 
 /*
- * Pricing / credits (design). Free tier vs paid packs; bKash + Nagad shown clearly.
- * Consumer pricing is low/free by design (PROJECT_CONTEXT §10) — monetize supply side later.
+ * Pricing / credits (design). Free tier + two paid credit packs; bKash + Nagad
+ * shown clearly. Consumer pricing is low/free by design (PROJECT_CONTEXT §10) —
+ * monetize supply side later.
  */
-const PLANS = [
-  {
-    name: "ফ্রি",
-    price: 0,
-    highlight: false,
-    features: [`${toBnDigits(5)}টি ফ্রি ডিজাইন`, "সব স্টাইল", "আসবাবের দাম দেখুন"],
-    cta: "শুরু করুন",
-  },
-  {
-    name: "ক্রেডিট প্যাক",
-    price: 200,
-    unit: `${toBnDigits(50)}টি ডিজাইন`,
-    highlight: true,
-    features: [`${toBnDigits(50)}টি ডিজাইন`, "হাই-রেজ আউটপুট", "প্রিমিয়াম স্টাইল", "সংরক্ষণ ও শেয়ার"],
-    cta: "bKash / Nagad দিয়ে কিনুন",
-  },
-];
+export default async function PricingPage() {
+  const { dict, locale } = await getDictionary();
+  const num = (n: number) => localeDigits(n, locale);
 
-export default function PricingPage() {
+  const plans = [
+    {
+      name: dict.pricing.freePlanName,
+      price: 0,
+      designs: 5,
+      highlight: false,
+      popular: false,
+      features: [
+        `${num(5)}${dict.pricing.freeFeature1Suffix}`,
+        dict.pricing.starterFeature2,
+        dict.pricing.starterFeature3,
+      ],
+      cta: dict.pricing.freeCta,
+    },
+    {
+      name: dict.pricing.packName,
+      price: 200,
+      designs: 50,
+      highlight: true,
+      popular: true,
+      features: [
+        `${num(50)}${dict.pricing.packFeature1Suffix}`,
+        dict.pricing.packFeature2,
+        dict.pricing.packFeature3,
+        dict.pricing.packFeature4,
+      ],
+      cta: dict.pricing.buyCta,
+    },
+    {
+      name: dict.pricing.proName,
+      price: 800,
+      designs: 250,
+      highlight: false,
+      popular: false,
+      features: [
+        `${num(250)}${dict.pricing.packFeature1Suffix}`,
+        dict.pricing.proFeature2,
+        dict.pricing.proFeature3,
+        dict.pricing.proFeature4,
+      ],
+      cta: dict.pricing.buyCta,
+    },
+  ];
+
   return (
     <>
       <SiteHeader />
-      <main className="mx-auto w-full max-w-4xl flex-1 px-6 py-14 text-center">
+      <main className="mx-auto w-full max-w-5xl flex-1 px-6 py-14 text-center">
         <h1 className="font-serif font-extrabold text-3xl text-foreground md:text-4xl">
-          সহজ ও সাশ্রয়ী দাম
+          {dict.pricing.title}
         </h1>
-        <p className="mt-2 text-brand-body">প্রথম {toBnDigits(5)}টি ডিজাইন একদম ফ্রি। কার্ড লাগবে না।</p>
+        <p className="mt-2 text-brand-body">
+          {dict.pricing.subtitlePrefix}
+          {num(5)}
+          {dict.pricing.subtitleSuffix}
+        </p>
 
-        <div className="mt-10 grid gap-5 md:grid-cols-2">
-          {PLANS.map((plan) => (
+        <div className="mt-10 grid gap-5 md:grid-cols-3">
+          {plans.map((plan) => (
             <div
               key={plan.name}
               className={cn(
-                "flex flex-col gap-5 rounded-2xl bg-card p-7 text-left shadow-sm",
+                "relative flex flex-col gap-5 rounded-2xl bg-card p-7 text-left shadow-sm",
                 plan.highlight && "ring-2 ring-primary",
               )}
             >
+              {plan.popular ? (
+                <span className="-top-3 -translate-x-1/2 absolute left-1/2 rounded-full bg-primary px-3 py-1 font-bold text-[11px] text-primary-foreground">
+                  {dict.pricing.popularBadge}
+                </span>
+              ) : null}
               <div>
                 <div className="font-bold text-foreground text-lg">{plan.name}</div>
                 <div className="mt-2 flex items-baseline gap-1.5">
                   <span className="font-serif font-extrabold text-3xl text-foreground">
-                    {plan.price === 0 ? "ফ্রি" : formatBdt(plan.price)}
+                    {plan.price === 0 ? dict.pricing.free : formatBdt(plan.price, locale)}
                   </span>
-                  {plan.unit ? (
-                    <span className="text-muted-foreground text-sm">/ {plan.unit}</span>
-                  ) : null}
+                  <span className="text-muted-foreground text-sm">
+                    / {num(plan.designs)}
+                    {dict.pricing.packUnitSuffix}
+                  </span>
                 </div>
+                {plan.price > 0 ? (
+                  <div className="mt-1 text-brand-faint text-xs">
+                    ~{formatBdt(plan.price / plan.designs, locale)} {dict.pricing.perDesignSuffix}
+                  </div>
+                ) : null}
               </div>
               <ul className="flex flex-col gap-2.5">
                 {plan.features.map((f) => (
@@ -73,9 +119,7 @@ export default function PricingPage() {
             </div>
           ))}
         </div>
-        <p className="mt-6 text-brand-faint text-xs">
-          পেমেন্ট: bKash · Nagad · কার্ড — SSLCommerz এর মাধ্যমে নিরাপদ।
-        </p>
+        <p className="mt-6 text-brand-faint text-xs">{dict.pricing.footer}</p>
       </main>
     </>
   );

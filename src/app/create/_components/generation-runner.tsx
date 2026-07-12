@@ -3,6 +3,7 @@
 import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState, useTransition } from "react";
 import { Button } from "@/components/ui/button";
+import { useTranslation } from "@/lib/i18n/client";
 import { handleORPCError } from "@/lib/utils/error";
 import { rpc } from "@/server/rpc/client";
 import { useCreateStore } from "../_modules/create-store";
@@ -15,6 +16,7 @@ import { useCreateStore } from "../_modules/create-store";
  * so there's no polling.
  */
 export function GenerationRunner() {
+  const { dict } = useTranslation();
   const router = useRouter();
   const started = useRef(false);
   const [pending, startTransition] = useTransition();
@@ -60,11 +62,13 @@ export function GenerationRunner() {
     return (
       <>
         <div>
-          <h1 className="font-serif font-extrabold text-3xl text-foreground">কিছু একটা ভুল হয়েছে</h1>
-          <p className="mt-2.5 text-brand-body">ছবি সাজানো যায়নি। আবার চেষ্টা করুন।</p>
+          <h1 className="font-serif font-extrabold text-3xl text-foreground">
+            {dict.generating.errorTitle}
+          </h1>
+          <p className="mt-2.5 text-brand-body">{dict.generating.errorBody}</p>
         </div>
         <Button size="lg" onClick={run}>
-          আবার চেষ্টা করুন
+          {dict.common.tryAgain}
         </Button>
       </>
     );
@@ -82,22 +86,24 @@ export function GenerationRunner() {
         </div>
       </div>
       <div>
-        <h1 className="font-serif font-extrabold text-3xl text-foreground">আপনার ঘর সাজানো হচ্ছে</h1>
-        <p className="mt-2.5 text-brand-body">একটু অপেক্ষা করুন — সাধারণত ১৫–৩০ সেকেন্ড সময় লাগে।</p>
+        <h1 className="font-serif font-extrabold text-3xl text-foreground">
+          {dict.generating.title}
+        </h1>
+        <p className="mt-2.5 text-brand-body">{dict.generating.subtitle}</p>
       </div>
       <div className="w-full max-w-md">
         <div className="h-2.5 overflow-hidden rounded-full bg-primary/10">
           <div className="h-full w-[62%] animate-pulse rounded-full bg-primary" />
         </div>
-        <p className="mt-3 font-semibold text-secondary-foreground text-sm">আসবাব বসানো হচ্ছে...</p>
+        <p className="mt-3 font-semibold text-secondary-foreground text-sm">
+          {dict.generating.progress}
+        </p>
       </div>
       <div className="flex max-w-md items-center gap-3 rounded-2xl bg-card p-4 shadow-sm">
         <div className="flex size-8 shrink-0 items-center justify-center rounded-lg bg-secondary font-serif font-bold text-primary">
           i
         </div>
-        <p className="text-left text-brand-body text-sm leading-relaxed">
-          জানেন কি? প্রতিটি আসবাবের সাথে দেশি ব্র্যান্ড ও পুরনো বাজারের দাম দেখাবে।
-        </p>
+        <p className="text-left text-brand-body text-sm leading-relaxed">{dict.generating.tip}</p>
       </div>
     </>
   );

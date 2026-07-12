@@ -4,6 +4,7 @@ import { ArrowRight } from "lucide-react";
 import { ImagePlaceholder } from "@/components/brand/image-placeholder";
 import type { FurnitureDetail } from "@/db/types";
 import { formatBdt, toBnDigits } from "@/lib/format";
+import { useTranslation } from "@/lib/i18n/client";
 import { mockUsedAlternative } from "@/lib/mock-data";
 
 /*
@@ -20,6 +21,7 @@ export function FurnitureDetailPanel({
   item: FurnitureDetail;
   pinIndex?: number;
 }) {
+  const { dict, locale } = useTranslation();
   const dims = item.dimensions;
   const dimStr = dims
     ? `${toBnDigits(dims.width ?? 0)}″ × ${toBnDigits(dims.depth ?? 0)}″ × ${toBnDigits(dims.height ?? 0)}″`
@@ -31,21 +33,28 @@ export function FurnitureDetailPanel({
         <ImagePlaceholder label="product" className="h-26 w-26 shrink-0 rounded-2xl" />
         <div className="flex flex-1 flex-col gap-1.5">
           <span className="inline-flex w-fit rounded-full bg-secondary px-2.5 py-0.5 font-bold text-[11px] text-secondary-foreground">
-            {toBnDigits(pinIndex)} · {item.category ?? "আসবাব"}
+            {toBnDigits(pinIndex)} · {item.category ?? dict.furniture.fallbackCategory}
           </span>
           <h3 className="font-serif font-bold text-foreground text-lg leading-tight">
             {item.name}
           </h3>
-          {dimStr ? <p className="text-muted-foreground text-xs">মাপ: {dimStr}</p> : null}
+          {dimStr ? (
+            <p className="text-muted-foreground text-xs">
+              {dict.furniture.dimensions} {dimStr}
+            </p>
+          ) : null}
         </div>
       </div>
 
       {item.priceBdt !== null ? (
         <div className="flex items-baseline gap-2.5">
           <span className="font-serif font-extrabold text-2xl text-foreground">
-            {formatBdt(item.priceBdt)}
+            {formatBdt(item.priceBdt, locale)}
           </span>
-          <span className="text-muted-foreground text-xs">নতুন · {item.brand ?? "ব্র্যান্ড"} অনুযায়ী</span>
+          <span className="text-muted-foreground text-xs">
+            {dict.furniture.conditionNew} · {item.brand ?? dict.furniture.fallbackBrand}
+            {dict.furniture.byBrandSuffix}
+          </span>
         </div>
       ) : null}
 
@@ -58,11 +67,14 @@ export function FurnitureDetailPanel({
           className="flex items-center justify-between rounded-2xl bg-primary px-4 py-3.5 text-primary-foreground shadow-lg"
         >
           <div className="flex flex-col">
-            <span className="font-bold text-sm">নতুন কিনুন</span>
-            <span className="text-xs opacity-90">{item.brand ?? "ব্র্যান্ড"} · অফিসিয়াল স্টোর</span>
+            <span className="font-bold text-sm">{dict.furniture.buyNew}</span>
+            <span className="text-xs opacity-90">
+              {item.brand ?? dict.furniture.fallbackBrand}
+              {dict.furniture.officialStore}
+            </span>
           </div>
           <span className="flex items-center gap-1 font-bold text-sm">
-            {item.priceBdt !== null ? formatBdt(item.priceBdt) : ""}{" "}
+            {item.priceBdt !== null ? formatBdt(item.priceBdt, locale) : ""}{" "}
             <ArrowRight className="size-4" />
           </span>
         </a>
@@ -75,27 +87,28 @@ export function FurnitureDetailPanel({
           className="flex items-center justify-between rounded-2xl border-[1.5px] border-brand-gold bg-white px-4 py-3.5"
         >
           <div className="flex flex-col">
-            <span className="font-bold text-brand-gold-dark text-sm">ব্যবহৃত কিনুন</span>
+            <span className="font-bold text-brand-gold-dark text-sm">{dict.furniture.buyUsed}</span>
             <span className="text-brand-gold text-xs">
-              Bikroy · {toBnDigits(mockUsedAlternative.listingCount)}টি বিজ্ঞাপন
+              Bikroy · {toBnDigits(mockUsedAlternative.listingCount)}
+              {dict.furniture.listingsSuffix}
             </span>
           </div>
           <span className="flex items-center gap-1 font-bold text-brand-gold-dark text-sm">
-            {formatBdt(mockUsedAlternative.priceBdt)} <ArrowRight className="size-4" />
+            {formatBdt(mockUsedAlternative.priceBdt, locale)} <ArrowRight className="size-4" />
           </span>
         </a>
       </div>
 
       {item.similar.length > 0 ? (
         <div>
-          <p className="mb-2 text-muted-foreground text-xs">একই রকম অন্য ব্র্যান্ডে</p>
+          <p className="mb-2 text-muted-foreground text-xs">{dict.furniture.similar}</p>
           <div className="flex flex-wrap gap-2">
             {item.similar.map((s) => (
               <span
                 key={s.id}
                 className="rounded-full border-[1.5px] border-border bg-white px-3.5 py-1.5 font-semibold text-foreground text-xs"
               >
-                {s.brand} {s.priceBdt !== null ? formatBdt(s.priceBdt, false) : ""}
+                {s.brand} {s.priceBdt !== null ? formatBdt(s.priceBdt, locale, false) : ""}
               </span>
             ))}
           </div>

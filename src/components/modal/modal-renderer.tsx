@@ -19,6 +19,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import { useTranslation } from "@/lib/i18n/client";
 import { cn } from "@/lib/utils";
 import { useModal } from "./modal.store";
 
@@ -28,6 +29,7 @@ import { useModal } from "./modal.store";
  * custom component (type: 'custom').
  */
 export function ModalRenderer() {
+  const { dict } = useTranslation();
   const { isOpen, config, closeModal, resetModal } = useModal();
   const [isPending, startTransition] = useTransition();
   const pathname = usePathname();
@@ -67,7 +69,7 @@ export function ModalRenderer() {
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel disabled={isPending}>
-              {config.cancelLabel ?? "বাতিল"}
+              {config.cancelLabel ?? dict.modal.cancel}
             </AlertDialogCancel>
             <AlertDialogAction
               disabled={isPending}
@@ -80,7 +82,7 @@ export function ModalRenderer() {
                   "bg-destructive text-destructive-foreground hover:bg-destructive/90",
               )}
             >
-              {isPending ? "..." : (config.actionLabel ?? "নিশ্চিত করুন")}
+              {isPending ? "..." : (config.actionLabel ?? dict.modal.confirm)}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>

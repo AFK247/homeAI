@@ -5,6 +5,7 @@ import { designQueries } from "@/app/create/_modules/design.queries";
 import { designDetailPromises } from "@/app/create/_modules/promises";
 import { CreditBadge } from "@/components/brand/credit-badge";
 import { SiteHeader } from "@/components/layout/site-header";
+import { getDictionary } from "@/lib/i18n/server";
 import { mockCreditState } from "@/lib/mock-data";
 import { QueryProvider } from "@/providers/query.provider";
 import { ResultContent } from "./_components/result-content";
@@ -37,12 +38,15 @@ async function Content({ designId }: { designId: string }) {
 
 export default async function ResultPage({ params }: { params: Promise<{ designId: string }> }) {
   const { designId } = await params;
+  const { dict } = await getDictionary();
 
   return (
     <>
       <SiteHeader rightSlot={<CreditBadge credit={mockCreditState} />} />
       <main className="mx-auto w-full max-w-6xl flex-1 px-4 py-7 md:px-10">
-        <Suspense fallback={<div className="py-20 text-center text-brand-body">লোড হচ্ছে…</div>}>
+        <Suspense
+          fallback={<div className="py-20 text-center text-brand-body">{dict.common.loading}</div>}
+        >
           <Content designId={designId} />
         </Suspense>
       </main>

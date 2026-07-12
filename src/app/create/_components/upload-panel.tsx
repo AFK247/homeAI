@@ -3,6 +3,7 @@
 import imageCompression from "browser-image-compression";
 import { Camera, Globe, Upload } from "lucide-react";
 import { useRef, useState } from "react";
+import { useTranslation } from "@/lib/i18n/client";
 import { useCreateStore } from "../_modules/create-store";
 
 /*
@@ -19,6 +20,7 @@ function fileToDataUrl(file: File): Promise<string> {
 }
 
 export function UploadPanel() {
+  const { dict } = useTranslation();
   const inputRef = useRef<HTMLInputElement>(null);
   const [busy, setBusy] = useState(false);
   const image = useCreateStore((s) => s.image);
@@ -68,7 +70,7 @@ export function UploadPanel() {
           // biome-ignore lint/performance/noImgElement: local data-URL preview
           <img
             src={image}
-            alt="আপলোড করা ঘর"
+            alt={dict.upload.imageAlt}
             className="max-h-72 w-full rounded-2xl object-contain"
           />
         ) : (
@@ -77,13 +79,13 @@ export function UploadPanel() {
               <Upload className="size-7 text-primary" />
             </div>
             <div>
-              <div className="font-bold text-foreground text-lg">ছবি টেনে আনুন বা বাছাই করুন</div>
-              <div className="mt-1 text-brand-body text-sm">JPG, PNG · সর্বোচ্চ ১০ MB</div>
+              <div className="font-bold text-foreground text-lg">{dict.upload.dropzone}</div>
+              <div className="mt-1 text-brand-body text-sm">{dict.upload.fileHint}</div>
             </div>
           </>
         )}
       </button>
-      {busy && <p className="text-brand-body text-sm">ছবি প্রস্তুত হচ্ছে…</p>}
+      {busy && <p className="text-brand-body text-sm">{dict.upload.preparing}</p>}
       <div className="flex gap-3.5">
         <button
           type="button"
@@ -91,7 +93,7 @@ export function UploadPanel() {
           className="flex flex-1 items-center gap-3 rounded-2xl border-[1.5px] border-border bg-card p-4"
         >
           <Camera className="size-6 text-foreground" />
-          <span className="font-semibold text-foreground text-sm">ক্যামেরা দিয়ে তুলুন</span>
+          <span className="font-semibold text-foreground text-sm">{dict.upload.camera}</span>
         </button>
         <button
           type="button"
@@ -103,7 +105,7 @@ export function UploadPanel() {
           }
         >
           <Globe className="size-6 text-foreground" />
-          <span className="font-semibold text-foreground text-sm">৩৬০° প্যানোরামা</span>
+          <span className="font-semibold text-foreground text-sm">{dict.upload.panorama}</span>
         </button>
       </div>
     </div>

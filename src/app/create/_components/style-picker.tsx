@@ -5,6 +5,7 @@ import { useEffect } from "react";
 import { ImagePlaceholder } from "@/components/brand/image-placeholder";
 import { Button } from "@/components/ui/button";
 import { BUDGET_OPTIONS, STYLE_OPTIONS } from "@/config/catalog";
+import { useTranslation } from "@/lib/i18n/client";
 import { useCreateStore } from "../_modules/create-store";
 
 /*
@@ -13,6 +14,7 @@ import { useCreateStore } from "../_modules/create-store";
  * The page shell around it stays a Server Component.
  */
 export function StylePicker() {
+  const { dict, locale } = useTranslation();
   const router = useRouter();
   const image = useCreateStore((s) => s.image);
   const style = useCreateStore((s) => s.style);
@@ -51,7 +53,7 @@ export function StylePicker() {
 
       <div className="flex flex-col gap-5 rounded-2xl bg-card p-6 shadow-sm">
         <div>
-          <h2 className="mb-3 font-bold text-foreground">বাজেট</h2>
+          <h2 className="mb-3 font-bold text-foreground">{dict.style.budget}</h2>
           <div className="flex gap-2">
             {BUDGET_OPTIONS.map((b) => (
               <button
@@ -64,25 +66,26 @@ export function StylePicker() {
                     : "flex-1 rounded-xl border-[1.5px] border-border py-2.5 font-semibold text-foreground text-sm"
                 }
               >
-                {b.bn}
+                {b[locale]}
               </button>
             ))}
           </div>
         </div>
         <div>
           <h2 className="mb-3 font-bold text-foreground">
-            নিজের মতো বলুন <span className="font-medium text-muted-foreground">(ঐচ্ছিক)</span>
+            {dict.style.customPrompt}{" "}
+            <span className="font-medium text-muted-foreground">{dict.common.optional}</span>
           </h2>
           <textarea
             value={prompt}
             onChange={(e) => setPrompt(e.target.value)}
             maxLength={500}
-            placeholder="যেমন: হালকা রঙ, কাঠের আসবাব, বেশি আলো..."
+            placeholder={dict.style.promptPlaceholder}
             className="min-h-24 w-full resize-none rounded-xl border-[1.5px] border-border p-3.5 text-foreground text-sm placeholder:text-brand-faint focus:border-primary focus:outline-none"
           />
         </div>
         <Button size="lg" onClick={() => router.push("/create/generating")}>
-          ঘর সাজান ✦
+          {dict.style.generate}
         </Button>
       </div>
     </div>

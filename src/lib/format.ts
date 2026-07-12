@@ -21,9 +21,17 @@ export function toBnDigits(input: string | number): string {
   return String(input).replace(/[0-9]/g, (d) => EN_TO_BN_DIGITS[d] ?? d);
 }
 
-/** Format a BDT amount as "৳ ৪২,০০০" (Bengali digits, grouped). */
-export function formatBdt(amount: number, withSymbol = true): string {
+/** Render a number's digits in the given locale (Bengali for bn, ASCII for en). */
+export function localeDigits(input: string | number, locale: "bn" | "en" = "bn"): string {
+  return locale === "bn" ? toBnDigits(input) : String(input);
+}
+
+/**
+ * Format a BDT amount as "৳ ৪২,০০০" (bn) or "৳ 42,000" (en). The ৳ symbol is
+ * kept in both locales — it's the currency mark, not language-specific.
+ */
+export function formatBdt(amount: number, locale: "bn" | "en" = "bn", withSymbol = true): string {
   const grouped = new Intl.NumberFormat("en-US").format(Math.round(amount));
-  const bn = toBnDigits(grouped);
-  return withSymbol ? `৳ ${bn}` : bn;
+  const digits = localeDigits(grouped, locale);
+  return withSymbol ? `৳ ${digits}` : digits;
 }

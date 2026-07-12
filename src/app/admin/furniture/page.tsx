@@ -1,67 +1,58 @@
-import { Logo } from "@/components/brand/logo";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { formatBdt, toBnDigits } from "@/lib/format";
-import { getDictionary } from "@/lib/i18n/server";
-import { mockFurniture } from "@/lib/mock-data";
+import { formatBdt } from "@/lib/format";
+import { FurnitureService } from "@/server/service/furniture.service";
 
 /*
- * Admin — furniture catalog (design/plan §8). Light-role admin manages the local catalog.
- * Stage C renders mock; Stage D adds create/edit sheets + real rpc + withRole('admin').
+ * Admin — furniture catalog, wired to the real catalog (FurnitureService.list).
+ * Create/edit sheets land in a follow-up. Prices shown in ASCII (admin is an
+ * internal English tool).
  */
 export default async function AdminFurniturePage() {
-  const { dict, locale } = await getDictionary();
-  const items = mockFurniture;
-  const num = (n: number) => (locale === "bn" ? toBnDigits(n) : String(n));
+  const items = await FurnitureService.list();
 
   return (
-    <>
-      <header className="flex items-center justify-between border-border border-b bg-card px-6 py-4">
-        <div className="flex items-center gap-3">
-          <Logo size="sm" />
-          <span className="font-semibold text-brand-body text-sm">{dict.admin.title}</span>
+    <div className="flex flex-col gap-6">
+      <div className="flex items-center justify-between">
+        <div className="flex items-baseline gap-3">
+          <h1 className="font-serif font-extrabold text-3xl text-foreground">Furniture</h1>
+          <span className="text-brand-body text-sm">{items.length} items</span>
         </div>
-        <Button>{dict.admin.newItem}</Button>
-      </header>
-      <main className="mx-auto w-full max-w-5xl flex-1 px-6 py-8">
-        <div className="overflow-hidden rounded-2xl bg-card shadow-sm">
-          <table className="w-full text-left text-sm">
-            <thead className="border-border border-b bg-muted/40 text-muted-foreground">
-              <tr>
-                <th className="px-4 py-3 font-semibold">{dict.admin.colName}</th>
-                <th className="px-4 py-3 font-semibold">{dict.admin.colBrand}</th>
-                <th className="px-4 py-3 font-semibold">{dict.admin.colCategory}</th>
-                <th className="px-4 py-3 font-semibold">{dict.admin.colPrice}</th>
-                <th className="px-4 py-3 font-semibold">{dict.admin.colCondition}</th>
+        <Button>New item</Button>
+      </div>
+
+      <div className="overflow-x-auto rounded-2xl bg-card shadow-sm">
+        <table className="w-full min-w-[640px] text-left text-sm">
+          <thead className="border-border border-b bg-muted/40 text-muted-foreground">
+            <tr>
+              <th className="px-4 py-3 font-semibold">Name</th>
+              <th className="px-4 py-3 font-semibold">Brand</th>
+              <th className="px-4 py-3 font-semibold">Category</th>
+              <th className="px-4 py-3 font-semibold">Price</th>
+              <th className="px-4 py-3 font-semibold">Condition</th>
+              <th className="px-4 py-3 font-semibold">Source</th>
+            </tr>
+          </thead>
+          <tbody>
+            {items.map((item) => (
+              <tr key={item.id} className="border-border border-b last:border-0">
+                <td className="px-4 py-3 font-semibold text-foreground">{item.name}</td>
+                <td className="px-4 py-3 text-brand-body">{item.brand ?? "—"}</td>
+                <td className="px-4 py-3 text-brand-body">{item.category ?? "—"}</td>
+                <td className="px-4 py-3 text-brand-body">
+                  {item.priceBdt !== null ? formatBdt(item.priceBdt, "en") : "—"}
+                </td>
+                <td className="px-4 py-3">
+                  <Badge variant={item.condition === "new" ? "default" : "secondary"}>
+                    {item.condition}
+                  </Badge>
+                </td>
+                <td className="px-4 py-3 text-brand-body">{item.source}</td>
               </tr>
-            </thead>
-            <tbody>
-              {items.map((item) => (
-                <tr key={item.id} className="border-border border-b last:border-0">
-                  <td className="px-4 py-3 font-semibold text-foreground">{item.name}</td>
-                  <td className="px-4 py-3 text-brand-body">{item.brand}</td>
-                  <td className="px-4 py-3 text-brand-body">{item.category}</td>
-                  <td className="px-4 py-3 text-brand-body">
-                    {item.priceBdt !== null ? formatBdt(item.priceBdt, locale) : "—"}
-                  </td>
-                  <td className="px-4 py-3">
-                    <Badge variant={item.condition === "new" ? "default" : "secondary"}>
-                      {item.condition === "new"
-                        ? dict.admin.conditionNew
-                        : dict.admin.conditionUsed}
-                    </Badge>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-        <p className="mt-4 text-brand-faint text-xs">
-          {dict.admin.totalPrefix}
-          {num(items.length)}
-          {dict.admin.totalSuffix}
-        </p>
-      </main>
-    </>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    </div>
   );
 }

@@ -6,6 +6,7 @@ import type { FurnitureDetail } from "@/db/types";
 import { formatBdt, toBnDigits } from "@/lib/format";
 import { useTranslation } from "@/lib/i18n/client";
 import { mockUsedAlternative } from "@/lib/mock-data";
+import { rpc } from "@/server/rpc/client";
 
 /*
  * Furniture detail body (design §7b). Rendered inside the modal (desktop) or sheet (mobile).
@@ -22,6 +23,13 @@ export function FurnitureDetailPanel({
   pinIndex?: number;
 }) {
   const { dict, locale } = useTranslation();
+
+  // Fire-and-forget conversion signal (the vendor sales pitch). Never blocks the
+  // outbound link.
+  const logBuy = (condition: "new" | "used") => {
+    void rpc.furniture.logBuyClick({ furnitureItemId: item.id, condition }).catch(() => {});
+  };
+
   const dims = item.dimensions;
   const dimStr = dims
     ? `${toBnDigits(dims.width ?? 0)}″ × ${toBnDigits(dims.depth ?? 0)}″ × ${toBnDigits(dims.height ?? 0)}″`
@@ -64,6 +72,7 @@ export function FurnitureDetailPanel({
           href={item.productUrl ?? "#"}
           target="_blank"
           rel="noopener noreferrer"
+          onClick={() => logBuy("new")}
           className="flex items-center justify-between rounded-2xl bg-primary px-4 py-3.5 text-primary-foreground shadow-lg"
         >
           <div className="flex flex-col">
@@ -84,6 +93,7 @@ export function FurnitureDetailPanel({
           href={mockUsedAlternative.url}
           target="_blank"
           rel="noopener noreferrer"
+          onClick={() => logBuy("used")}
           className="flex items-center justify-between rounded-2xl border-[1.5px] border-brand-gold bg-white px-4 py-3.5"
         >
           <div className="flex flex-col">

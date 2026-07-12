@@ -1,9 +1,11 @@
 import "server-only";
 
-import { and, desc, eq, isNull } from "drizzle-orm";
+import { and, desc, eq, inArray, isNull } from "drizzle-orm";
 import { db } from "@/db/client";
-import { designs } from "@/db/schemas/design.schema";
+import { designs, designTags } from "@/db/schemas/design.schema";
+import { furnitureItems } from "@/db/schemas/furniture.schema";
 import type { DesignStyle, RoomType } from "@/db/schemas/shared.schema";
+import type { PlannedTag } from "@/server/service/furniture.service";
 
 /*
  * Design service (plan §5.1). All Drizzle for designs lives here. Every query is
@@ -47,7 +49,37 @@ export const DesignService = {
       .where(
         and(eq(designs.id, id), eq(designs.anonymousId, anonymousId), isNull(designs.deletedAt)),
       );
-    return row ?? null;
+    if (!row) return null;
+
+    // Resolve the design's pins to their catalog items (DesignWithTags).
+    const tagRows = await db.select().from(designTags).where(eq(designTags.designId, row.id));
+
+    const itemIds = tagRows.map((t) => t.furnitureItemId).filter((v): v is string => v !== null);
+    const items = itemIds.length
+      ? await db.select().from(furnitureItems).where(inArray(furnitureItems.id, itemIds))
+      : [];
+    const itemById = new Map(items.map((i) => [i.id, i]));
+
+    const tags = tagRows.map((t) => ({
+      ...t,
+      furnitureItem: t.furnitureItemId ? (itemById.get(t.furnitureItemId) ?? null) : null,
+    }));
+
+    return { ...row, tags };
+  },
+
+  /** Insert the planned pins for a design (called after generation). */
+  createTags: async (designId: string, planned: PlannedTag[]) => {
+    if (planned.length === 0) return;
+    await db.insert(designTags).values(
+      planned.map((p) => ({
+        designId,
+        furnitureItemId: p.furnitureItemId,
+        label: p.label,
+        xCoord: p.xCoord,
+        yCoord: p.yCoord,
+      })),
+    );
   },
 
   listByAnon: async ({ anonymousId }: Scope) => {

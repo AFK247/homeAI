@@ -6,10 +6,9 @@ import { FurniturePin } from "@/components/furniture/furniture-pin";
 import { useFurnitureDetail } from "@/components/furniture/use-furniture-detail";
 import { Button } from "@/components/ui/button";
 import { STYLE_OPTIONS } from "@/config/catalog";
-import type { DesignWithTags, FurnitureDetail } from "@/db/types";
+import type { DesignWithTags } from "@/db/types";
 import { formatBdt } from "@/lib/format";
 import { useTranslation } from "@/lib/i18n/client";
-import { mockFurnitureDetail } from "@/lib/mock-data";
 
 /*
  * Result screen body (design §7b). Image with clickable furniture pins, furniture list,
@@ -20,9 +19,6 @@ export function ResultView({ design }: { design: DesignWithTags }) {
   const { dict, locale } = useTranslation();
   const openFurniture = useFurnitureDetail();
   const styleLabel = STYLE_OPTIONS.find((s) => s.value === design.style)?.[locale] ?? design.style;
-
-  // Stage D resolves each tag to a full FurnitureDetail; for now reuse the mock detail.
-  const toDetail = (): FurnitureDetail => mockFurnitureDetail;
 
   return (
     <div className="grid gap-6 lg:grid-cols-[1.6fr_1fr]">
@@ -42,14 +38,16 @@ export function ResultView({ design }: { design: DesignWithTags }) {
           <div className="absolute top-3 left-3 rounded-full bg-[rgba(22,44,36,0.72)] px-3 py-1 font-semibold text-white text-xs">
             {styleLabel} · {dict.result.budgetMedium}
           </div>
-          {design.tags.map((tag, i) => (
-            <FurniturePin
-              key={tag.id}
-              tag={tag}
-              index={i + 1}
-              onOpen={() => openFurniture(toDetail(), i + 1)}
-            />
-          ))}
+          {design.tags.map((tag, i) =>
+            tag.furnitureItemId ? (
+              <FurniturePin
+                key={tag.id}
+                tag={tag}
+                index={i + 1}
+                onOpen={() => openFurniture(tag.furnitureItemId as string, i + 1)}
+              />
+            ) : null,
+          )}
         </div>
         <p className="mt-3 text-center text-muted-foreground text-sm">{dict.result.tapHint}</p>
       </div>
@@ -62,12 +60,12 @@ export function ResultView({ design }: { design: DesignWithTags }) {
         <div className="flex flex-col gap-3">
           {design.tags.map((tag, i) => {
             const item = tag.furnitureItem;
-            if (!item) return null;
+            if (!item || !tag.furnitureItemId) return null;
             return (
               <button
                 type="button"
                 key={tag.id}
-                onClick={() => openFurniture(toDetail(), i + 1)}
+                onClick={() => openFurniture(tag.furnitureItemId as string, i + 1)}
                 className="flex items-center gap-3 rounded-2xl bg-card p-3 text-left shadow-sm transition-shadow hover:shadow-md"
               >
                 <ImagePlaceholder className="size-16 shrink-0 rounded-xl" />

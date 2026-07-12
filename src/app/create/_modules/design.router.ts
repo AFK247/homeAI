@@ -6,6 +6,7 @@ import { DESIGN_STYLES, ROOM_TYPES } from "@/db/schemas/shared.schema";
 import { logger } from "@/lib/logger";
 import { publicProcedure } from "@/server/rpc/procedures";
 import { AiService } from "@/server/service/ai/ai.service";
+import { FurnitureService } from "@/server/service/furniture.service";
 import { StorageService } from "@/server/service/storage/storage.service";
 import { DesignService } from "./design.service";
 
@@ -69,6 +70,11 @@ export const designRouter = {
         generatedImageUrl,
         status: "done",
       });
+
+      // Place furniture pins for this room type (heuristic "find similar").
+      const planned = await FurnitureService.planTags(input.roomType);
+      await DesignService.createTags(design.id, planned);
+
       return done ?? design;
     } catch (err) {
       logger.error({ err, designId: design.id }, "generation failed");

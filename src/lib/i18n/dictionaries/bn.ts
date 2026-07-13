@@ -24,6 +24,7 @@ export const bn = {
     dropzone: "ছবি টেনে আনুন বা বাছাই করুন",
     fileHint: "JPG, PNG · সর্বোচ্চ ১০ MB",
     preparing: "ছবি প্রস্তুত হচ্ছে…",
+    invalidFile: "১০ MB-এর কম একটি JPG, PNG বা WebP ছবি বাছাই করুন।",
     camera: "ক্যামেরা দিয়ে তুলুন",
     panorama: "৩৬০° প্যানোরামা",
     roomType: "ঘরের ধরন",

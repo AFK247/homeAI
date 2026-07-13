@@ -18,8 +18,11 @@ export const designs = pgTable(
     id,
     userId: text("user_id").references(() => users.id, cascade), // nullable until signup
     anonymousId: text("anonymous_id"), // anon session cookie id
-    originalImageUrl: text("original_image_url").notNull(), // R2 key/url
-    generatedImageUrl: text("generated_image_url"), // null until job done
+    // Stores the storage KEY (path), not a full URL. The env-specific base URL
+    // is joined on at read time (StorageService.publicUrl). Column name kept for
+    // stability; the value is a key like "originals/anon_x/123.jpg".
+    originalImageUrl: text("original_image_url").notNull(),
+    generatedImageUrl: text("generated_image_url"), // key; null until job done
     roomType: roomTypeEnum("room_type").notNull(),
     style: designStyleEnum("style").notNull(),
     prompt: text("prompt"), // user free-text (server prompt stays private)

@@ -2,7 +2,7 @@ import "server-only";
 
 import { logger } from "@/lib/logger";
 import { cloudflareProvider } from "./cloudflare.provider";
-import { pollinationsProvider } from "./pollinations.provider";
+import { openrouterProvider } from "./openrouter.provider";
 import type { AiProvider, RedesignRequest, RedesignResult } from "./types";
 
 /*
@@ -12,7 +12,7 @@ import type { AiProvider, RedesignRequest, RedesignResult } from "./types";
  *
  * To reorder or add providers: edit CHAIN. To swap the primary, move it first.
  */
-export const CHAIN: AiProvider[] = [cloudflareProvider, pollinationsProvider];
+export const CHAIN: AiProvider[] = [openrouterProvider, cloudflareProvider];
 
 export async function redesignWithFallback(req: RedesignRequest): Promise<RedesignResult> {
   const ready = CHAIN.filter((p) => p.isReady());
@@ -21,11 +21,19 @@ export async function redesignWithFallback(req: RedesignRequest): Promise<Redesi
   }
 
   const errors: string[] = [];
+  const providersTried: string[] = [];
   for (const provider of ready) {
+    providersTried.push(provider.key);
     try {
-      const bytes = await provider.redesign(req);
-      logger.info({ provider: provider.key, model: provider.model }, "redesign succeeded");
-      return { bytes, provider: provider.key, model: provider.model };
+      const { bytes, costUsd } = await provider.redesign(req);
+      logger.info({ provider: provider.key, model: provider.model, costUsd }, "redesign succeeded");
+      return {
+        bytes,
+        provider: provider.key,
+        model: provider.model,
+        costUsd: costUsd ?? null,
+        providersTried,
+      };
     } catch (err) {
       const msg = err instanceof Error ? err.message : String(err);
       errors.push(`${provider.key}: ${msg}`);
@@ -33,5 +41,8 @@ export async function redesignWithFallback(req: RedesignRequest): Promise<Redesi
     }
   }
 
-  throw new Error(`all AI providers failed — ${errors.join("; ")}`);
+  // Attach the attempted chain to the error so the caller can log it.
+  const error = new Error(`all AI providers failed — ${errors.join("; ")}`);
+  (error as Error & { providersTried?: string[] }).providersTried = providersTried;
+  throw error;
 }

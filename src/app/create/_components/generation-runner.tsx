@@ -36,7 +36,11 @@ export function GenerationRunner() {
       try {
         const design = await rpc.design.generate({
           image,
-          imageMime: s.imageMime,
+          // Server accepts only jpeg/png/webp; fall back to jpeg for anything else.
+          imageMime:
+            s.imageMime === "image/png" || s.imageMime === "image/webp"
+              ? s.imageMime
+              : "image/jpeg",
           roomType: s.roomType,
           style: s.style,
           prompt: s.prompt || undefined,

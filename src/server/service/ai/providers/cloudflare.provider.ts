@@ -2,7 +2,7 @@ import "server-only";
 
 import { env } from "@/lib/env";
 import { logger } from "@/lib/logger";
-import type { AiProvider, RedesignRequest } from "./types";
+import type { AiProvider, RedesignProviderResult, RedesignRequest } from "./types";
 
 /*
  * Cloudflare Workers AI — FLUX.2 [klein] 9B (img2img). Multipart in, JSON base64
@@ -20,7 +20,7 @@ export const cloudflareProvider: AiProvider = {
     return Boolean(env.CLOUDFLARE_ACCOUNT_ID && env.CLOUDFLARE_API_TOKEN);
   },
 
-  async redesign(req: RedesignRequest): Promise<Buffer> {
+  async redesign(req: RedesignRequest): Promise<RedesignProviderResult> {
     const endpoint = `https://api.cloudflare.com/client/v4/accounts/${env.CLOUDFLARE_ACCOUNT_ID}/ai/run/${MODEL}`;
     const form = new FormData();
     form.append("prompt", req.prompt);
@@ -44,6 +44,7 @@ export const cloudflareProvider: AiProvider = {
     const json = (await res.json()) as { result?: { image?: string } };
     const b64 = json.result?.image;
     if (!b64) throw new Error("cloudflare returned no image");
-    return Buffer.from(b64, "base64");
+    // Cloudflare bills via Neurons (free daily quota), not per-call USD — cost unknown here.
+    return { bytes: Buffer.from(b64, "base64"), costUsd: null };
   },
 };

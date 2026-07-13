@@ -8,5 +8,6 @@ export * from "./schemas/billing.schema";
 export * from "./schemas/design.schema";
 export * from "./schemas/event.schema";
 export * from "./schemas/furniture.schema";
+export * from "./schemas/generation-log.schema";
 export * from "./schemas/shared.schema";
 export * from "./schemas/vendor.schema";

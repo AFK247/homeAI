@@ -7,6 +7,7 @@ import { logger } from "@/lib/logger";
 import { publicProcedure } from "@/server/rpc/procedures";
 import { AiService } from "@/server/service/ai/ai.service";
 import { FurnitureService } from "@/server/service/furniture.service";
+import { GenerationLogService } from "@/server/service/generation-log.service";
 import { StorageService } from "@/server/service/storage/storage.service";
 import { DesignService } from "./design.service";
 
@@ -16,10 +17,20 @@ import { DesignService } from "./design.service";
  * one request (no job/polling). Scoped by the anonymous session.
  */
 
+// Max accepted base64 payload. The client compresses to <=1.5MB; base64 inflates
+// ~33%, so ~10MB is generous headroom while blocking oversized/abusive uploads
+// that bypass the client (the server is the real limit — the client can be
+// bypassed). ~10MB in chars.
+const MAX_IMAGE_CHARS = 10 * 1024 * 1024;
+const ACCEPTED_MIME = ["image/jpeg", "image/png", "image/webp"] as const;
+
 // Input: the uploaded room image (base64 data URL or raw base64) + selections.
 const GenerateInput = z.object({
-  image: z.string().min(1), // data URL (data:image/...;base64,xxx) or bare base64
-  imageMime: z.string().default("image/jpeg"),
+  image: z
+    .string()
+    .min(1)
+    .max(MAX_IMAGE_CHARS, "image is too large (max ~7MB)"), // data URL or bare base64
+  imageMime: z.enum(ACCEPTED_MIME).default("image/jpeg"),
   roomType: z.enum(ROOM_TYPES),
   style: z.enum(DESIGN_STYLES),
   prompt: z.string().max(500).optional(),
@@ -36,14 +47,14 @@ export const designRouter = {
   generate: publicProcedure.input(GenerateInput).handler(async ({ input, context }) => {
     const bytes = decodeImage(input.image);
 
-    // 1. store the original upload
+    // 1. store the original upload — persist the KEY, not a full URL
     const originalKey = `originals/${context.anonymousId}/${Date.now()}.jpg`;
-    const originalImageUrl = await StorageService.put(originalKey, bytes, input.imageMime);
+    await StorageService.put(originalKey, bytes, input.imageMime);
 
     // 2. create the design row (status: processing)
     const design = await DesignService.create({
       anonymousId: context.anonymousId,
-      originalImageUrl,
+      originalImageUrl: originalKey,
       roomType: input.roomType,
       style: input.style,
       prompt: input.prompt,
@@ -53,25 +64,43 @@ export const designRouter = {
       throw new ORPCError("INTERNAL_SERVER_ERROR", { message: "could not create design" });
 
     // 3. run the redesign through the provider fallback chain, store result, persist
+    const startedAt = performance.now();
     try {
       const result = await AiService.redesign({
         imageBytes: bytes,
         imageMime: input.imageMime,
-        imageUrl: originalImageUrl,
+        // Providers that fetch by URL need the full public URL, built here.
+        imageUrl: StorageService.publicUrl(originalKey) ?? "",
         style: input.style,
         roomType: input.roomType,
         userPrompt: input.prompt,
       });
       const generatedKey = `generated/${context.anonymousId}/${design.id}.png`;
-      const generatedImageUrl = await StorageService.put(generatedKey, result.bytes, "image/png");
+      await StorageService.put(generatedKey, result.bytes, "image/png");
 
       const done = await DesignService.setResult({
         id: design.id,
         anonymousId: context.anonymousId,
-        generatedImageUrl,
+        generatedImageUrl: generatedKey,
         status: "done",
         aiProvider: result.provider,
         aiModel: result.model,
+      });
+
+      // Technical audit trail — provider/model/cost/latency/fallback (fire-and-forget).
+      await GenerationLogService.log({
+        designId: design.id,
+        anonymousId: context.anonymousId,
+        roomType: input.roomType,
+        style: input.style,
+        hasUserPrompt: Boolean(input.prompt),
+        success: true,
+        provider: result.provider,
+        model: result.model,
+        providersTried: result.providersTried,
+        costUsd: result.costUsd,
+        latencyMs: Math.round(performance.now() - startedAt),
+        inputBytes: result.inputBytes,
       });
 
       // Place furniture pins for this room type (heuristic "find similar").
@@ -87,6 +116,19 @@ export const designRouter = {
         generatedImageUrl: null,
         status: "failed",
       });
+
+      await GenerationLogService.log({
+        designId: design.id,
+        anonymousId: context.anonymousId,
+        roomType: input.roomType,
+        style: input.style,
+        hasUserPrompt: Boolean(input.prompt),
+        success: false,
+        providersTried: (err as { providersTried?: string[] }).providersTried,
+        errorMessage: err instanceof Error ? err.message : String(err),
+        latencyMs: Math.round(performance.now() - startedAt),
+      });
+
       throw new ORPCError("INTERNAL_SERVER_ERROR", { message: "generation failed" });
     }
   }),

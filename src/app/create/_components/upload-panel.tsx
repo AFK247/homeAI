@@ -27,18 +27,31 @@ async function dataUrlToFile(dataUrl: string, name: string): Promise<File> {
 }
 
 const COMPRESS_OPTS = { maxWidthOrHeight: 1280, maxSizeMB: 1.5, useWebWorker: true };
+// Reject before compression: cap the raw file and require an image type. The
+// compressor shrinks well within the server's limit; this just blocks obviously
+// bad picks (giant files, non-images) with a clean message.
+const MAX_UPLOAD_BYTES = 10 * 1024 * 1024; // 10MB raw
+const ACCEPTED_TYPES = ["image/jpeg", "image/png", "image/webp"];
 
 export function UploadPanel() {
   const { dict } = useTranslation();
   const openModal = useModal((s) => s.openModal);
   const inputRef = useRef<HTMLInputElement>(null);
   const [busy, setBusy] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   const image = useCreateStore((s) => s.image);
   const isPanorama = useCreateStore((s) => s.isPanorama);
   const setImage = useCreateStore((s) => s.setImage);
   const setPanorama = useCreateStore((s) => s.setPanorama);
 
   async function ingest(file: File) {
+    // Validate before compressing — the compressor can hang/error on huge or
+    // non-image inputs. The server enforces its own hard cap regardless.
+    if (!ACCEPTED_TYPES.includes(file.type) || file.size > MAX_UPLOAD_BYTES) {
+      setError(dict.upload.invalidFile);
+      return;
+    }
+    setError(null);
     setBusy(true);
     try {
       const compressed = await imageCompression(file, COMPRESS_OPTS);
@@ -110,6 +123,7 @@ export function UploadPanel() {
         )}
       </button>
       {busy && <p className="text-brand-body text-sm">{dict.upload.preparing}</p>}
+      {error && <p className="text-destructive text-sm">{error}</p>}
       <div className="flex gap-3.5">
         <button
           type="button"

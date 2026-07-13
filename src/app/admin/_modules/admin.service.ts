@@ -15,7 +15,19 @@ import { designs } from "@/db/schemas/design.schema";
 import { events } from "@/db/schemas/event.schema";
 import { furnitureItems } from "@/db/schemas/furniture.schema";
 import { vendors } from "@/db/schemas/vendor.schema";
+import { StorageService } from "@/server/service/storage/storage.service";
 import type { PromiseResult } from "@/lib/types/utils";
+
+/** Join the env-specific base URL onto a design row's stored image keys. */
+function resolveDesignUrls<
+  T extends { originalImageUrl: string; generatedImageUrl: string | null },
+>(row: T): T {
+  return {
+    ...row,
+    originalImageUrl: StorageService.publicUrl(row.originalImageUrl) ?? "",
+    generatedImageUrl: StorageService.publicUrl(row.generatedImageUrl),
+  };
+}
 
 /*
  * Admin service — read-only aggregate + list queries for the admin dashboard.
@@ -69,20 +81,25 @@ export const AdminService = {
       roomType: designs.roomType,
       status: designs.status,
     };
-    return paginate(params, db.select(sqlCount()).from(designs).where(where), (limit, offset) =>
-      db
-        .select()
-        .from(designs)
-        .where(where)
-        .orderBy(withSorting(sortMap, params, designs.createdAt))
-        .limit(limit)
-        .offset(offset),
+    const page = await paginate(
+      params,
+      db.select(sqlCount()).from(designs).where(where),
+      (limit, offset) =>
+        db
+          .select()
+          .from(designs)
+          .where(where)
+          .orderBy(withSorting(sortMap, params, designs.createdAt))
+          .limit(limit)
+          .offset(offset),
     );
+    return { ...page, data: page.data.map(resolveDesignUrls) };
   },
 
   /** A few most-recent designs for the overview. */
   recentDesigns: async (limit = 6) => {
-    return db.select().from(designs).orderBy(desc(designs.createdAt)).limit(limit);
+    const rows = await db.select().from(designs).orderBy(desc(designs.createdAt)).limit(limit);
+    return rows.map(resolveDesignUrls);
   },
 
   /** Anonymous sessions grouped: designs per session, last activity. */

@@ -24,6 +24,7 @@ export const en: Dictionary = {
     dropzone: "Drag an image here or choose one",
     fileHint: "JPG, PNG · up to 10 MB",
     preparing: "Preparing image…",
+    invalidFile: "Please choose a JPG, PNG or WebP image under 10 MB.",
     camera: "Take with camera",
     panorama: "360° panorama",
     roomType: "Room type",

@@ -31,9 +31,12 @@ const serverSchema = z.object({
   CLOUDFLARE_ACCOUNT_ID: z.string(),
   CLOUDFLARE_API_TOKEN: z.string(),
 
-  // AI fallback (Pollinations kontext img2img). Optional publishable key from
-  // enter.pollinations.ai — free, no card. Without it the provider is skipped.
-  POLLINATIONS_API_KEY: z.string().optional(),
+  // AI primary (OpenRouter Unified Image API — img2img via Gemini flash / FLUX /
+  // Seedream). Pay-as-you-go key (sk-or-v1-...) from openrouter.ai/keys; balance
+  // required (no free image tier). Without it the provider is skipped.
+  OPENROUTER_API_KEY: z.string().optional(),
+  // Override the OpenRouter image model (default: gemini-3.1-flash-image).
+  OPENROUTER_IMAGE_MODEL: z.string().optional(),
 
   // Object storage (S3-compatible: local MinIO now, R2/Supabase in prod)
   S3_ENDPOINT: z.url(),

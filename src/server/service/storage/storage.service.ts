@@ -6,7 +6,13 @@ import { env } from "@/lib/env";
 /*
  * Object storage service — S3-compatible. Points at local MinIO now; the same
  * code works against Cloudflare R2 or Supabase Storage in production (just swap
- * the S3_* env vars). Services call `put()` and get back a public URL.
+ * the S3_* env vars).
+ *
+ * URL CONVENTION: `put()` stores the object and returns its KEY (the stable
+ * path, e.g. "originals/anon_x/123.jpg") — NOT a full URL. Only the key is
+ * persisted in the DB. The public base URL (S3_PUBLIC_URL) is env-specific and
+ * changeable, so the full URL is built at READ time via `publicUrl(key)`. This
+ * way switching storage/domain never invalidates stored rows.
  */
 
 const globalForS3 = globalThis as unknown as { __homeaiS3__?: S3Client };
@@ -28,7 +34,7 @@ if (env.NODE_ENV !== "production") {
 }
 
 export const StorageService = {
-  /** Upload bytes under `key`, return the public URL for reading it. */
+  /** Upload bytes under `key`; returns the stored KEY (not a URL). */
   put: async (key: string, bytes: Buffer, contentType: string): Promise<string> => {
     await s3.send(
       new PutObjectCommand({
@@ -38,6 +44,16 @@ export const StorageService = {
         ContentType: contentType,
       }),
     );
-    return `${env.S3_PUBLIC_URL}/${key}`;
+    return key;
+  },
+
+  /**
+   * Build the full public URL for a stored key at read time. Pass-through for
+   * values that are already absolute URLs (e.g. legacy rows) or empty.
+   */
+  publicUrl: (key: string | null | undefined): string | null => {
+    if (!key) return null;
+    if (key.startsWith("http://") || key.startsWith("https://")) return key;
+    return `${env.S3_PUBLIC_URL}/${key.replace(/^\/+/, "")}`;
   },
 };

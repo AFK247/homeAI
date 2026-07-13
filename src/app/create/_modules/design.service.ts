@@ -6,6 +6,7 @@ import { designs, designTags } from "@/db/schemas/design.schema";
 import { furnitureItems } from "@/db/schemas/furniture.schema";
 import type { DesignStyle, RoomType } from "@/db/schemas/shared.schema";
 import type { PlannedTag } from "@/server/service/furniture.service";
+import { StorageService } from "@/server/service/storage/storage.service";
 
 /*
  * Design service (plan §5.1). All Drizzle for designs lives here. Every query is
@@ -15,6 +16,21 @@ import type { PlannedTag } from "@/server/service/furniture.service";
 
 interface Scope {
   anonymousId: string;
+}
+
+/**
+ * Resolve a design row's stored KEYS into full public URLs at read time. The DB
+ * holds env-agnostic keys; the base URL (env-specific) is joined on here so the
+ * UI always gets a ready-to-render `src`.
+ */
+function resolveUrls<T extends { originalImageUrl: string; generatedImageUrl: string | null }>(
+  row: T,
+): T {
+  return {
+    ...row,
+    originalImageUrl: StorageService.publicUrl(row.originalImageUrl) ?? "",
+    generatedImageUrl: StorageService.publicUrl(row.generatedImageUrl),
+  };
 }
 
 interface CreateInput extends Scope {
@@ -65,7 +81,7 @@ export const DesignService = {
       furnitureItem: t.furnitureItemId ? (itemById.get(t.furnitureItemId) ?? null) : null,
     }));
 
-    return { ...row, tags };
+    return { ...resolveUrls(row), tags };
   },
 
   /** Insert the planned pins for a design (called after generation). */
@@ -83,11 +99,12 @@ export const DesignService = {
   },
 
   listByAnon: async ({ anonymousId }: Scope) => {
-    return db
+    const rows = await db
       .select()
       .from(designs)
       .where(and(eq(designs.anonymousId, anonymousId), isNull(designs.deletedAt)))
       .orderBy(desc(designs.createdAt));
+    return rows.map(resolveUrls);
   },
 
   setResult: async ({

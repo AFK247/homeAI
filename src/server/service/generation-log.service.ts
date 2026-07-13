@@ -1,0 +1,55 @@
+import "server-only";
+
+import { db } from "@/db/client";
+import { generationLogs } from "@/db/schemas/generation-log.schema";
+import type { DesignStyle, RoomType } from "@/db/schemas/shared.schema";
+
+/*
+ * Generation logging — the engineering/cost audit trail for AI redesigns.
+ * One row per generation attempt (provider, model, cost, latency, success,
+ * fallback chain). Separate from EventService (product/vendor analytics).
+ *
+ * Fire-and-forget from the router: logging must never break the user flow.
+ */
+
+export interface GenerationLogInput {
+  designId?: string | null;
+  anonymousId: string | null;
+  userId?: string | null;
+  roomType: RoomType;
+  style: DesignStyle;
+  hasUserPrompt: boolean;
+  success: boolean;
+  provider?: string | null;
+  model?: string | null;
+  providersTried?: string[];
+  errorMessage?: string | null;
+  costUsd?: number | null;
+  latencyMs?: number | null;
+  inputBytes?: number | null;
+}
+
+export const GenerationLogService = {
+  log: async (input: GenerationLogInput): Promise<void> => {
+    try {
+      await db.insert(generationLogs).values({
+        designId: input.designId ?? null,
+        anonymousId: input.anonymousId,
+        userId: input.userId ?? null,
+        roomType: input.roomType,
+        style: input.style,
+        hasUserPrompt: input.hasUserPrompt,
+        success: input.success,
+        provider: input.provider ?? null,
+        model: input.model ?? null,
+        providersTried: input.providersTried ?? null,
+        errorMessage: input.errorMessage ?? null,
+        costUsd: input.costUsd ?? null,
+        latencyMs: input.latencyMs ?? null,
+        inputBytes: input.inputBytes ?? null,
+      });
+    } catch {
+      // Logging must never break the user flow.
+    }
+  },
+};

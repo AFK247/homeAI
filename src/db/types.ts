@@ -10,6 +10,7 @@ import type { users } from "@/db/schemas/auth.schema";
 import type { credits, payments } from "@/db/schemas/billing.schema";
 import type { designs, designTags } from "@/db/schemas/design.schema";
 import type { furnitureItems } from "@/db/schemas/furniture.schema";
+import type { generationLogs } from "@/db/schemas/generation-log.schema";
 import type { vendors } from "@/db/schemas/vendor.schema";
 
 // Base row types
@@ -20,6 +21,7 @@ export type FurnitureItem = typeof furnitureItems.$inferSelect;
 export type Vendor = typeof vendors.$inferSelect;
 export type Credit = typeof credits.$inferSelect;
 export type Payment = typeof payments.$inferSelect;
+export type GenerationLog = typeof generationLogs.$inferSelect;
 
 // Composed shapes used by screens
 /** A furniture pin resolved to its catalog item (result screen). */

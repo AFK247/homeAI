@@ -27,6 +27,18 @@ type ImageEditResponse = {
   usage?: { cost?: number };
 };
 
+/** Remaining OpenRouter balance in USD via the free /credits endpoint. Throws on HTTP error. */
+async function fetchRemaining(): Promise<number | null> {
+  const res = await fetch("https://openrouter.ai/api/v1/credits", {
+    cache: "no-store", // live balance — never cached
+    headers: { Authorization: `Bearer ${env.OPENROUTER_API_KEY}` },
+  });
+  if (!res.ok) throw new Error(`HTTP ${res.status}`);
+  const json = (await res.json()) as { data?: { total_credits?: number; total_usage?: number } };
+  const { total_credits, total_usage } = json.data ?? {};
+  return total_credits != null && total_usage != null ? total_credits - total_usage : null;
+}
+
 export const openrouterProvider: AiProvider = {
   key: "openrouter",
   label: "OpenRouter (FLUX.2 klein)",
@@ -34,6 +46,18 @@ export const openrouterProvider: AiProvider = {
 
   isReady() {
     return Boolean(env.OPENROUTER_API_KEY);
+  },
+
+  async balance() {
+    if (!env.OPENROUTER_API_KEY) return { display: "not configured", remaining: null };
+    try {
+      const remaining = await fetchRemaining();
+      return remaining != null
+        ? { display: `$${remaining.toFixed(2)}`, remaining }
+        : { display: "reachable", remaining: null };
+    } catch {
+      return { display: "unavailable", remaining: null };
+    }
   },
 
   async redesign(req: RedesignRequest): Promise<RedesignProviderResult> {

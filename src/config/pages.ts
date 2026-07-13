@@ -34,6 +34,9 @@ export const PAGES = {
     FURNITURE: "/admin/furniture",
     VENDORS: "/admin/vendors",
     PROVIDER: "/admin/provider",
+    GENERATIONS: "/admin/generations",
+    DESIGN_DETAIL: (id: string) => `/admin/designs/${id}`,
+    GENERATION_DETAIL: (id: string) => `/admin/generations/${id}`,
   },
 
   API: {

@@ -1,7 +1,10 @@
 "use client";
 
 import { format } from "date-fns";
+import { Eye } from "lucide-react";
 import Image from "next/image";
+import Link from "next/link";
+import { PAGES } from "@/config/pages";
 import type { DataTableColumn } from "@/components/data-table/data-table";
 import { Badge } from "@/components/ui/badge";
 import type { Design } from "@/db/types";
@@ -51,5 +54,19 @@ export const columns: DataTableColumn<Design>[] = [
     sortable: true,
     className: "text-muted-foreground text-xs",
     cell: (d) => format(new Date(d.createdAt), "d MMM, HH:mm"),
+  },
+  {
+    header: "",
+    accessorKey: "id",
+    className: "w-10 text-right",
+    cell: (d) => (
+      <Link
+        href={PAGES.ADMIN.DESIGN_DETAIL(d.id)}
+        aria-label="View design"
+        className="inline-flex size-8 items-center justify-center rounded-md text-muted-foreground hover:bg-muted hover:text-foreground"
+      >
+        <Eye className="size-4" />
+      </Link>
+    ),
   },
 ];

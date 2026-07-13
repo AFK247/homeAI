@@ -48,7 +48,16 @@ export const generationLogs = pgTable(
     // Cost + performance.
     costUsd: numeric("cost_usd", costConfig), // provider-reported USD; null if unknown
     latencyMs: integer("latency_ms"), // wall-clock for the whole redesign
+
+    // Image sizes. Dimensions explain the cost for MP-billed models (e.g. klein
+    // $0.014/first MP): megapixels = width*height/1e6, so it's derived at read
+    // time, NOT stored (would be redundant with width/height).
     inputBytes: integer("input_bytes"), // preprocessed image size sent to the model
+    inputWidth: integer("input_width"),
+    inputHeight: integer("input_height"),
+    outputBytes: integer("output_bytes"),
+    outputWidth: integer("output_width"),
+    outputHeight: integer("output_height"),
 
     ...timestampColumns,
   },

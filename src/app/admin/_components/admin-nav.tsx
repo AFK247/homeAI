@@ -1,6 +1,15 @@
 "use client";
 
-import { BarChart3, Boxes, Cpu, Image, LayoutDashboard, Store, Users } from "lucide-react";
+import {
+  BarChart3,
+  Boxes,
+  Cpu,
+  Image,
+  LayoutDashboard,
+  Sparkles,
+  Store,
+  Users,
+} from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { PAGES } from "@/config/pages";
@@ -17,6 +26,7 @@ const LINKS = [
   { href: PAGES.ADMIN.EVENTS, label: "Events", icon: BarChart3 },
   { href: PAGES.ADMIN.FURNITURE, label: "Furniture", icon: Boxes },
   { href: PAGES.ADMIN.VENDORS, label: "Vendors", icon: Store },
+  { href: PAGES.ADMIN.GENERATIONS, label: "Generations", icon: Sparkles },
   { href: PAGES.ADMIN.PROVIDER, label: "AI Provider", icon: Cpu },
 ];
 

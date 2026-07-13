@@ -27,6 +27,11 @@ export interface GenerationLogInput {
   costUsd?: number | null;
   latencyMs?: number | null;
   inputBytes?: number | null;
+  inputWidth?: number | null;
+  inputHeight?: number | null;
+  outputBytes?: number | null;
+  outputWidth?: number | null;
+  outputHeight?: number | null;
 }
 
 export const GenerationLogService = {
@@ -47,6 +52,11 @@ export const GenerationLogService = {
         costUsd: input.costUsd ?? null,
         latencyMs: input.latencyMs ?? null,
         inputBytes: input.inputBytes ?? null,
+        inputWidth: input.inputWidth ?? null,
+        inputHeight: input.inputHeight ?? null,
+        outputBytes: input.outputBytes ?? null,
+        outputWidth: input.outputWidth ?? null,
+        outputHeight: input.outputHeight ?? null,
       });
     } catch {
       // Logging must never break the user flow.

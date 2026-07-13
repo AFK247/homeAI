@@ -1,6 +1,6 @@
 import "server-only";
 
-import { desc, sql } from "drizzle-orm";
+import { desc, eq, sql } from "drizzle-orm";
 import { db } from "@/db/client";
 import type { SearchParams } from "@/db/helpers/search-params";
 import {
@@ -14,6 +14,7 @@ import {
 import { designs } from "@/db/schemas/design.schema";
 import { events } from "@/db/schemas/event.schema";
 import { furnitureItems } from "@/db/schemas/furniture.schema";
+import { generationLogs } from "@/db/schemas/generation-log.schema";
 import { vendors } from "@/db/schemas/vendor.schema";
 import { StorageService } from "@/server/service/storage/storage.service";
 import type { PromiseResult } from "@/lib/types/utils";
@@ -164,9 +165,87 @@ export const AdminService = {
   allVendors: async () => {
     return db.select().from(vendors).orderBy(desc(vendors.createdAt));
   },
+
+  /** Paginated AI generation logs with backend search / filter / sort. */
+  paginatedGenerationLogs: async (params: SearchParams) => {
+    const where = andWhere([
+      searchFilters(
+        [generationLogs.model, generationLogs.provider, generationLogs.anonymousId],
+        params.search,
+      ),
+      ...equalFilters(
+        {
+          provider: generationLogs.provider,
+          style: generationLogs.style,
+          roomType: generationLogs.roomType,
+        },
+        params.filters,
+      ),
+    ]);
+    const sortMap = {
+      createdAt: generationLogs.createdAt,
+      costUsd: generationLogs.costUsd,
+      latencyMs: generationLogs.latencyMs,
+      model: generationLogs.model,
+    };
+    return paginate(
+      params,
+      db.select(sqlCount()).from(generationLogs).where(where),
+      (limit, offset) =>
+        db
+          .select()
+          .from(generationLogs)
+          .where(where)
+          .orderBy(withSorting(sortMap, params, generationLogs.createdAt))
+          .limit(limit)
+          .offset(offset),
+    );
+  },
+
+  /** One design + all its generation attempts (newest first), for the detail page. */
+  designDetail: async (id: string) => {
+    const [design] = await db.select().from(designs).where(eq(designs.id, id));
+    if (!design) return null;
+    const attempts = await db
+      .select()
+      .from(generationLogs)
+      .where(eq(generationLogs.designId, id))
+      .orderBy(desc(generationLogs.createdAt));
+    return { design: resolveDesignUrls(design), attempts };
+  },
+
+  /** One generation attempt + its parent design (if any), for the detail page. */
+  generationDetail: async (id: string) => {
+    const [attempt] = await db.select().from(generationLogs).where(eq(generationLogs.id, id));
+    if (!attempt) return null;
+    let design = null;
+    if (attempt.designId) {
+      const [d] = await db.select().from(designs).where(eq(designs.id, attempt.designId));
+      design = d ? resolveDesignUrls(d) : null;
+    }
+    return { attempt, design };
+  },
+
+  /** Headline generation KPIs: total spend, count, success rate, avg latency. */
+  generationStats: async () => {
+    const [row] = await db
+      .select({
+        total: sql<number>`count(*)::int`,
+        succeeded: sql<number>`count(*) filter (where ${generationLogs.success})::int`,
+        totalCostUsd: sql<number>`coalesce(sum(${generationLogs.costUsd}), 0)::float`,
+        avgLatencyMs: sql<number>`coalesce(round(avg(${generationLogs.latencyMs})), 0)::int`,
+      })
+      .from(generationLogs);
+    return (
+      row ?? { total: 0, succeeded: 0, totalCostUsd: 0, avgLatencyMs: 0 }
+    );
+  },
 };
 
 // Inferred row types for the admin table components.
 export type SessionRow = PromiseResult<typeof AdminService.sessions>[number];
 export type EventRow = PromiseResult<typeof AdminService.recentEvents>[number];
 export type DesignRow = PromiseResult<typeof AdminService.paginatedDesigns>["data"][number];
+export type GenerationLogRow = PromiseResult<
+  typeof AdminService.paginatedGenerationLogs
+>["data"][number];

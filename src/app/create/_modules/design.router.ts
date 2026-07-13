@@ -6,6 +6,7 @@ import { DESIGN_STYLES, ROOM_TYPES } from "@/db/schemas/shared.schema";
 import { logger } from "@/lib/logger";
 import { publicProcedure } from "@/server/rpc/procedures";
 import { AiService } from "@/server/service/ai/ai.service";
+import { measureImage } from "@/server/service/ai/image-preprocess";
 import { FurnitureService } from "@/server/service/furniture.service";
 import { GenerationLogService } from "@/server/service/generation-log.service";
 import { StorageService } from "@/server/service/storage/storage.service";
@@ -77,6 +78,7 @@ export const designRouter = {
       });
       const generatedKey = `generated/${context.anonymousId}/${design.id}.png`;
       await StorageService.put(generatedKey, result.bytes, "image/png");
+      const outputDims = await measureImage(result.bytes);
 
       const done = await DesignService.setResult({
         id: design.id,
@@ -87,7 +89,7 @@ export const designRouter = {
         aiModel: result.model,
       });
 
-      // Technical audit trail — provider/model/cost/latency/fallback (fire-and-forget).
+      // Technical audit trail — provider/model/cost/latency/sizes/fallback (fire-and-forget).
       await GenerationLogService.log({
         designId: design.id,
         anonymousId: context.anonymousId,
@@ -100,7 +102,12 @@ export const designRouter = {
         providersTried: result.providersTried,
         costUsd: result.costUsd,
         latencyMs: Math.round(performance.now() - startedAt),
-        inputBytes: result.inputBytes,
+        inputBytes: result.inputDims.bytes,
+        inputWidth: result.inputDims.width,
+        inputHeight: result.inputDims.height,
+        outputBytes: outputDims.bytes,
+        outputWidth: outputDims.width,
+        outputHeight: outputDims.height,
       });
 
       // Place furniture pins for this room type (heuristic "find similar").

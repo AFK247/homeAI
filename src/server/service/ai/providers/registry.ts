@@ -1,6 +1,7 @@
 import "server-only";
 
 import { logger } from "@/lib/logger";
+import { preprocessForModel } from "../image-preprocess";
 import { cloudflareProvider } from "./cloudflare.provider";
 import { openrouterProvider } from "./openrouter.provider";
 import type { AiProvider, RedesignRequest, RedesignResult } from "./types";
@@ -11,8 +12,12 @@ import type { AiProvider, RedesignRequest, RedesignResult } from "./types";
  * returned so they can be persisted on the design.
  *
  * To reorder or add providers: edit CHAIN. To swap the primary, move it first.
+ *
+ * Order = cheapest first: Cloudflare has a free daily quota (near-$0/image), so
+ * it runs first; OpenRouter (paid, ~$0.016/image) is the fallback once
+ * Cloudflare's quota is exhausted or it errors.
  */
-export const CHAIN: AiProvider[] = [openrouterProvider, cloudflareProvider];
+export const CHAIN: AiProvider[] = [cloudflareProvider, openrouterProvider];
 
 export async function redesignWithFallback(req: RedesignRequest): Promise<RedesignResult> {
   const ready = CHAIN.filter((p) => p.isReady());
@@ -25,7 +30,16 @@ export async function redesignWithFallback(req: RedesignRequest): Promise<Redesi
   for (const provider of ready) {
     providersTried.push(provider.key);
     try {
-      const { bytes, costUsd } = await provider.redesign(req);
+      // Conform the input to THIS provider's declared spec (e.g. Cloudflare's
+      // <512px cap). Providers without a spec get the shared default unchanged.
+      const conformed = provider.inputSpec
+        ? await preprocessForModel(req.imageBytes, provider.inputSpec)
+        : { bytes: req.imageBytes, mime: req.imageMime };
+      const { bytes, costUsd } = await provider.redesign({
+        ...req,
+        imageBytes: conformed.bytes,
+        imageMime: conformed.mime,
+      });
       logger.info({ provider: provider.key, model: provider.model, costUsd }, "redesign succeeded");
       return {
         bytes,

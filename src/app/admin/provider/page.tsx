@@ -1,14 +1,36 @@
-import { Check, Cpu, X } from "lucide-react";
-import { Badge } from "@/components/ui/badge";
-import { providerChainStatus } from "@/server/service/ai/providers/status";
+import { Cpu } from "lucide-react";
+import { cloudflareDailyQuota } from "@/server/service/ai/providers/cloudflare-analytics";
+import { providerBalances, providerChainStatus } from "@/server/service/ai/providers/status";
+import { ProviderList } from "./list";
+import { ProviderCards } from "./quota-card";
+
+// Always render fresh — balance + quota are live external data that must not be
+// served from Next.js's route cache (otherwise the numbers look frozen).
+export const dynamic = "force-dynamic";
 
 /*
- * Admin — AI provider chain. Shows the ordered fallback list and each provider's
- * readiness. Generation tries them top-to-bottom until one succeeds; the winner
- * is persisted on each design (ai_provider / ai_model).
+ * Admin — AI provider chain. Shows the ordered fallback list, each provider's
+ * readiness, remaining balance, and Cloudflare's real free daily quota (card +
+ * per-row). Balance + quota run once server-side on load. Generation tries
+ * providers top-to-bottom until one succeeds; the winner is saved on the design.
  */
-export default function AdminProviderPage() {
+export default async function AdminProviderPage() {
   const chain = providerChainStatus();
+  // UTC-midnight = Cloudflare's daily quota reset boundary.
+  const now = new Date();
+  const utcMidnight = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate()));
+  const [balances, quota] = await Promise.all([
+    providerBalances(),
+    cloudflareDailyQuota(utcMidnight, now),
+  ]);
+  const balanceByKey = Object.fromEntries(balances.map((b) => [b.key, b]));
+  const rows = chain.map((c) => ({
+    ...c,
+    balance: balanceByKey[c.key]?.display ?? "—",
+    balanceRemaining: balanceByKey[c.key]?.remaining ?? null,
+    // Cloudflare's real daily free-neuron quota; null for other providers.
+    quota: c.key === "cloudflare" ? quota : null,
+  }));
 
   return (
     <div className="flex flex-col gap-6">
@@ -24,40 +46,17 @@ export default function AdminProviderPage() {
         </div>
       </div>
 
-      <div className="overflow-hidden rounded-xl border border-border bg-card">
-        <table className="w-full text-left text-sm">
-          <thead className="[&_tr]:border-border [&_tr]:border-b">
-            <tr>
-              <th className="px-4 py-3 font-semibold text-[#6B7280]">Order</th>
-              <th className="px-4 py-3 font-semibold text-[#6B7280]">Provider</th>
-              <th className="px-4 py-3 font-semibold text-[#6B7280]">Model</th>
-              <th className="px-4 py-3 font-semibold text-[#6B7280]">Status</th>
-            </tr>
-          </thead>
-          <tbody>
-            {chain.map((p) => (
-              <tr key={p.key} className="border-border border-b last:border-b-0">
-                <td className="px-4 py-3 font-medium text-foreground">{p.order}</td>
-                <td className="px-4 py-3 text-foreground">{p.label}</td>
-                <td className="px-4 py-3">
-                  <code className="rounded bg-muted px-1.5 py-0.5 text-xs">{p.model}</code>
-                </td>
-                <td className="px-4 py-3">
-                  {p.ready ? (
-                    <Badge variant="default" className="gap-1">
-                      <Check className="size-3" /> Ready
-                    </Badge>
-                  ) : (
-                    <Badge variant="secondary" className="gap-1">
-                      <X className="size-3" /> Not configured
-                    </Badge>
-                  )}
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
+      <ProviderCards
+        cards={rows.map((r) => ({
+          key: r.key,
+          label: r.label,
+          quota: r.quota,
+          balance: r.balance,
+          balanceRemaining: r.balanceRemaining,
+        }))}
+      />
+
+      <ProviderList data={rows} />
 
       <p className="text-brand-body text-sm">
         To reorder, swap the primary, or add a provider, edit{" "}

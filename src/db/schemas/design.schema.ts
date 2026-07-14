@@ -39,6 +39,28 @@ export const designs = pgTable(
 );
 
 /*
+ * design_versions — every generated image for a design (first render + each
+ * regenerate). Gives the user a browsable history to compare and revert to.
+ * `designs.generatedImageUrl` still points to the ACTIVE version for existing
+ * code; `isActive` flags which version that is.
+ */
+export const designVersions = pgTable(
+  "design_versions",
+  {
+    id,
+    designId: text("design_id")
+      .notNull()
+      .references(() => designs.id, cascade),
+    imageUrl: text("image_url").notNull(), // storage KEY of this version's image
+    aiProvider: text("ai_provider"),
+    aiModel: text("ai_model"),
+    isActive: boolean("is_active").notNull().default(true), // the currently-shown version
+    ...timestampColumns,
+  },
+  (t) => [index("design_versions_design_idx").on(t.designId)],
+);
+
+/*
  * design_tags — clickable furniture pins on the generated image.
  * x/yCoord are 0..1 relative positions.
  */
@@ -61,6 +83,11 @@ export const designTags = pgTable(
 export const designsRelations = relations(designs, ({ one, many }) => ({
   user: one(users, { fields: [designs.userId], references: [users.id] }),
   tags: many(designTags),
+  versions: many(designVersions),
+}));
+
+export const designVersionsRelations = relations(designVersions, ({ one }) => ({
+  design: one(designs, { fields: [designVersions.designId], references: [designs.id] }),
 }));
 
 export const designTagsRelations = relations(designTags, ({ one }) => ({

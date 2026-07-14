@@ -45,6 +45,10 @@ export const bn = {
     promptPlaceholder: "যেমন: হালকা রঙ, কাঠের আসবাব, বেশি আলো...",
     generate: "ঘর সাজান ✦",
   },
+  create: {
+    uploadFirst: "শুরু করতে ঘরের একটি ছবি আপলোড করুন",
+    failed: "রিডিজাইন ব্যর্থ হয়েছে — আবার চেষ্টা করুন।",
+  },
   generating: {
     title: "আপনার ঘর সাজানো হচ্ছে",
     subtitle: "একটু অপেক্ষা করুন — সাধারণত ১৫–৩০ সেকেন্ড সময় লাগে।",
@@ -66,6 +70,9 @@ export const bn = {
     conditionNew: "নতুন",
     conditionUsed: "ব্যবহৃত",
     regenerate: "আবার তৈরি করুন",
+    regenerating: "আবার তৈরি হচ্ছে…",
+    versions: "আগের সংস্করণগুলো",
+    fullscreen: "ফুল স্ক্রিনে দেখুন",
     otherStyle: "অন্য স্টাইল",
     save: "সংরক্ষণ",
     share: "শেয়ার",

@@ -14,8 +14,6 @@ export const PAGES = {
 
   CREATE: {
     INDEX: "/create",
-    STYLE: "/create/style",
-    GENERATING: "/create/generating",
   },
 
   RESULT: {

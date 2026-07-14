@@ -1,29 +1,23 @@
-import { StepIndicator } from "@/components/brand/step-indicator";
 import { SiteHeader } from "@/components/layout/site-header";
 import { getDictionary } from "@/lib/i18n/server";
-import { RoomPicker } from "./_components/room-picker";
-import { UploadPanel } from "./_components/upload-panel";
+import { CreateForm } from "./_components/create-form";
 
 /*
- * Step 1 — Upload. Server Component: static shell (header, headings, layout)
- * renders on the server; the interactive bits are client islands (UploadPanel,
- * RoomPicker) so only they ship JS.
+ * Create — a single-page form: upload + room + style + budget + optional prompt,
+ * all on one screen, then Generate (guarded on the image). No multi-step wizard,
+ * so the user can tweak any field freely without navigating back and forth.
  */
-export default async function UploadPage() {
+export default async function CreatePage() {
   const { dict } = await getDictionary();
   return (
     <>
       <SiteHeader />
       <main className="mx-auto w-full max-w-5xl flex-1 px-6 py-8">
-        <StepIndicator current={1} />
-        <h1 className="mt-5 font-serif font-extrabold text-3xl text-foreground">
-          {dict.upload.title}
-        </h1>
+        <h1 className="font-serif font-extrabold text-3xl text-foreground">{dict.upload.title}</h1>
         <p className="mt-1.5 text-brand-body">{dict.upload.subtitle}</p>
 
-        <div className="mt-7 grid items-start gap-7 lg:grid-cols-[1.4fr_1fr]">
-          <UploadPanel />
-          <RoomPicker />
+        <div className="mt-7">
+          <CreateForm />
         </div>
       </main>
     </>

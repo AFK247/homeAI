@@ -35,10 +35,13 @@ export const generationLogs = pgTable(
     roomType: roomTypeEnum("room_type").notNull(),
     style: designStyleEnum("style").notNull(),
     hasUserPrompt: boolean("has_user_prompt").notNull().default(false),
+    // The full assembled prompt actually sent to the model (for debugging quality).
+    prompt: text("prompt"),
 
     // What ran + outcome.
     provider: text("provider"), // winning provider key; null if all failed
     model: text("model"), // winning model id
+    imageUrl: text("image_url"), // storage KEY of THIS attempt's output image (null on failure)
     success: boolean("success").notNull(),
     // Ordered list of providers attempted, e.g. ["openrouter","cloudflare"] —
     // lets us measure fallback rate without a second table.

@@ -17,6 +17,8 @@ export interface ProviderRow {
   balanceRemaining: number | null;
   /** Cloudflare's real daily free-neuron quota; null for other providers. */
   quota: DailyQuota | null;
+  /** Total successful images this provider has generated. */
+  generationCount: number;
 }
 
 function fmt(n: number): string {
@@ -44,6 +46,16 @@ export const columns: DataTableColumn<ProviderRow>[] = [
           <X className="size-3" /> Not configured
         </Badge>
       ),
+  },
+  {
+    header: "Generated",
+    accessorKey: "generationCount",
+    className: "text-right tabular-nums",
+    cell: (p) => (
+      <span className="font-semibold text-foreground">
+        {p.generationCount.toLocaleString("en-US")}
+      </span>
+    ),
   },
   {
     header: "Balance",

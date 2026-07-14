@@ -51,6 +51,22 @@ export const columns: DataTableColumn<GenerationLogRow>[] = [
   { header: "Room", accessorKey: "roomType" },
   { header: "Style", accessorKey: "style" },
   {
+    header: "Prompt",
+    accessorKey: "prompt",
+    // Truncated preview; full prompt on hover (native title) + on the detail page.
+    cell: (g) =>
+      g.prompt ? (
+        <span
+          title={g.prompt}
+          className="block max-w-[16rem] cursor-help truncate text-muted-foreground text-xs"
+        >
+          {g.prompt}
+        </span>
+      ) : (
+        <span className="text-muted-foreground text-xs">—</span>
+      ),
+  },
+  {
     header: "Size (in → out)",
     accessorKey: "outputWidth",
     className: "text-xs tabular-nums",

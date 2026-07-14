@@ -45,8 +45,20 @@ export const columns: DataTableColumn<Design>[] = [
   {
     header: "Session",
     accessorKey: "anonymousId",
-    className: "font-mono text-muted-foreground text-xs",
-    cell: (d) => (d.anonymousId ? `${d.anonymousId.slice(0, 8)}…` : d.userId ? "user" : "—"),
+    className: "font-mono text-xs",
+    // Clickable → filter designs to this session.
+    cell: (d) =>
+      d.anonymousId ? (
+        <Link
+          href={`${PAGES.ADMIN.DESIGNS}?session=${encodeURIComponent(d.anonymousId)}`}
+          className="text-primary hover:underline"
+          title="Filter to this session"
+        >
+          {d.anonymousId.slice(0, 8)}…
+        </Link>
+      ) : (
+        <span className="text-muted-foreground">{d.userId ? "user" : "—"}</span>
+      ),
   },
   {
     header: "Created",

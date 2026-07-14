@@ -37,6 +37,8 @@ import { cn } from "@/lib/utils";
 export interface DataTableColumn<T> {
   header: string;
   accessorKey: keyof T;
+  /** Unique column id — set this for action columns or when two columns share an accessorKey. */
+  id?: string;
   cell?: (row: T) => React.ReactNode;
   size?: number;
   sortable?: boolean;
@@ -185,9 +187,10 @@ export function DataTable<T>({
             <tr>
               {columns.map((col) => {
                 const k = String(col.accessorKey);
+                const colKey = col.id ?? k;
                 return (
                   <th
-                    key={k}
+                    key={colKey}
                     style={{ width: col.size }}
                     className="whitespace-nowrap border-border border-r px-4 py-3 text-left align-middle font-semibold text-[#6B7280] last:border-r-0"
                   >
@@ -224,7 +227,7 @@ export function DataTable<T>({
                 <tr key={`skeleton-${rowIdx}`} className="border-border border-b last:border-b-0">
                   {columns.map((col) => (
                     <td
-                      key={String(col.accessorKey)}
+                      key={col.id ?? String(col.accessorKey)}
                       className="border-border border-r px-4 py-3 last:border-r-0"
                     >
                       <div className="h-4 w-full animate-pulse rounded bg-muted" />
@@ -254,7 +257,7 @@ export function DataTable<T>({
                 >
                   {columns.map((col) => (
                     <td
-                      key={String(col.accessorKey)}
+                      key={col.id ?? String(col.accessorKey)}
                       className={cn(
                         "relative whitespace-nowrap border-border border-r px-4 py-2.5 align-middle text-foreground tabular-nums last:border-r-0",
                         col.className,
@@ -272,7 +275,7 @@ export function DataTable<T>({
 
       {hasPagination && total > 0 ? (
         <div className="border-border border-t px-5 py-4">
-          <TableFooter page={page} pageCount={pageCount} total={total} size={size} />
+          <TableFooter page={page} pageCount={pageCount} size={size} />
         </div>
       ) : null}
     </div>
@@ -314,12 +317,10 @@ function SearchInput({ placeholder }: { placeholder: string }) {
 function TableFooter({
   page,
   pageCount,
-  total,
   size,
 }: {
   page: number;
   pageCount: number;
-  total: number;
   size: number;
 }) {
   const { updateParams } = useQueryParams();

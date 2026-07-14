@@ -45,6 +45,10 @@ export const en: Dictionary = {
     promptPlaceholder: "e.g. light colors, wooden furniture, more light...",
     generate: "Redesign my room ✦",
   },
+  create: {
+    uploadFirst: "Upload a room photo to start",
+    failed: "Redesign failed — please try again.",
+  },
   generating: {
     title: "Redesigning your room",
     subtitle: "Please wait — this usually takes 15–30 seconds.",
@@ -66,6 +70,9 @@ export const en: Dictionary = {
     conditionNew: "New",
     conditionUsed: "Used",
     regenerate: "Regenerate",
+    regenerating: "Regenerating…",
+    versions: "Previous versions",
+    fullscreen: "View fullscreen",
     otherStyle: "Other style",
     save: "Save",
     share: "Share",

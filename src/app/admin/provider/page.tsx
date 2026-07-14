@@ -1,6 +1,7 @@
 import { Cpu } from "lucide-react";
 import { cloudflareDailyQuota } from "@/server/service/ai/providers/cloudflare-analytics";
 import { providerBalances, providerChainStatus } from "@/server/service/ai/providers/status";
+import { AdminService } from "../_modules/admin.service";
 import { ProviderList } from "./list";
 import { ProviderCards } from "./quota-card";
 
@@ -19,9 +20,10 @@ export default async function AdminProviderPage() {
   // UTC-midnight = Cloudflare's daily quota reset boundary.
   const now = new Date();
   const utcMidnight = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate()));
-  const [balances, quota] = await Promise.all([
+  const [balances, quota, genCounts] = await Promise.all([
     providerBalances(),
     cloudflareDailyQuota(utcMidnight, now),
+    AdminService.generationCountsByProvider(),
   ]);
   const balanceByKey = Object.fromEntries(balances.map((b) => [b.key, b]));
   const rows = chain.map((c) => ({
@@ -30,6 +32,8 @@ export default async function AdminProviderPage() {
     balanceRemaining: balanceByKey[c.key]?.remaining ?? null,
     // Cloudflare's real daily free-neuron quota; null for other providers.
     quota: c.key === "cloudflare" ? quota : null,
+    // Total successful images this provider has generated.
+    generationCount: genCounts[c.key] ?? 0,
   }));
 
   return (
@@ -53,6 +57,7 @@ export default async function AdminProviderPage() {
           quota: r.quota,
           balance: r.balance,
           balanceRemaining: r.balanceRemaining,
+          generationCount: r.generationCount,
         }))}
       />
 

@@ -72,7 +72,12 @@ export const AdminService = {
     const where = andWhere([
       searchFilters([designs.style, designs.roomType, designs.anonymousId], params.search),
       ...equalFilters(
-        { status: designs.status, roomType: designs.roomType, style: designs.style },
+        {
+          status: designs.status,
+          roomType: designs.roomType,
+          style: designs.style,
+          session: designs.anonymousId,
+        },
         params.filters,
       ),
     ]);
@@ -178,6 +183,8 @@ export const AdminService = {
           provider: generationLogs.provider,
           style: generationLogs.style,
           roomType: generationLogs.roomType,
+          session: generationLogs.anonymousId,
+          designId: generationLogs.designId,
         },
         params.filters,
       ),
@@ -206,18 +213,14 @@ export const AdminService = {
   designDetail: async (id: string) => {
     const [design] = await db.select().from(designs).where(eq(designs.id, id));
     if (!design) return null;
-    const attempts = await db
-      .select()
-      .from(generationLogs)
-      .where(eq(generationLogs.designId, id))
-      .orderBy(desc(generationLogs.createdAt));
-    return { design: resolveDesignUrls(design), attempts };
+    return { design: resolveDesignUrls(design) };
   },
 
   /** One generation attempt + its parent design (if any), for the detail page. */
   generationDetail: async (id: string) => {
-    const [attempt] = await db.select().from(generationLogs).where(eq(generationLogs.id, id));
-    if (!attempt) return null;
+    const [row] = await db.select().from(generationLogs).where(eq(generationLogs.id, id));
+    if (!row) return null;
+    const attempt = { ...row, imageUrl: StorageService.publicUrl(row.imageUrl) };
     let design = null;
     if (attempt.designId) {
       const [d] = await db.select().from(designs).where(eq(designs.id, attempt.designId));
@@ -239,6 +242,22 @@ export const AdminService = {
     return (
       row ?? { total: 0, succeeded: 0, totalCostUsd: 0, avgLatencyMs: 0 }
     );
+  },
+
+  /** Generation count per provider (successful attempts), keyed by provider. */
+  generationCountsByProvider: async (): Promise<Record<string, number>> => {
+    const rows = await db
+      .select({
+        provider: generationLogs.provider,
+        count: sql<number>`count(*) filter (where ${generationLogs.success})::int`,
+      })
+      .from(generationLogs)
+      .groupBy(generationLogs.provider);
+    const map: Record<string, number> = {};
+    for (const r of rows) {
+      if (r.provider) map[r.provider] = r.count;
+    }
+    return map;
   },
 };
 

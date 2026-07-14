@@ -1,7 +1,9 @@
 "use client";
 
-import { Download, Link2, RefreshCw, Share2 } from "lucide-react";
+import { Download, Expand, Link2, Loader2, RefreshCw, Share2, X } from "lucide-react";
 import Image from "next/image";
+import { useRouter } from "next/navigation";
+import { useState, useTransition } from "react";
 import { ImagePlaceholder } from "@/components/brand/image-placeholder";
 import { FurniturePin } from "@/components/furniture/furniture-pin";
 import { useFurnitureDetail } from "@/components/furniture/use-furniture-detail";
@@ -10,6 +12,8 @@ import { STYLE_OPTIONS } from "@/config/catalog";
 import type { DesignWithTags } from "@/db/types";
 import { formatBdt } from "@/lib/format";
 import { useTranslation } from "@/lib/i18n/client";
+import { rpc } from "@/server/rpc/client";
+import { VersionHistory } from "./version-history";
 
 /*
  * Result screen body (design §7b). Image with clickable furniture pins, furniture list,
@@ -19,7 +23,23 @@ import { useTranslation } from "@/lib/i18n/client";
 export function ResultView({ design }: { design: DesignWithTags }) {
   const { dict, locale } = useTranslation();
   const openFurniture = useFurnitureDetail();
+  const router = useRouter();
+  const [regenerating, startRegenerate] = useTransition();
+  const [versionKey, setVersionKey] = useState(0); // bump to refetch version history
+  const [fullscreen, setFullscreen] = useState(false);
   const styleLabel = STYLE_OPTIONS.find((s) => s.value === design.style)?.[locale] ?? design.style;
+
+  function regenerate() {
+    startRegenerate(async () => {
+      try {
+        await rpc.design.regenerate({ id: design.id });
+        setVersionKey((k) => k + 1); // new version → refresh the history strip
+        router.refresh(); // re-fetch the server component → shows the new image
+      } catch {
+        // Swallow; the button re-enables. (A toast system can surface this later.)
+      }
+    });
+  }
 
   return (
     <div className="grid gap-6 lg:grid-cols-[1.6fr_1fr]">
@@ -41,6 +61,23 @@ export function ResultView({ design }: { design: DesignWithTags }) {
           <div className="absolute top-3 left-3 rounded-full bg-[rgba(22,44,36,0.72)] px-3 py-1 font-semibold text-white text-xs">
             {styleLabel} · {dict.result.budgetMedium}
           </div>
+          {design.generatedImageUrl && (
+            <button
+              type="button"
+              onClick={() => setFullscreen(true)}
+              aria-label={dict.result.fullscreen}
+              title={dict.result.fullscreen}
+              className="absolute top-3 right-3 flex size-9 items-center justify-center rounded-full bg-[rgba(22,44,36,0.72)] text-white transition-colors hover:bg-[rgba(22,44,36,0.9)]"
+            >
+              <Expand className="size-4" />
+            </button>
+          )}
+          {regenerating && (
+            <div className="absolute inset-0 flex flex-col items-center justify-center gap-2 bg-[rgba(22,44,36,0.55)] text-white">
+              <Loader2 className="size-8 animate-spin" />
+              <span className="font-semibold text-sm">{dict.result.regenerating}</span>
+            </div>
+          )}
           {design.tags.map((tag, i) =>
             tag.furnitureItemId ? (
               <FurniturePin
@@ -53,6 +90,7 @@ export function ResultView({ design }: { design: DesignWithTags }) {
           )}
         </div>
         <p className="mt-3 text-center text-muted-foreground text-sm">{dict.result.tapHint}</p>
+        <VersionHistory designId={design.id} refreshKey={versionKey} />
       </div>
 
       {/* Furniture list + actions */}
@@ -89,8 +127,13 @@ export function ResultView({ design }: { design: DesignWithTags }) {
         </div>
 
         <div className="grid grid-cols-2 gap-2.5">
-          <Button className="gap-2">
-            <RefreshCw className="size-4" /> {dict.result.regenerate}
+          <Button className="gap-2" onClick={regenerate} disabled={regenerating}>
+            {regenerating ? (
+              <Loader2 className="size-4 animate-spin" />
+            ) : (
+              <RefreshCw className="size-4" />
+            )}
+            {dict.result.regenerate}
           </Button>
           <Button variant="outline" className="gap-2">
             {dict.result.otherStyle}
@@ -111,6 +154,29 @@ export function ResultView({ design }: { design: DesignWithTags }) {
           </span>
         </div>
       </div>
+
+      {/* Fullscreen preview overlay — click backdrop or ✕ to close. */}
+      {fullscreen && design.generatedImageUrl && (
+        <button
+          type="button"
+          aria-label={dict.result.fullscreen}
+          onClick={() => setFullscreen(false)}
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/90 p-4"
+        >
+          <div className="relative h-full w-full">
+            <Image
+              src={design.generatedImageUrl}
+              alt={dict.result.imageAlt}
+              fill
+              sizes="100vw"
+              className="object-contain"
+            />
+          </div>
+          <span className="absolute top-4 right-4 flex size-10 items-center justify-center rounded-full bg-white/15 text-white hover:bg-white/25">
+            <X className="size-5" />
+          </span>
+        </button>
+      )}
     </div>
   );
 }

@@ -19,9 +19,11 @@ export interface GenerationLogInput {
   roomType: RoomType;
   style: DesignStyle;
   hasUserPrompt: boolean;
+  prompt?: string | null;
   success: boolean;
   provider?: string | null;
   model?: string | null;
+  imageUrl?: string | null;
   providersTried?: string[];
   errorMessage?: string | null;
   costUsd?: number | null;
@@ -44,9 +46,11 @@ export const GenerationLogService = {
         roomType: input.roomType,
         style: input.style,
         hasUserPrompt: input.hasUserPrompt,
+        prompt: input.prompt ?? null,
         success: input.success,
         provider: input.provider ?? null,
         model: input.model ?? null,
+        imageUrl: input.imageUrl ?? null,
         providersTried: input.providersTried ?? null,
         errorMessage: input.errorMessage ?? null,
         costUsd: input.costUsd ?? null,

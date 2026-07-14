@@ -1,6 +1,6 @@
 import "server-only";
 
-import { PutObjectCommand, S3Client } from "@aws-sdk/client-s3";
+import { GetObjectCommand, PutObjectCommand, S3Client } from "@aws-sdk/client-s3";
 import { env } from "@/lib/env";
 
 /*
@@ -47,6 +47,14 @@ export const StorageService = {
     return key;
   },
 
+  /** Fetch the raw bytes stored under `key` (e.g. to regenerate from the original). */
+  get: async (key: string): Promise<Buffer> => {
+    const res = await s3.send(new GetObjectCommand({ Bucket: env.S3_BUCKET, Key: key }));
+    const bytes = await res.Body?.transformToByteArray();
+    if (!bytes) throw new Error(`storage: no body for key ${key}`);
+    return Buffer.from(bytes);
+  },
+
   /**
    * Build the full public URL for a stored key at read time. Pass-through for
    * values that are already absolute URLs (e.g. legacy rows) or empty.
@@ -55,5 +63,11 @@ export const StorageService = {
     if (!key) return null;
     if (key.startsWith("http://") || key.startsWith("https://")) return key;
     return `${env.S3_PUBLIC_URL}/${key.replace(/^\/+/, "")}`;
+  },
+
+  /** Inverse of publicUrl — recover the storage key from a full public URL (or a bare key). */
+  keyFromUrl: (url: string): string => {
+    const prefix = `${env.S3_PUBLIC_URL}/`;
+    return url.startsWith(prefix) ? url.slice(prefix.length) : url.replace(/^\/+/, "");
   },
 };

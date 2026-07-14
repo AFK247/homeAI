@@ -1,5 +1,6 @@
 import { format } from "date-fns";
-import { Check, X } from "lucide-react";
+import { Check, ImageOff, X } from "lucide-react";
+import Image from "next/image";
 import { Badge } from "@/components/ui/badge";
 import type { GenerationLog } from "@/db/types";
 
@@ -43,28 +44,59 @@ export function GenerationPanel({ log }: { log: GenerationLog }) {
         )}
       </div>
 
-      <dl className="grid grid-cols-2 gap-x-6 gap-y-3 md:grid-cols-3">
-        <Field label="Provider" value={log.provider ?? "—"} />
-        <Field
-          label="Model"
-          value={<span className="font-mono text-xs">{log.model ?? "—"}</span>}
-        />
-        <Field label="Cost" value={fmtCost(log)} />
-        <Field
-          label="Latency"
-          value={log.latencyMs != null ? `${(log.latencyMs / 1000).toFixed(1)}s` : "—"}
-        />
-        <Field label="Input size" value={dims(log.inputWidth, log.inputHeight)} />
-        <Field label="Output size" value={dims(log.outputWidth, log.outputHeight, true)} />
-        <Field label="Room" value={log.roomType} />
-        <Field label="Style" value={log.style} />
-        <Field label="Has prompt" value={log.hasUserPrompt ? "Yes" : "No"} />
-        <Field
-          label="Fallback chain"
-          value={log.providersTried?.length ? log.providersTried.join(" → ") : "—"}
-        />
-        <Field label="Created" value={format(new Date(log.createdAt), "d MMM yyyy, HH:mm")} />
-      </dl>
+      <div className="flex flex-col gap-5 md:flex-row">
+        {/* This attempt's own output image (null on failed attempts). */}
+        <div className="w-full shrink-0 md:w-[220px]">
+          {log.imageUrl ? (
+            <div className="relative aspect-[4/3] w-full overflow-hidden rounded-lg border border-border bg-muted">
+              <Image
+                src={log.imageUrl}
+                alt="Generated result"
+                fill
+                sizes="(max-width: 768px) 100vw, 220px"
+                className="object-cover"
+              />
+            </div>
+          ) : (
+            <div className="flex aspect-[4/3] w-full flex-col items-center justify-center gap-1 rounded-lg border border-border border-dashed bg-muted text-muted-foreground">
+              <ImageOff className="size-6" />
+              <span className="px-2 text-center text-xs">
+                {log.success ? "Image not stored" : "Failed — no image"}
+              </span>
+            </div>
+          )}
+        </div>
+
+        <dl className="grid flex-1 grid-cols-2 gap-x-6 gap-y-3 md:grid-cols-3">
+          <Field label="Provider" value={log.provider ?? "—"} />
+          <Field
+            label="Model"
+            value={<span className="font-mono text-xs">{log.model ?? "—"}</span>}
+          />
+          <Field label="Cost" value={fmtCost(log)} />
+          <Field
+            label="Latency"
+            value={log.latencyMs != null ? `${(log.latencyMs / 1000).toFixed(1)}s` : "—"}
+          />
+          <Field label="Input size" value={dims(log.inputWidth, log.inputHeight)} />
+          <Field label="Output size" value={dims(log.outputWidth, log.outputHeight, true)} />
+          <Field label="Room" value={log.roomType} />
+          <Field label="Style" value={log.style} />
+          <Field label="Has prompt" value={log.hasUserPrompt ? "Yes" : "No"} />
+          <Field
+            label="Fallback chain"
+            value={log.providersTried?.length ? log.providersTried.join(" → ") : "—"}
+          />
+          <Field label="Created" value={format(new Date(log.createdAt), "d MMM yyyy, HH:mm")} />
+        </dl>
+      </div>
+
+      {log.prompt && (
+        <div className="mt-4 border-border border-t pt-3">
+          <dt className="mb-1 text-brand-body text-xs">Prompt sent to the model</dt>
+          <dd className="whitespace-pre-wrap text-foreground text-sm">{log.prompt}</dd>
+        </div>
+      )}
 
       {log.errorMessage && (
         <div className="mt-4 rounded-lg border border-destructive/30 bg-destructive/5 p-3">

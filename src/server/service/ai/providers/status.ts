@@ -1,5 +1,6 @@
 import "server-only";
 
+import { cloudflareNeuronUsage } from "./cloudflare/analytics";
 import { CHAIN } from "./registry";
 
 /*
@@ -53,4 +54,35 @@ export async function providerQuotas() {
       quota: p.quota ? await p.quota() : null,
     })),
   );
+}
+
+/** Real per-model Neuron cost, keyed by model id (from Cloudflare analytics). */
+export interface ModelUsage {
+  calls: number;
+  neurons: number;
+  costUsd: number;
+  avgNeuronsPerCall: number;
+  avgCostUsdPerCall: number;
+}
+
+/**
+ * Real Neuron consumption per model over the trailing 24h, keyed by model id — so
+ * the admin can see actual cost/call for image generation vs furniture tagging.
+ * Empty map when analytics is unavailable. Never throws.
+ */
+export async function modelNeuronUsage(): Promise<Record<string, ModelUsage>> {
+  const now = new Date();
+  const start = new Date(now.getTime() - 24 * 60 * 60 * 1000);
+  const usage = await cloudflareNeuronUsage(start, now);
+  const map: Record<string, ModelUsage> = {};
+  for (const u of usage) {
+    map[u.modelId] = {
+      calls: u.count,
+      neurons: u.neurons,
+      costUsd: u.costUsd,
+      avgNeuronsPerCall: u.avgNeuronsPerCall,
+      avgCostUsdPerCall: u.avgCostUsdPerCall,
+    };
+  }
+  return map;
 }

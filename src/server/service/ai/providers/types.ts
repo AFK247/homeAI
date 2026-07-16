@@ -27,6 +27,8 @@ export interface RedesignResult {
   model: string;
   /** Provider-reported cost in USD, if known (for the generation log). */
   costUsd?: number | null;
+  /** Real Neurons the winning generation call consumed (Cloudflare), or null. */
+  neurons?: number | null;
   /** Providers attempted in order (last one succeeded) — fallback tracking. */
   providersTried: string[];
 }
@@ -35,6 +37,9 @@ export interface RedesignProviderResult {
   bytes: Buffer;
   /** Provider-reported cost in USD, if the API returns it. */
   costUsd?: number | null;
+  /** Real Neurons this call consumed, from Cloudflare's `cf-ai-neurons` response
+   *  header. null for providers that don't report it (e.g. OpenRouter). */
+  neurons?: number | null;
 }
 
 export interface BalanceResult {

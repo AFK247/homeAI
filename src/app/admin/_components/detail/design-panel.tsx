@@ -1,7 +1,7 @@
 import { format } from "date-fns";
 import Image from "next/image";
 import { Badge } from "@/components/ui/badge";
-import type { Design } from "@/db/types";
+import type { Design, DesignTag } from "@/db/types";
 
 const STATUS_VARIANT: Record<string, "default" | "secondary" | "destructive"> = {
   done: "default",
@@ -19,7 +19,19 @@ function Field({ label, value }: { label: string; value: React.ReactNode }) {
   );
 }
 
-function Figure({ src, label }: { src: string; label: string }) {
+function Figure({
+  src,
+  label,
+  caption,
+  tags,
+}: {
+  src: string;
+  label: string;
+  /** Sub-caption under the title, e.g. a pin count. */
+  caption?: string;
+  /** Furniture pins to overlay (numbered dots) — the "with tags" variant. */
+  tags?: DesignTag[];
+}) {
   return (
     <figure className="flex flex-col gap-1.5">
       <div className="relative aspect-[4/3] w-full overflow-hidden rounded-lg border border-border bg-muted">
@@ -30,17 +42,34 @@ function Figure({ src, label }: { src: string; label: string }) {
           sizes="(max-width: 640px) 50vw, 220px"
           className="object-cover"
         />
+        {tags?.map((t, i) => (
+          <span
+            key={t.id}
+            className="-translate-x-1/2 -translate-y-1/2 absolute flex size-5 items-center justify-center rounded-full border-2 border-white bg-primary font-bold text-[10px] text-primary-foreground shadow"
+            style={{ left: `${t.xCoord * 100}%`, top: `${t.yCoord * 100}%` }}
+            title={t.label ?? undefined}
+          >
+            {i + 1}
+          </span>
+        ))}
       </div>
-      <figcaption className="text-center text-brand-body text-xs">{label}</figcaption>
+      <figcaption className="text-center text-brand-body text-xs">
+        {label}
+        {caption ? (
+          <span className="block text-[11px] text-muted-foreground">{caption}</span>
+        ) : null}
+      </figcaption>
     </figure>
   );
 }
 
 /*
  * Shared design-info panel — reused by the design detail page and (as the parent
- * design) the generation detail page. Before/after images on top, metadata below.
+ * design) the generation detail page. Three images on top (original, redesigned,
+ * redesigned-with-furniture-pins), metadata below.
  */
-export function DesignPanel({ design }: { design: Design }) {
+export function DesignPanel({ design, tags = [] }: { design: Design; tags?: DesignTag[] }) {
+  const pinCount = tags.length;
   return (
     <section className="overflow-hidden rounded-2xl border border-border bg-card">
       <div className="flex items-center justify-between border-border border-b px-5 py-4">
@@ -49,17 +78,27 @@ export function DesignPanel({ design }: { design: Design }) {
       </div>
 
       <div className="p-5">
-        {/* Before / after images — capped width so they stay a preview, not huge. */}
-        <div className="grid max-w-md grid-cols-2 gap-4">
+        {/* Original → Redesigned → Redesigned with furniture pins. */}
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
           {design.originalImageUrl ? (
-            <Figure src={design.originalImageUrl} label="Original" />
+            <Figure src={design.originalImageUrl} label="① Original" caption="The uploaded room" />
           ) : (
-            <EmptyFigure label="Original" />
+            <EmptyFigure label="① Original" />
           )}
           {design.generatedImageUrl ? (
-            <Figure src={design.generatedImageUrl} label="Redesigned" />
+            <Figure src={design.generatedImageUrl} label="② Redesigned" caption="AI result" />
           ) : (
-            <EmptyFigure label="Redesigned" />
+            <EmptyFigure label="② Redesigned" />
+          )}
+          {design.generatedImageUrl ? (
+            <Figure
+              src={design.generatedImageUrl}
+              label="③ With furniture tags"
+              caption={pinCount ? `${pinCount} pin${pinCount === 1 ? "" : "s"}` : "No pins yet"}
+              tags={tags}
+            />
+          ) : (
+            <EmptyFigure label="③ With furniture tags" />
           )}
         </div>
 

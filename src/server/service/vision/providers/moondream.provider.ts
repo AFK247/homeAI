@@ -57,9 +57,9 @@ export const moondreamProvider: TagProvider = {
     return Boolean(env.CLOUDFLARE_ACCOUNT_ID && env.CLOUDFLARE_API_TOKEN);
   },
 
-  async detect(req: DetectRequest): Promise<DetectedTag[]> {
+  async detect(req: DetectRequest): Promise<{ tags: DetectedTag[]; neurons: number | null }> {
     const target = req.targets[0];
-    if (!target) return [];
+    if (!target) return { tags: [], neurons: null };
 
     const url = `https://api.cloudflare.com/client/v4/accounts/${env.CLOUDFLARE_ACCOUNT_ID}/ai/run/${MODEL}`;
     const controller = new AbortController();
@@ -84,19 +84,24 @@ export const moondreamProvider: TagProvider = {
       throw new Error(`moondream HTTP ${res.status}`);
     }
 
+    // Real per-call Neuron cost, straight from Cloudflare's response header.
+    const n = Number.parseFloat(res.headers.get("cf-ai-neurons") ?? "");
+    const neurons = Number.isFinite(n) ? n : null;
+
     const parsed = DetectResponse.safeParse(await res.json());
     if (!parsed.success) {
       logger.warn({ err: parsed.error }, "moondream response failed validation");
-      return [];
+      return { tags: [], neurons };
     }
-    if (!parsed.data.success) return [];
+    if (!parsed.data.success) return { tags: [], neurons };
 
-    return (parsed.data.result?.result?.objects ?? []).map((o) => ({
+    const tags = (parsed.data.result?.result?.objects ?? []).map((o) => ({
       label: target,
       xPct: ((o.x_min + o.x_max) / 2) * 100,
       yPct: ((o.y_min + o.y_max) / 2) * 100,
       areaFrac: (o.x_max - o.x_min) * (o.y_max - o.y_min),
       box: [o.x_min, o.y_min, o.x_max, o.y_max] as [number, number, number, number],
     }));
+    return { tags, neurons };
   },
 };

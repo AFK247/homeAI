@@ -27,7 +27,7 @@ export default async function AdminDesignDetailPage({
         <ArrowLeft className="size-4" /> Back to designs
       </Link>
 
-      <DesignPanel design={data.design} />
+      <DesignPanel design={data.design} tags={data.tags} />
     </div>
   );
 }

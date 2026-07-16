@@ -15,10 +15,27 @@ import type { DetectedTag, DetectRequest, TagProvider } from "./types";
  */
 export const CHAIN: TagProvider[] = [moondreamProvider];
 
+/**
+ * The tag-provider chain for the admin providers page — ordered list with each
+ * provider's readiness (mirrors ai/providers/status.ts::providerChainStatus). Tag
+ * providers share the image chain's Cloudflare Neuron quota, so no separate balance.
+ */
+export function visionChainStatus() {
+  return CHAIN.map((p, i) => ({
+    order: i + 1,
+    key: p.key,
+    label: p.label,
+    model: p.model,
+    ready: p.isReady(),
+  }));
+}
+
 export interface DetectChainResult {
   tags: DetectedTag[];
   /** Provider that produced them (null when nothing was ready or all failed). */
   provider: string | null;
+  /** Real Neurons consumed across all tagging calls (summed), or null. */
+  neurons: number | null;
 }
 
 /**
@@ -35,15 +52,15 @@ export async function detectWithFallback(req: DetectRequest): Promise<DetectChai
   const ready = CHAIN.filter((p) => p.isReady());
   if (ready.length === 0) {
     logger.warn("no tag provider is configured — skipping pins");
-    return { tags: [], provider: null };
+    return { tags: [], provider: null, neurons: null };
   }
 
   for (const provider of ready) {
     try {
       if (provider.targetMode === "batch") {
-        const tags = await provider.detect(req);
+        const { tags, neurons } = await provider.detect(req);
         logger.info({ provider: provider.key, count: tags.length }, "tag detection succeeded");
-        return { tags, provider: provider.key };
+        return { tags, provider: provider.key, neurons };
       }
 
       // per-target: one concurrent call per word, tolerate individual failures.
@@ -62,11 +79,18 @@ export async function detectWithFallback(req: DetectRequest): Promise<DetectChai
           "some tag targets failed — returning partial pins",
         );
       }
-      const tags = settled
-        .filter((s): s is PromiseFulfilledResult<DetectedTag[]> => s.status === "fulfilled")
-        .flatMap((s) => s.value);
-      logger.info({ provider: provider.key, count: tags.length }, "tag detection succeeded");
-      return { tags, provider: provider.key };
+      const ok = settled.filter(
+        (s): s is PromiseFulfilledResult<{ tags: DetectedTag[]; neurons: number | null }> =>
+          s.status === "fulfilled",
+      );
+      const tags = ok.flatMap((s) => s.value.tags);
+      // Sum the real neurons across every target call.
+      const neurons = ok.reduce((sum, s) => sum + (s.value.neurons ?? 0), 0);
+      logger.info(
+        { provider: provider.key, count: tags.length, neurons },
+        "tag detection succeeded",
+      );
+      return { tags, provider: provider.key, neurons };
     } catch (err) {
       logger.warn(
         { provider: provider.key, err: err instanceof Error ? err.message : String(err) },
@@ -75,5 +99,5 @@ export async function detectWithFallback(req: DetectRequest): Promise<DetectChai
     }
   }
 
-  return { tags: [], provider: null };
+  return { tags: [], provider: null, neurons: null };
 }

@@ -98,7 +98,7 @@ async function runRedesign(opts: {
       aiModel: result.model,
     });
 
-    await GenerationLogService.log({
+    const logId = await GenerationLogService.log({
       designId: design.id,
       anonymousId,
       roomType: design.roomType,
@@ -111,6 +111,8 @@ async function runRedesign(opts: {
       imageUrl: generatedKey,
       providersTried: result.providersTried,
       costUsd: result.costUsd,
+      // Real Neurons for the image-gen call (Cloudflare); tagging adds to this below.
+      neurons: result.neurons,
       latencyMs: Math.round(performance.now() - startedAt),
       inputBytes: result.inputDims.bytes,
       inputWidth: result.inputDims.width,
@@ -123,11 +125,15 @@ async function runRedesign(opts: {
     // Furniture pins: detect what the AI actually placed in THIS render, tied to this
     // version so switching versions shows matching pins. Fire-and-forget — the result
     // screen shows immediately and pins appear a couple of seconds later on refresh.
-    // Pins are a bonus: TagService never throws, so this can't fail a generation.
+    // Pins are a bonus: TagService never throws, so this can't fail a generation. Its
+    // real Neuron cost is added to the log so `neurons` = the WHOLE pipeline.
     if (version) {
       const versionId = version.id;
       void TagService.detect(result.bytes, "image/png", design.roomType)
-        .then((pins) => DesignService.setVisionTags(design.id, versionId, pins))
+        .then(async ({ pins, neurons }) => {
+          await DesignService.setVisionTags(design.id, versionId, pins);
+          if (logId && neurons) await GenerationLogService.addNeurons(logId, neurons);
+        })
         .catch((err) => logger.error({ err, designId: design.id }, "pin detection failed"));
     }
 

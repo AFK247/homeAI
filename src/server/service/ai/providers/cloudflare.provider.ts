@@ -70,12 +70,16 @@ export const cloudflareProvider: AiProvider = {
       logger.warn({ provider: "cloudflare", status: res.status, detail }, "provider failed");
       throw new Error(`cloudflare HTTP ${res.status}`);
     }
+    // Real per-call Neuron cost — Cloudflare returns it in this response header.
+    // This is the actual measured figure, not a formula (persisted per generation).
+    const neurons = Number.parseFloat(res.headers.get("cf-ai-neurons") ?? "");
     const json = (await res.json()) as { result?: { image?: string } };
     const b64 = json.result?.image;
     if (!b64) throw new Error("cloudflare returned no image");
-    // Cloudflare returns no per-call cost. The REAL Neuron consumption is read
-    // (aggregated) from the analytics API — see cloudflare-analytics.ts, shown
-    // on the admin provider/generations pages. No per-call estimate here.
-    return { bytes: Buffer.from(b64, "base64"), costUsd: null };
+    return {
+      bytes: Buffer.from(b64, "base64"),
+      costUsd: null,
+      neurons: Number.isFinite(neurons) ? neurons : null,
+    };
   },
 };

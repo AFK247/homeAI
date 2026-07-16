@@ -50,6 +50,10 @@ export const generationLogs = pgTable(
 
     // Cost + performance.
     costUsd: numeric("cost_usd", costConfig), // provider-reported USD; null if unknown
+    // Real Neurons this generation consumed (Cloudflare's `cf-ai-neurons` header):
+    // the image-gen call plus the furniture-tagging calls, summed. null when the
+    // winning provider doesn't report neurons (e.g. OpenRouter is $-billed).
+    neurons: numeric("neurons", costConfig),
     latencyMs: integer("latency_ms"), // wall-clock for the whole redesign
 
     // Image sizes. Dimensions explain the cost for MP-billed models (e.g. klein

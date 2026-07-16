@@ -3,6 +3,7 @@
 import { Check, X } from "lucide-react";
 import type { DataTableColumn } from "@/components/data-table/data-table";
 import { Badge } from "@/components/ui/badge";
+import type { ModelUsage } from "@/server/service/ai/providers/status";
 import type { QuotaResult } from "@/server/service/ai/providers/types";
 
 export interface ProviderRow {
@@ -11,6 +12,8 @@ export interface ProviderRow {
   label: string;
   model: string;
   ready: boolean;
+  /** What the provider does — "Image" (generation) or "Tagging" (vision). */
+  kind: "Image" | "Tagging";
   /** Display string for remaining balance/quota, e.g. "$4.60". */
   balance: string;
   /** Numeric USD remaining, or null (used to colour low balances). */
@@ -19,6 +22,8 @@ export interface ProviderRow {
   quota: QuotaResult | null;
   /** Total successful images this provider has generated. */
   generationCount: number;
+  /** Real avg Neurons + $/call from Cloudflare analytics; null for others. */
+  usage: ModelUsage | null;
 }
 
 function fmt(n: number): string {
@@ -28,6 +33,15 @@ function fmt(n: number): string {
 export const columns: DataTableColumn<ProviderRow>[] = [
   { header: "Order", accessorKey: "order", className: "w-16" },
   { header: "Provider", accessorKey: "label" },
+  {
+    header: "Type",
+    accessorKey: "kind",
+    cell: (p) => (
+      <Badge variant="secondary" className="font-normal">
+        {p.kind}
+      </Badge>
+    ),
+  },
   {
     header: "Model",
     accessorKey: "model",
@@ -56,6 +70,24 @@ export const columns: DataTableColumn<ProviderRow>[] = [
         {p.generationCount.toLocaleString("en-US")}
       </span>
     ),
+  },
+  {
+    header: "Real cost / call",
+    accessorKey: "usage",
+    id: "usage",
+    className: "text-right text-xs tabular-nums",
+    // Real measured Neurons + $ per call over the last 24h (Cloudflare only).
+    cell: (p) =>
+      p.usage ? (
+        <span className="whitespace-nowrap">
+          <span className="font-semibold text-foreground">~{fmt(p.usage.avgNeuronsPerCall)} N</span>
+          <span className="ml-1 text-muted-foreground">
+            (~${p.usage.avgCostUsdPerCall.toFixed(4)})
+          </span>
+        </span>
+      ) : (
+        <span className="text-muted-foreground">—</span>
+      ),
   },
   {
     header: "Balance",

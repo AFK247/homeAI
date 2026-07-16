@@ -39,6 +39,8 @@ export interface GenerationLogInput {
   providersTried?: string[];
   errorMessage?: string | null;
   costUsd?: number | null;
+  /** Real Neurons for the generation call (Cloudflare `cf-ai-neurons` header). */
+  neurons?: number | null;
   latencyMs?: number | null;
   inputBytes?: number | null;
   inputWidth?: number | null;
@@ -49,33 +51,57 @@ export interface GenerationLogInput {
 }
 
 export const GenerationLogService = {
-  log: async (input: GenerationLogInput): Promise<void> => {
+  /** Insert a generation-attempt row; returns its id (null if the write failed). */
+  log: async (input: GenerationLogInput): Promise<string | null> => {
     try {
-      await db.insert(generationLogs).values({
-        designId: input.designId ?? null,
-        anonymousId: input.anonymousId,
-        userId: input.userId ?? null,
-        roomType: input.roomType,
-        style: input.style,
-        hasUserPrompt: input.hasUserPrompt,
-        prompt: input.prompt ?? null,
-        success: input.success,
-        provider: input.provider ?? null,
-        model: input.model ?? null,
-        imageUrl: input.imageUrl ?? null,
-        providersTried: input.providersTried ?? null,
-        errorMessage: input.errorMessage ?? null,
-        costUsd: input.costUsd ?? null,
-        latencyMs: input.latencyMs ?? null,
-        inputBytes: input.inputBytes ?? null,
-        inputWidth: input.inputWidth ?? null,
-        inputHeight: input.inputHeight ?? null,
-        outputBytes: input.outputBytes ?? null,
-        outputWidth: input.outputWidth ?? null,
-        outputHeight: input.outputHeight ?? null,
-      });
+      const [row] = await db
+        .insert(generationLogs)
+        .values({
+          designId: input.designId ?? null,
+          anonymousId: input.anonymousId,
+          userId: input.userId ?? null,
+          roomType: input.roomType,
+          style: input.style,
+          hasUserPrompt: input.hasUserPrompt,
+          prompt: input.prompt ?? null,
+          success: input.success,
+          provider: input.provider ?? null,
+          model: input.model ?? null,
+          imageUrl: input.imageUrl ?? null,
+          providersTried: input.providersTried ?? null,
+          errorMessage: input.errorMessage ?? null,
+          costUsd: input.costUsd ?? null,
+          neurons: input.neurons ?? null,
+          latencyMs: input.latencyMs ?? null,
+          inputBytes: input.inputBytes ?? null,
+          inputWidth: input.inputWidth ?? null,
+          inputHeight: input.inputHeight ?? null,
+          outputBytes: input.outputBytes ?? null,
+          outputWidth: input.outputWidth ?? null,
+          outputHeight: input.outputHeight ?? null,
+        })
+        .returning({ id: generationLogs.id });
+      return row?.id ?? null;
     } catch {
       // Logging must never break the user flow.
+      return null;
+    }
+  },
+
+  /**
+   * Add neurons to a log row's running total — used by the background tagging step
+   * so a generation's `neurons` reflects the WHOLE pipeline (image gen + tagging),
+   * not just the generation call. No-op if the id is missing or the add fails.
+   */
+  addNeurons: async (id: string, neurons: number): Promise<void> => {
+    if (!neurons) return;
+    try {
+      await db
+        .update(generationLogs)
+        .set({ neurons: sql`coalesce(${generationLogs.neurons}, 0) + ${neurons}` })
+        .where(eq(generationLogs.id, id));
+    } catch {
+      // Never break the user flow for a cost figure.
     }
   },
 

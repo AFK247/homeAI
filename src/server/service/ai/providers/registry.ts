@@ -35,17 +35,21 @@ export async function redesignWithFallback(req: RedesignRequest): Promise<Redesi
       const conformed = provider.inputSpec
         ? await preprocessForModel(req.imageBytes, provider.inputSpec)
         : { bytes: req.imageBytes, mime: req.imageMime };
-      const { bytes, costUsd } = await provider.redesign({
+      const { bytes, costUsd, neurons } = await provider.redesign({
         ...req,
         imageBytes: conformed.bytes,
         imageMime: conformed.mime,
       });
-      logger.info({ provider: provider.key, model: provider.model, costUsd }, "redesign succeeded");
+      logger.info(
+        { provider: provider.key, model: provider.model, costUsd, neurons },
+        "redesign succeeded",
+      );
       return {
         bytes,
         provider: provider.key,
         model: provider.model,
         costUsd: costUsd ?? null,
+        neurons: neurons ?? null,
         providersTried,
       };
     } catch (err) {

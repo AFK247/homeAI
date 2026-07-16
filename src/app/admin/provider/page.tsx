@@ -2,10 +2,12 @@ import { Cpu } from "lucide-react";
 import { PageHeader } from "@/components/layout/page-header";
 import { serverRpc } from "@/server/rpc/server";
 import {
+  modelNeuronUsage,
   providerBalances,
   providerChainStatus,
   providerQuotas,
 } from "@/server/service/ai/providers/status";
+import { visionChainStatus } from "@/server/service/vision/registry";
 import { ProviderList } from "./list";
 import { ProviderCards } from "./quota-card";
 
@@ -14,43 +16,63 @@ import { ProviderCards } from "./quota-card";
 export const dynamic = "force-dynamic";
 
 /*
- * Admin — AI provider chain. Shows the ordered fallback list, each provider's
- * readiness, remaining balance, and free-tier quota (card + per-row). Balance +
- * quota run once server-side on load. Generation tries providers top-to-bottom
- * until one succeeds; the winner is saved on the design.
+ * Admin — every AI provider in one place: cards up top, then a single table listing
+ * all providers (image generation + furniture tagging) with readiness, balance,
+ * quota, generated count, and real cost/call. Same layout as the generations page.
  *
  * Vendor-agnostic: every figure comes from the provider interface, so adding or
  * swapping a provider needs no change here.
  */
 export default async function AdminProviderPage() {
-  const chain = providerChainStatus();
-  const [balances, quotas, genCounts] = await Promise.all([
+  const imageChain = providerChainStatus();
+  const [balances, quotas, genCounts, usage] = await Promise.all([
     providerBalances(),
     providerQuotas(),
     serverRpc.generation.countsByProvider(),
+    modelNeuronUsage(),
   ]);
   const balanceByKey = Object.fromEntries(balances.map((b) => [b.key, b]));
   const quotaByKey = Object.fromEntries(quotas.map((q) => [q.key, q.quota]));
-  const rows = chain.map((c) => ({
+
+  // Image-generation providers — full metrics.
+  const imageRows = imageChain.map((c) => ({
     ...c,
+    kind: "Image" as const,
     balance: balanceByKey[c.key]?.display ?? "—",
     balanceRemaining: balanceByKey[c.key]?.remaining ?? null,
-    // Free-tier quota; null for providers that don't report one (pay-as-you-go).
     quota: quotaByKey[c.key] ?? null,
-    // Total successful images this provider has generated.
     generationCount: genCounts[c.key] ?? 0,
+    usage: usage[c.model] ?? null,
   }));
+
+  // Vision (furniture-tagging) providers — no own balance/quota/generated count
+  // (they share the Cloudflare quota above), so those columns show "—".
+  const visionRows = visionChainStatus().map((v) => ({
+    ...v,
+    kind: "Tagging" as const,
+    balance: "—",
+    balanceRemaining: null,
+    quota: null,
+    generationCount: 0,
+    usage: usage[v.model] ?? null,
+  }));
+
+  // ONE table, ordered by chain: image providers first, then tagging.
+  const rows = [
+    ...imageRows.map((r, i) => ({ ...r, order: i + 1 })),
+    ...visionRows.map((r, i) => ({ ...r, order: imageRows.length + i + 1 })),
+  ];
 
   return (
     <>
       <PageHeader
         title="AI Providers"
-        description="Image generation tries these in order until one succeeds (fallback chain)."
+        description="Ordered fallback chains for image generation and furniture tagging. Each tries its providers top-to-bottom until one succeeds."
         icon={<Cpu className="size-5" />}
       />
 
       <ProviderCards
-        cards={rows.map((r) => ({
+        cards={imageRows.map((r) => ({
           key: r.key,
           label: r.label,
           quota: r.quota,
@@ -61,14 +83,6 @@ export default async function AdminProviderPage() {
       />
 
       <ProviderList data={rows} />
-
-      <p className="text-brand-body text-sm">
-        To reorder, swap the primary, or add a provider, edit{" "}
-        <code className="rounded bg-muted px-1.5 py-0.5 text-xs">
-          src/server/service/ai/providers/registry.ts
-        </code>
-        . The provider that produced each image is saved on the design.
-      </p>
     </>
   );
 }

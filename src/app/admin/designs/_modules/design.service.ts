@@ -1,6 +1,6 @@
 import "server-only";
 
-import { eq } from "drizzle-orm";
+import { and, eq } from "drizzle-orm";
 import { db } from "@/db/client";
 import type { SearchParams } from "@/db/helpers/search-params";
 import {
@@ -11,7 +11,7 @@ import {
   sqlCount,
   withSorting,
 } from "@/db/helpers/with-filters";
-import { designs } from "@/db/schemas/design.schema";
+import { designs, designTags, designVersions } from "@/db/schemas/design.schema";
 import { StorageService } from "@/server/service/storage/storage.service";
 
 /*
@@ -75,10 +75,20 @@ export const DesignAdminService = {
     return { ...page, data: page.data.map(resolveDesignUrls) };
   },
 
-  /** One design, for the detail page. */
+  /** One design + its active version's furniture pins, for the detail page. */
   getById: async (id: string) => {
     const [design] = await db.select().from(designs).where(eq(designs.id, id));
     if (!design) return null;
-    return { design: resolveDesignUrls(design) };
+
+    // The pins shown to the user belong to the ACTIVE version's image.
+    const [activeVersion] = await db
+      .select({ id: designVersions.id })
+      .from(designVersions)
+      .where(and(eq(designVersions.designId, id), eq(designVersions.isActive, true)));
+    const tags = activeVersion
+      ? await db.select().from(designTags).where(eq(designTags.designVersionId, activeVersion.id))
+      : [];
+
+    return { design: resolveDesignUrls(design), tags };
   },
 };

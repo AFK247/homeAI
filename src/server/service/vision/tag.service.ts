@@ -75,23 +75,29 @@ function toPins(raw: DetectedTag[]): FurnitureTag[] {
   }));
 }
 
+export interface DetectResult {
+  pins: FurnitureTag[];
+  /** Real Neurons consumed by tagging (Cloudflare), summed across targets, or null. */
+  neurons: number | null;
+}
+
 export const TagService = {
-  /** Detect furniture pins in a generated design. Returns [] on any failure. */
+  /** Detect furniture pins in a generated design. Returns empty on any failure. */
   detect: async (
     imageBytes: Buffer,
     imageMime: string,
     roomType: RoomType,
-  ): Promise<FurnitureTag[]> => {
+  ): Promise<DetectResult> => {
     try {
-      const { tags } = await detectWithFallback({
+      const { tags, neurons } = await detectWithFallback({
         imageBytes,
         imageMime,
         targets: ROOM_TARGETS[roomType],
       });
-      return toPins(tags);
+      return { pins: toPins(tags), neurons };
     } catch (err) {
       logger.warn({ err, roomType }, "furniture tagging failed — no pins");
-      return [];
+      return { pins: [], neurons: null };
     }
   },
 };

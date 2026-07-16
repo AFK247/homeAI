@@ -9,13 +9,14 @@ import { PAGES } from "@/config/pages";
 import type { GenerationLogRow } from "./_modules/generation.router";
 
 /**
- * Real reported cost only. OpenRouter returns a $ cost; Cloudflare returns none
- * per image (its real usage is aggregated in the provider-page quota card), so
- * Cloudflare rows show "—" — we never show a calculated number as if measured.
+ * Cost per generation — the REAL figure recorded at generation time. Cloudflare rows
+ * show the actual Neurons consumed (image-gen + tagging summed, from the cf-ai-neurons
+ * header); OpenRouter rows show its reported $. "—" when neither was reported.
  */
-function fmtCost(cost: number | null): string {
-  if (cost == null || !Number.isFinite(cost)) return "—";
-  return `$${cost.toFixed(4)}`;
+function fmtCost(row: GenerationLogRow): string {
+  if (row.neurons != null && Number.isFinite(row.neurons)) return `${Math.round(row.neurons)} N`;
+  if (row.costUsd != null && Number.isFinite(row.costUsd)) return `$${row.costUsd.toFixed(4)}`;
+  return "—";
 }
 
 function dims(w: number | null, h: number | null): string {
@@ -89,7 +90,8 @@ export const columns: DataTableColumn<GenerationLogRow>[] = [
     accessorKey: "costUsd",
     sortable: true,
     className: "text-right tabular-nums",
-    cell: (g) => fmtCost(g.costUsd),
+    // Real Neurons for Cloudflare (image-gen + tagging summed), $ for OpenRouter.
+    cell: (g) => fmtCost(g),
   },
   {
     header: "Latency",

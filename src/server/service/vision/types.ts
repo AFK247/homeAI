@@ -50,7 +50,8 @@ export interface TagProvider {
   /**
    * Detect furniture. For "per-target" providers the registry calls this once per
    * target with a single-element `targets`. Throws on failure so the chain falls
-   * through to the next provider.
+   * through to the next provider. `neurons` is the real Cloudflare neuron cost of
+   * this call (from the `cf-ai-neurons` header), or null for non-Cloudflare providers.
    */
-  detect(req: DetectRequest): Promise<DetectedTag[]>;
+  detect(req: DetectRequest): Promise<{ tags: DetectedTag[]; neurons: number | null }>;
 }

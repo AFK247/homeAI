@@ -1,7 +1,7 @@
 "use client";
 
 import { format } from "date-fns";
-import type { EventRow } from "@/app/admin/_modules/admin.service";
+import type { EventRow } from "@/app/admin/events/_modules/event.router";
 import type { DataTableColumn } from "@/components/data-table/data-table";
 
 export const columns: DataTableColumn<EventRow>[] = [

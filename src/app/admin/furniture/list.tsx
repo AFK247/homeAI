@@ -1,14 +1,15 @@
-"use client";
-
 import { DataTable } from "@/components/data-table/data-table";
+import { parseListParams, type RawSearchParams } from "@/db/helpers/search-params";
 import { FURNITURE_CONDITIONS, FURNITURE_SOURCES } from "@/db/schemas/shared.schema";
-import { useDataProvider } from "@/providers/data.provider";
+import { serverRpc } from "@/server/rpc/server";
 import { columns } from "./columns";
-import type { FurniturePageData } from "./promises";
 
-/* Furniture list — reads its data from the DataProvider (not props). */
-export function FurnitureList() {
-  const { result } = useDataProvider<FurniturePageData>();
+/* Furniture list — server component; reads through the oRPC router via serverRpc. */
+export async function FurnitureList({ searchParams }: { searchParams: RawSearchParams }) {
+  const params = parseListParams(searchParams, {
+    filterKeys: ["condition", "source", "brand", "category"],
+  });
+  const result = await serverRpc.furniture.getPaginated(params);
   return (
     <DataTable
       columns={columns}

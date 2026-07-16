@@ -1,6 +1,6 @@
 "use client";
 
-import { Download, Expand, Link2, Loader2, RefreshCw, Share2, X } from "lucide-react";
+import { Download, Expand, Eye, EyeOff, Link2, Loader2, RefreshCw, Share2, X } from "lucide-react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useState, useTransition } from "react";
@@ -27,6 +27,8 @@ export function ResultView({ design }: { design: DesignWithTags }) {
   const [regenerating, startRegenerate] = useTransition();
   const [versionKey, setVersionKey] = useState(0); // bump to refetch version history
   const [fullscreen, setFullscreen] = useState(false);
+  const [pinsVisible, setPinsVisible] = useState(true); // let the user declutter the image
+  const hasPins = design.tags.length > 0;
   const styleLabel = STYLE_OPTIONS.find((s) => s.value === design.style)?.[locale] ?? design.style;
 
   function regenerate() {
@@ -62,15 +64,28 @@ export function ResultView({ design }: { design: DesignWithTags }) {
             {styleLabel} · {dict.result.budgetMedium}
           </div>
           {design.generatedImageUrl && (
-            <button
-              type="button"
-              onClick={() => setFullscreen(true)}
-              aria-label={dict.result.fullscreen}
-              title={dict.result.fullscreen}
-              className="absolute top-3 right-3 flex size-9 items-center justify-center rounded-full bg-[rgba(22,44,36,0.72)] text-white transition-colors hover:bg-[rgba(22,44,36,0.9)]"
-            >
-              <Expand className="size-4" />
-            </button>
+            <div className="absolute top-3 right-3 flex items-center gap-2">
+              {hasPins && (
+                <button
+                  type="button"
+                  onClick={() => setPinsVisible((v) => !v)}
+                  aria-label={pinsVisible ? dict.result.hidePins : dict.result.showPins}
+                  title={pinsVisible ? dict.result.hidePins : dict.result.showPins}
+                  className="flex size-9 items-center justify-center rounded-full bg-[rgba(22,44,36,0.72)] text-white transition-colors hover:bg-[rgba(22,44,36,0.9)]"
+                >
+                  {pinsVisible ? <EyeOff className="size-4" /> : <Eye className="size-4" />}
+                </button>
+              )}
+              <button
+                type="button"
+                onClick={() => setFullscreen(true)}
+                aria-label={dict.result.fullscreen}
+                title={dict.result.fullscreen}
+                className="flex size-9 items-center justify-center rounded-full bg-[rgba(22,44,36,0.72)] text-white transition-colors hover:bg-[rgba(22,44,36,0.9)]"
+              >
+                <Expand className="size-4" />
+              </button>
+            </div>
           )}
           {regenerating && (
             <div className="absolute inset-0 flex flex-col items-center justify-center gap-2 bg-[rgba(22,44,36,0.55)] text-white">
@@ -78,16 +93,19 @@ export function ResultView({ design }: { design: DesignWithTags }) {
               <span className="font-semibold text-sm">{dict.result.regenerating}</span>
             </div>
           )}
-          {design.tags.map((tag, i) =>
-            tag.furnitureItemId ? (
+          {pinsVisible &&
+            design.tags.map((tag, i) => (
               <FurniturePin
                 key={tag.id}
                 tag={tag}
                 index={i + 1}
-                onOpen={() => openFurniture(tag.furnitureItemId as string, i + 1)}
+                onOpen={
+                  tag.furnitureItemId
+                    ? () => openFurniture(tag.furnitureItemId as string, i + 1)
+                    : undefined
+                }
               />
-            ) : null,
-          )}
+            ))}
         </div>
         <p className="mt-3 text-center text-muted-foreground text-sm">{dict.result.tapHint}</p>
         <VersionHistory designId={design.id} refreshKey={versionKey} />

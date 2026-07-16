@@ -63,6 +63,11 @@ export const designVersions = pgTable(
 /*
  * design_tags — clickable furniture pins on the generated image.
  * x/yCoord are 0..1 relative positions.
+ *
+ * Pins are per-VERSION: each render (first + regenerate) is a different image with
+ * furniture in different places, so its pins are detected fresh and tied to that
+ * version via `designVersionId`. The result screen shows only the ACTIVE version's
+ * pins, so switching versions shows the matching pins (not stale ones).
  */
 export const designTags = pgTable(
   "design_tags",
@@ -71,13 +76,19 @@ export const designTags = pgTable(
     designId: text("design_id")
       .notNull()
       .references(() => designs.id, cascade),
+    // Which version's image these pins sit on. Nullable for legacy rows created
+    // before per-version pins; new rows always set it.
+    designVersionId: text("design_version_id").references(() => designVersions.id, cascade),
     furnitureItemId: text("furniture_item_id").references(() => furnitureItems.id, setNull),
     label: text("label"), // e.g. "সোফা" — shown on the pin before item resolves
     xCoord: numeric("x_coord", numericConfig).notNull(),
     yCoord: numeric("y_coord", numericConfig).notNull(),
     ...timestampColumns,
   },
-  (t) => [index("design_tags_design_idx").on(t.designId)],
+  (t) => [
+    index("design_tags_design_idx").on(t.designId),
+    index("design_tags_version_idx").on(t.designVersionId),
+  ],
 );
 
 export const designsRelations = relations(designs, ({ one, many }) => ({

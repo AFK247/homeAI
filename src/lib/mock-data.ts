@@ -119,6 +119,7 @@ export const mockDesign: DesignWithTags = {
     {
       id: "t1",
       designId: "a3f9",
+      designVersionId: null,
       furnitureItemId: "f_sofa",
       label: "সোফা",
       xCoord: 0.26,
@@ -131,6 +132,7 @@ export const mockDesign: DesignWithTags = {
     {
       id: "t2",
       designId: "a3f9",
+      designVersionId: null,
       furnitureItemId: "f_table",
       label: "টেবিল",
       xCoord: 0.6,
@@ -143,6 +145,7 @@ export const mockDesign: DesignWithTags = {
     {
       id: "t3",
       designId: "a3f9",
+      designVersionId: null,
       furnitureItemId: "f_lamp",
       label: "ল্যাম্প",
       xCoord: 0.78,

@@ -2,6 +2,7 @@ import "server-only";
 
 import { env } from "@/lib/env";
 import { logger } from "@/lib/logger";
+import { cloudflareNeuronQuota } from "./cloudflare/analytics";
 import type { AiProvider, RedesignProviderResult, RedesignRequest } from "./types";
 
 /*
@@ -36,9 +37,13 @@ export const cloudflareProvider: AiProvider = {
   },
 
   async balance() {
-    // Cloudflare Workers AI has no queryable $ balance — it's a free daily
-    // Neuron quota (~6 klein img2img/day) then $0.011/1000 Neurons.
-    return { display: "free daily quota", remaining: null };
+    // Cloudflare Workers AI has no queryable $ balance — it's a free Neuron
+    // allocation (see quota()) and then $0.011/1000 Neurons.
+    return { display: "free quota", remaining: null };
+  },
+
+  async quota() {
+    return cloudflareNeuronQuota();
   },
 
   async redesign(req: RedesignRequest): Promise<RedesignProviderResult> {

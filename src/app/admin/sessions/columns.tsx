@@ -3,9 +3,9 @@
 import { format } from "date-fns";
 import { Eye } from "lucide-react";
 import Link from "next/link";
-import type { SessionRow } from "@/app/admin/_modules/admin.service";
-import { PAGES } from "@/config/pages";
+import type { SessionRow } from "@/app/admin/sessions/_modules/session.router";
 import type { DataTableColumn } from "@/components/data-table/data-table";
+import { PAGES } from "@/config/pages";
 
 export const columns: DataTableColumn<SessionRow>[] = [
   {

@@ -73,6 +73,8 @@ export const bn = {
     regenerating: "আবার তৈরি হচ্ছে…",
     versions: "আগের সংস্করণগুলো",
     fullscreen: "ফুল স্ক্রিনে দেখুন",
+    hidePins: "ট্যাগ লুকান",
+    showPins: "ট্যাগ দেখান",
     otherStyle: "অন্য স্টাইল",
     save: "সংরক্ষণ",
     share: "শেয়ার",

@@ -140,15 +140,18 @@ const BUDGET: Record<BudgetTier, BudgetSpec> = {
  */
 
 // Opening lock — the first thing the model reads. Enumerates every fixed element.
+// Framed as an EDIT of the existing photo (keep the room, change only furnishings),
+// not a fresh render — this is what most strongly stops FLUX from redrawing structure.
 const PRESERVATION_LEAD =
-  "This is a STRICT interior restyle of an existing room photo. You MUST keep the " +
-  "room's architecture and structure 100% identical to the original. Do NOT move, " +
-  "add, remove, resize, or redraw any of these fixed elements: walls, windows, " +
-  "window positions and sizes, doors, doorways, the ceiling, ceiling height, " +
-  "beams, columns, the floor plane, and the overall room shape and layout. Keep " +
-  "the EXACT same camera angle, viewpoint, perspective, and proportions as the " +
-  "original photo. The wall, window, and door positions in your output must line " +
-  "up exactly with the input.";
+  "Keep this EXACT room and only redecorate it. This is a photo EDIT, not a new " +
+  "image: preserve the original room's architecture and structure 100% unchanged. " +
+  "The doors, doorways, windows, and their EXACT positions and sizes are FIXED and " +
+  "must stay pixel-aligned with the input — do NOT move, resize, add, remove, or " +
+  "redraw a single door or window. Likewise keep the walls, wall positions, ceiling, " +
+  "ceiling height, beams, columns, floor plane, and overall room shape and layout " +
+  "identical. Keep the EXACT same camera angle, viewpoint, perspective, and " +
+  "proportions as the original photo. Think of it as repainting and refurnishing a " +
+  "room whose walls, doors, and windows are permanently built in place.";
 
 // What is ALLOWED to change — scopes the edit tightly to non-structural elements.
 const SCOPE =
@@ -159,10 +162,12 @@ const SCOPE =
 
 // Closing re-assertion + quality guards (positive framing — no negative field).
 const PRESERVATION_TAIL =
-  "Do not distort the geometry; keep walls straight and vertical, and windows and " +
-  "doors in their original places. Furniture rests naturally on the floor. " +
-  "Photorealistic, same room, same structure. No extra windows or doors, no moved " +
-  "walls, no warped perspective, no duplicate or floating furniture, no text, no watermark.";
+  "Critically: the doors and windows must remain in their ORIGINAL positions and " +
+  "sizes — same wall, same spot, same dimensions as the input. Do not distort the " +
+  "geometry; keep walls straight and vertical. Furniture rests naturally on the " +
+  "floor. Photorealistic, same room, same structure, same layout. No extra, moved, " +
+  "resized, or removed windows or doors, no moved walls, no warped perspective, no " +
+  "duplicate or floating furniture, no text, no watermark.";
 
 export interface PromptParams {
   style: DesignStyle;
@@ -184,10 +189,12 @@ export function buildRedesignPrompt({ style, roomType, budget, userPrompt }: Pro
   const parts = [
     PRESERVATION_LEAD,
     SCOPE,
-    `Restyle this ${r.label} into a ${s.name} interior using ${s.materials}, with ${b.materials}.`,
-    `Furnish it with ${r.furniture}, arranged within the existing layout.`,
+    `Redecorate this ${r.label} in a ${s.name} interior using ${s.materials}, with ${b.materials}.`,
+    `Refurnish it with ${r.furniture}, arranged within the existing walls and layout.`,
     `${s.lighting}. ${b.quality}, ${s.mood}.`,
-    userPrompt?.trim() ? `Also incorporate (without altering the architecture): ${userPrompt.trim()}.` : "",
+    userPrompt?.trim()
+      ? `Also incorporate (without altering the architecture): ${userPrompt.trim()}.`
+      : "",
     PRESERVATION_TAIL,
   ];
   return parts.filter(Boolean).join(" ");

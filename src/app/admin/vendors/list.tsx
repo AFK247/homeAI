@@ -1,14 +1,13 @@
-"use client";
-
 import { DataTable } from "@/components/data-table/data-table";
+import { parseListParams, type RawSearchParams } from "@/db/helpers/search-params";
 import { VENDOR_TYPES } from "@/db/schemas/shared.schema";
-import { useDataProvider } from "@/providers/data.provider";
+import { serverRpc } from "@/server/rpc/server";
 import { columns } from "./columns";
-import type { VendorsPageData } from "./promises";
 
-/* Vendors list — reads its data from the DataProvider (not props). */
-export function VendorsList() {
-  const { result } = useDataProvider<VendorsPageData>();
+/* Vendors list — server component; reads through the oRPC router via serverRpc. */
+export async function VendorsList({ searchParams }: { searchParams: RawSearchParams }) {
+  const params = parseListParams(searchParams, { filterKeys: ["type"] });
+  const result = await serverRpc.vendor.getPaginated(params);
   return (
     <DataTable
       columns={columns}

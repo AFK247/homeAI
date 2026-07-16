@@ -1,5 +1,5 @@
 import { CircleDollarSign, ImageIcon, Zap } from "lucide-react";
-import type { DailyQuota } from "@/server/service/ai/providers/cloudflare-analytics";
+import type { QuotaResult } from "@/server/service/ai/providers/types";
 
 function fmt(n: number): string {
   return Math.round(n).toLocaleString("en-US");
@@ -8,9 +8,9 @@ function fmt(n: number): string {
 export interface ProviderCard {
   key: string;
   label: string;
-  /** Cloudflare: real daily free-neuron quota. */
-  quota: DailyQuota | null;
-  /** OpenRouter: remaining balance display + numeric. */
+  /** Free-tier quota, when the provider reports one. */
+  quota: QuotaResult | null;
+  /** Remaining balance display + numeric, for pay-as-you-go providers. */
   balance: string;
   balanceRemaining: number | null;
   /** Total successful images this provider has generated. */
@@ -22,23 +22,30 @@ function GeneratedFooter({ count }: { count: number }) {
   return (
     <div className="mt-4 flex items-center gap-1.5 border-border border-t pt-3 text-brand-body text-xs">
       <ImageIcon className="size-3.5" />
-      <span className="font-semibold text-foreground tabular-nums">{fmt(count)}</span> images generated
+      <span className="font-semibold text-foreground tabular-nums">{fmt(count)}</span> images
+      generated
     </div>
   );
 }
 
-/* One summary card per provider. Cloudflare shows its free daily neuron quota
- * (used/total + bar); a paid provider (OpenRouter) shows its remaining balance. */
+/* One summary card per provider: a free-tier provider shows its quota (used/total
+ * + bar); a pay-as-you-go provider shows its remaining balance. Which card a
+ * provider gets is decided by whether it reports a quota — no vendor names here. */
 export function ProviderCards({ cards }: { cards: ProviderCard[] }) {
   return (
     <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-      {cards.map((c) => (c.quota ? <QuotaCard key={c.key} card={c} /> : <BalanceCard key={c.key} card={c} />))}
+      {cards.map((c) =>
+        c.quota ? (
+          <QuotaCard key={c.key} card={c} quota={c.quota} />
+        ) : (
+          <BalanceCard key={c.key} card={c} />
+        ),
+      )}
     </div>
   );
 }
 
-function QuotaCard({ card }: { card: ProviderCard }) {
-  const q = card.quota as DailyQuota;
+function QuotaCard({ card, quota: q }: { card: ProviderCard; quota: QuotaResult }) {
   const bar = q.usedPct >= 90 ? "bg-destructive" : q.usedPct >= 70 ? "bg-amber-500" : "bg-primary";
   const leftColor =
     q.usedPct >= 90
@@ -50,13 +57,14 @@ function QuotaCard({ card }: { card: ProviderCard }) {
   return (
     <CardShell
       icon={<Zap className="size-4 text-primary" />}
+      // The window label comes from the provider — it owns its own quota policy.
+      tag={`free quota · ${q.window}`}
       label={card.label}
-      tag="free daily quota · resets 00:00 UTC"
       count={card.generationCount}
     >
       <div className="flex items-end justify-between">
         <div>
-          <div className="text-brand-body text-xs">Neurons left today</div>
+          <div className="text-brand-body text-xs">Left in window</div>
           <div className={`mt-0.5 font-bold text-3xl tabular-nums ${leftColor}`}>{fmt(q.left)}</div>
         </div>
         <div className="text-right text-brand-body text-xs">

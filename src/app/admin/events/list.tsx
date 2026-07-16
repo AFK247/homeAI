@@ -1,14 +1,16 @@
-"use client";
-
 import { DataTable } from "@/components/data-table/data-table";
+import { parseListParams, type RawSearchParams } from "@/db/helpers/search-params";
 import { EVENT_TYPES } from "@/db/schemas/shared.schema";
-import { useDataProvider } from "@/providers/data.provider";
+import { serverRpc } from "@/server/rpc/server";
 import { columns } from "./columns";
-import type { EventsPageData } from "./promises";
 
-/* Events list — reads result + breakdown from the DataProvider (not props). */
-export function EventsList() {
-  const { result, breakdown } = useDataProvider<EventsPageData>();
+/* Events list — server component; reads through the oRPC router via serverRpc. */
+export async function EventsList({ searchParams }: { searchParams: RawSearchParams }) {
+  const params = parseListParams(searchParams, { filterKeys: ["eventType"] });
+  const [result, breakdown] = await Promise.all([
+    serverRpc.event.getPaginated(params),
+    serverRpc.event.countsByType(),
+  ]);
   return (
     <div className="flex flex-col gap-4">
       <div className="flex flex-wrap gap-3">

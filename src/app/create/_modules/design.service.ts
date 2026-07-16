@@ -5,7 +5,6 @@ import { db } from "@/db/client";
 import { designs, designTags, designVersions } from "@/db/schemas/design.schema";
 import { furnitureItems } from "@/db/schemas/furniture.schema";
 import type { DesignStyle, RoomType } from "@/db/schemas/shared.schema";
-import type { PlannedTag } from "@/server/service/furniture.service";
 import { StorageService } from "@/server/service/storage/storage.service";
 
 /*
@@ -67,8 +66,21 @@ export const DesignService = {
       );
     if (!row) return null;
 
-    // Resolve the design's pins to their catalog items (DesignWithTags).
-    const tagRows = await db.select().from(designTags).where(eq(designTags.designId, row.id));
+    // Pins are per-version: show only the ACTIVE version's pins so switching
+    // versions shows the matching furniture positions (not stale ones).
+    const [activeVersion] = await db
+      .select({ id: designVersions.id })
+      .from(designVersions)
+      .where(and(eq(designVersions.designId, row.id), eq(designVersions.isActive, true)));
+
+    // Resolve the active version's pins to their catalog items (DesignWithTags).
+    // Fall back to designId for legacy rows with no version link.
+    const tagRows = activeVersion
+      ? await db.select().from(designTags).where(eq(designTags.designVersionId, activeVersion.id))
+      : await db
+          .select()
+          .from(designTags)
+          .where(and(eq(designTags.designId, row.id), isNull(designTags.designVersionId)));
 
     const itemIds = tagRows.map((t) => t.furnitureItemId).filter((v): v is string => v !== null);
     const items = itemIds.length
@@ -84,16 +96,31 @@ export const DesignService = {
     return { ...resolveUrls(row), tags };
   },
 
-  /** Insert the planned pins for a design (called after generation). */
-  createTags: async (designId: string, planned: PlannedTag[]) => {
-    if (planned.length === 0) return;
+  /**
+   * Store the furniture pins detected for ONE version of a design. Pins carry a label
+   * + position but no catalog item yet (furnitureItemId null) — matching a pin to a
+   * real product ("shop similar") is a later phase.
+   *
+   * Scoped to the version, not the design: every render places furniture differently,
+   * so each version owns its own pins and switching versions shows the right ones.
+   * Clears this version's prior pins first so a re-detect doesn't stack.
+   */
+  setVisionTags: async (
+    designId: string,
+    designVersionId: string,
+    pins: { label: string; xPct: number; yPct: number }[],
+  ) => {
+    await db.delete(designTags).where(eq(designTags.designVersionId, designVersionId));
+    if (pins.length === 0) return;
     await db.insert(designTags).values(
-      planned.map((p) => ({
+      pins.map((p) => ({
         designId,
-        furnitureItemId: p.furnitureItemId,
+        designVersionId,
+        furnitureItemId: null,
         label: p.label,
-        xCoord: p.xCoord,
-        yCoord: p.yCoord,
+        // The UI positions pins with 0..1 relative coords; the detector reports 0..100.
+        xCoord: p.xPct / 100,
+        yCoord: p.yPct / 100,
       })),
     );
   },

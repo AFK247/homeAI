@@ -3,7 +3,7 @@
 import { Check, X } from "lucide-react";
 import type { DataTableColumn } from "@/components/data-table/data-table";
 import { Badge } from "@/components/ui/badge";
-import type { DailyQuota } from "@/server/service/ai/providers/cloudflare-analytics";
+import type { QuotaResult } from "@/server/service/ai/providers/types";
 
 export interface ProviderRow {
   order: number;
@@ -15,8 +15,8 @@ export interface ProviderRow {
   balance: string;
   /** Numeric USD remaining, or null (used to colour low balances). */
   balanceRemaining: number | null;
-  /** Cloudflare's real daily free-neuron quota; null for other providers. */
-  quota: DailyQuota | null;
+  /** Free-tier quota, when the provider reports one; null otherwise. */
+  quota: QuotaResult | null;
   /** Total successful images this provider has generated. */
   generationCount: number;
 }
@@ -67,7 +67,11 @@ export const columns: DataTableColumn<ProviderRow>[] = [
       return (
         <span
           className={`font-semibold ${
-            veryLow ? "text-destructive" : low ? "text-amber-600 dark:text-amber-500" : "text-foreground"
+            veryLow
+              ? "text-destructive"
+              : low
+                ? "text-amber-600 dark:text-amber-500"
+                : "text-foreground"
           }`}
         >
           {p.balance}
@@ -79,7 +83,7 @@ export const columns: DataTableColumn<ProviderRow>[] = [
     header: "Daily quota left",
     accessorKey: "quota",
     className: "tabular-nums",
-    // Cloudflare's REAL remaining free-neuron quota (from analytics). Amber ≥70%
+    // The provider's real remaining free-tier quota. Amber ≥70%
     // used, red ≥90%. Other providers show "—".
     cell: (p) => {
       const q = p.quota;

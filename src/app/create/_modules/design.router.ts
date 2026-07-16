@@ -14,9 +14,9 @@ import { logger } from "@/lib/logger";
 import { publicProcedure } from "@/server/rpc/procedures";
 import { AiService } from "@/server/service/ai/ai.service";
 import { measureImage } from "@/server/service/ai/image-preprocess";
-import { FurnitureService } from "@/server/service/furniture.service";
 import { GenerationLogService } from "@/server/service/generation-log.service";
 import { StorageService } from "@/server/service/storage/storage.service";
+import { TagService } from "@/server/service/vision/tag.service";
 import { DesignService } from "./design.service";
 
 /*
@@ -34,10 +34,7 @@ const ACCEPTED_MIME = ["image/jpeg", "image/png", "image/webp"] as const;
 
 // Input: the uploaded room image (base64 data URL or raw base64) + selections.
 const GenerateInput = z.object({
-  image: z
-    .string()
-    .min(1)
-    .max(MAX_IMAGE_CHARS, "image is too large (max ~7MB)"), // data URL or bare base64
+  image: z.string().min(1).max(MAX_IMAGE_CHARS, "image is too large (max ~7MB)"), // data URL or bare base64
   imageMime: z.enum(ACCEPTED_MIME).default("image/jpeg"),
   roomType: z.enum(ROOM_TYPES),
   style: z.enum(DESIGN_STYLES),
@@ -56,7 +53,7 @@ function decodeImage(input: string): Buffer {
  * Shared redesign core: given an existing design row + its source bytes, run the
  * provider chain, store the result, persist it on the design, and log the
  * attempt. Used by both `generate` (first render) and `regenerate` (re-render
- * the same design). Places furniture pins only on the first render.
+ * the same design).
  */
 async function runRedesign(opts: {
   design: { id: string; roomType: RoomType; style: DesignStyle; prompt: string | null };
@@ -65,7 +62,6 @@ async function runRedesign(opts: {
   sourceMime: string;
   sourceUrl: string;
   budget: BudgetTier;
-  placeTags: boolean;
 }) {
   const { design, anonymousId } = opts;
   const startedAt = performance.now();
@@ -95,7 +91,7 @@ async function runRedesign(opts: {
     });
 
     // Record this render as the active version (history — first render + regenerates).
-    await DesignService.addVersion({
+    const version = await DesignService.addVersion({
       designId: design.id,
       imageUrl: generatedKey,
       aiProvider: result.provider,
@@ -124,10 +120,17 @@ async function runRedesign(opts: {
       outputHeight: outputDims.height,
     });
 
-    if (opts.placeTags) {
-      const planned = await FurnitureService.planTags(design.roomType);
-      await DesignService.createTags(design.id, planned);
+    // Furniture pins: detect what the AI actually placed in THIS render, tied to this
+    // version so switching versions shows matching pins. Fire-and-forget — the result
+    // screen shows immediately and pins appear a couple of seconds later on refresh.
+    // Pins are a bonus: TagService never throws, so this can't fail a generation.
+    if (version) {
+      const versionId = version.id;
+      void TagService.detect(result.bytes, "image/png", design.roomType)
+        .then((pins) => DesignService.setVisionTags(design.id, versionId, pins))
+        .catch((err) => logger.error({ err, designId: design.id }, "pin detection failed"));
     }
+
     return done;
   } catch (err) {
     logger.error({ err, designId: design.id }, "generation failed");
@@ -153,47 +156,50 @@ async function runRedesign(opts: {
 }
 
 export const designRouter = {
-  generate: publicProcedure.input(GenerateInput).handler(async ({ input, context }) => {
-    const bytes = decodeImage(input.image);
+  generate: publicProcedure
+    .route({ method: "POST" })
+    .input(GenerateInput)
+    .handler(async ({ input, context }) => {
+      const bytes = decodeImage(input.image);
 
-    // 1. store the original upload — persist the KEY, not a full URL
-    const originalKey = `originals/${context.anonymousId}/${Date.now()}.jpg`;
-    await StorageService.put(originalKey, bytes, input.imageMime);
+      // 1. store the original upload — persist the KEY, not a full URL
+      const originalKey = `originals/${context.anonymousId}/${Date.now()}.jpg`;
+      await StorageService.put(originalKey, bytes, input.imageMime);
 
-    // 2. create the design row (status: processing)
-    const design = await DesignService.create({
-      anonymousId: context.anonymousId,
-      originalImageUrl: originalKey,
-      roomType: input.roomType,
-      style: input.style,
-      prompt: input.prompt,
-      isPanorama: input.isPanorama,
-    });
-    if (!design)
-      throw new ORPCError("INTERNAL_SERVER_ERROR", { message: "could not create design" });
-
-    // 3. run the redesign, store the result, persist, place furniture pins.
-    const done = await runRedesign({
-      design: {
-        id: design.id,
+      // 2. create the design row (status: processing)
+      const design = await DesignService.create({
+        anonymousId: context.anonymousId,
+        originalImageUrl: originalKey,
         roomType: input.roomType,
         style: input.style,
-        prompt: input.prompt ?? null,
-      },
-      anonymousId: context.anonymousId,
-      sourceBytes: bytes,
-      sourceMime: input.imageMime,
-      sourceUrl: StorageService.publicUrl(originalKey) ?? "",
-      budget: input.budget,
-      placeTags: true,
-    });
-    return done ?? design;
-  }),
+        prompt: input.prompt,
+        isPanorama: input.isPanorama,
+      });
+      if (!design)
+        throw new ORPCError("INTERNAL_SERVER_ERROR", { message: "could not create design" });
+
+      // 3. run the redesign, store the result, persist it on the design.
+      const done = await runRedesign({
+        design: {
+          id: design.id,
+          roomType: input.roomType,
+          style: input.style,
+          prompt: input.prompt ?? null,
+        },
+        anonymousId: context.anonymousId,
+        sourceBytes: bytes,
+        sourceMime: input.imageMime,
+        sourceUrl: StorageService.publicUrl(originalKey) ?? "",
+        budget: input.budget,
+      });
+      return done ?? design;
+    }),
 
   // Re-run the AI on an existing design's ORIGINAL image + same settings, replacing
   // its generated image in place. Budget isn't persisted on designs, so it defaults
-  // to "medium" (or an optional client override). Pins are kept as-is.
+  // to "medium" (or an optional client override).
   regenerate: publicProcedure
+    .route({ method: "POST" })
     .input(z.object({ id: z.string().min(1), budget: z.enum(BUDGET_TIERS).default("medium") }))
     .handler(async ({ input, context }) => {
       const design = await DesignService.getById({
@@ -219,24 +225,25 @@ export const designRouter = {
         sourceMime: "image/jpeg",
         sourceUrl: design.originalImageUrl,
         budget: input.budget,
-        placeTags: false,
       });
 
       return DesignService.getById({ id: input.id, anonymousId: context.anonymousId });
     }),
 
   getById: publicProcedure
+    .route({ method: "GET" })
     .input(z.object({ id: z.string().min(1) }))
     .handler(({ input, context }) =>
       DesignService.getById({ id: input.id, anonymousId: context.anonymousId }),
     ),
 
-  list: publicProcedure.handler(({ context }) =>
-    DesignService.listByAnon({ anonymousId: context.anonymousId }),
-  ),
+  list: publicProcedure
+    .route({ method: "GET" })
+    .handler(({ context }) => DesignService.listByAnon({ anonymousId: context.anonymousId })),
 
   // Version history: list all renders of a design, and switch the active one.
   versions: publicProcedure
+    .route({ method: "GET" })
     .input(z.object({ designId: z.string().min(1) }))
     .handler(({ input, context }) =>
       DesignService.listVersions({
@@ -246,6 +253,7 @@ export const designRouter = {
     ),
 
   activateVersion: publicProcedure
+    .route({ method: "POST" })
     .input(z.object({ designId: z.string().min(1), versionId: z.string().min(1) }))
     .handler(({ input, context }) =>
       DesignService.activateVersion({

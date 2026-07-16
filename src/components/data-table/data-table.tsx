@@ -63,7 +63,17 @@ interface DataTableProps<T> {
   searchPlaceholder?: string;
   /** Toolbar filter dropdowns. */
   filters?: DataTableFilter[];
+  /**
+   * URL params that filter the data but have NO toolbar dropdown — e.g. a `session`
+   * drill-in set by clicking a row on another page. The toolbar's Clear button treats
+   * these as active and clears them too, so "Clear" removes the drill-in as well.
+   */
+  extraFilterKeys?: string[];
+  /** Compute a stable row key. Client-only (it's a function). */
   rowKey?: (row: T, index: number) => string;
+  /** A column to key rows by, as a plain string — safe to pass from a Server
+   *  Component (unlike `rowKey`, which is a function). Falls back to `id`/index. */
+  keyField?: keyof T & string;
   onRowClick?: (row: T) => void;
   emptyMessage?: string;
   className?: string;
@@ -97,7 +107,9 @@ export function DataTable<T>({
   size,
   searchPlaceholder,
   filters = [],
+  extraFilterKeys = [],
   rowKey,
+  keyField,
   onRowClick,
   emptyMessage = "No records found.",
   className,
@@ -108,11 +120,19 @@ export function DataTable<T>({
 
   const hasPagination = total !== undefined && page && pageCount && size;
   const toolbarKeys = [...(searchPlaceholder ? ["search"] : []), ...filters.map((f) => f.paramKey)];
-  const hasActiveFilter = toolbarKeys.some((k) => queryParams[k]);
+  // Clear also removes drill-in params (e.g. ?session=) that have no dropdown.
+  const clearableKeys = [...toolbarKeys, ...extraFilterKeys];
+  const hasActiveFilter = clearableKeys.some((k) => queryParams[k]);
 
-  const key = (row: T, i: number) =>
-    rowKey?.(row, i) ??
-    (typeof (row as { id?: unknown }).id === "string" ? (row as { id: string }).id : String(i));
+  const key = (row: T, i: number) => {
+    if (rowKey) return rowKey(row, i);
+    if (keyField) {
+      const v = row[keyField];
+      if (typeof v === "string" && v) return v;
+    }
+    const id = (row as { id?: unknown }).id;
+    return typeof id === "string" ? id : String(i);
+  };
 
   function toggleSort(k: string) {
     if (sort === k) {
@@ -164,7 +184,7 @@ export function DataTable<T>({
               variant="outline"
               size="sm"
               className="gap-1"
-              onClick={() => removeParams([...toolbarKeys, "page"])}
+              onClick={() => removeParams([...clearableKeys, "page"])}
             >
               Clear <X className="size-3.5" />
             </Button>
@@ -314,15 +334,7 @@ function SearchInput({ placeholder }: { placeholder: string }) {
 }
 
 /** Rows-per-page + numbered page buttons (writes ?page= / ?size=). */
-function TableFooter({
-  page,
-  pageCount,
-  size,
-}: {
-  page: number;
-  pageCount: number;
-  size: number;
-}) {
+function TableFooter({ page, pageCount, size }: { page: number; pageCount: number; size: number }) {
   const { updateParams } = useQueryParams();
   const goto = (p: number) => updateParams({ page: p }, { resetPage: false });
   const nums = pageNumbers(page, pageCount);

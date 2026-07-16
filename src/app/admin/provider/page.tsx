@@ -1,7 +1,11 @@
 import { Cpu } from "lucide-react";
-import { cloudflareDailyQuota } from "@/server/service/ai/providers/cloudflare-analytics";
-import { providerBalances, providerChainStatus } from "@/server/service/ai/providers/status";
-import { AdminService } from "../_modules/admin.service";
+import { PageHeader } from "@/components/layout/page-header";
+import { serverRpc } from "@/server/rpc/server";
+import {
+  providerBalances,
+  providerChainStatus,
+  providerQuotas,
+} from "@/server/service/ai/providers/status";
 import { ProviderList } from "./list";
 import { ProviderCards } from "./quota-card";
 
@@ -11,44 +15,39 @@ export const dynamic = "force-dynamic";
 
 /*
  * Admin — AI provider chain. Shows the ordered fallback list, each provider's
- * readiness, remaining balance, and Cloudflare's real free daily quota (card +
- * per-row). Balance + quota run once server-side on load. Generation tries
- * providers top-to-bottom until one succeeds; the winner is saved on the design.
+ * readiness, remaining balance, and free-tier quota (card + per-row). Balance +
+ * quota run once server-side on load. Generation tries providers top-to-bottom
+ * until one succeeds; the winner is saved on the design.
+ *
+ * Vendor-agnostic: every figure comes from the provider interface, so adding or
+ * swapping a provider needs no change here.
  */
 export default async function AdminProviderPage() {
   const chain = providerChainStatus();
-  // UTC-midnight = Cloudflare's daily quota reset boundary.
-  const now = new Date();
-  const utcMidnight = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate()));
-  const [balances, quota, genCounts] = await Promise.all([
+  const [balances, quotas, genCounts] = await Promise.all([
     providerBalances(),
-    cloudflareDailyQuota(utcMidnight, now),
-    AdminService.generationCountsByProvider(),
+    providerQuotas(),
+    serverRpc.generation.countsByProvider(),
   ]);
   const balanceByKey = Object.fromEntries(balances.map((b) => [b.key, b]));
+  const quotaByKey = Object.fromEntries(quotas.map((q) => [q.key, q.quota]));
   const rows = chain.map((c) => ({
     ...c,
     balance: balanceByKey[c.key]?.display ?? "—",
     balanceRemaining: balanceByKey[c.key]?.remaining ?? null,
-    // Cloudflare's real daily free-neuron quota; null for other providers.
-    quota: c.key === "cloudflare" ? quota : null,
+    // Free-tier quota; null for providers that don't report one (pay-as-you-go).
+    quota: quotaByKey[c.key] ?? null,
     // Total successful images this provider has generated.
     generationCount: genCounts[c.key] ?? 0,
   }));
 
   return (
-    <div className="flex flex-col gap-6">
-      <div className="flex items-center gap-3">
-        <div className="flex size-11 items-center justify-center rounded-xl bg-secondary text-secondary-foreground">
-          <Cpu className="size-5" />
-        </div>
-        <div>
-          <h1 className="font-serif font-extrabold text-3xl text-foreground">AI Providers</h1>
-          <p className="text-brand-body text-sm">
-            Image generation tries these in order until one succeeds (fallback chain).
-          </p>
-        </div>
-      </div>
+    <>
+      <PageHeader
+        title="AI Providers"
+        description="Image generation tries these in order until one succeeds (fallback chain)."
+        icon={<Cpu className="size-5" />}
+      />
 
       <ProviderCards
         cards={rows.map((r) => ({
@@ -70,6 +69,6 @@ export default async function AdminProviderPage() {
         </code>
         . The provider that produced each image is saved on the design.
       </p>
-    </div>
+    </>
   );
 }

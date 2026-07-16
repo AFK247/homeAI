@@ -23,7 +23,10 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
         </div>
         <AdminNav />
       </aside>
-      <main className="flex-1 overflow-x-auto px-6 py-8">{children}</main>
+      {/* The `flex flex-col gap-6` here is the shared page-content spacing — every
+          admin page renders a PageHeader + body into it, so pages no longer repeat
+          that wrapper themselves. */}
+      <main className="flex flex-1 flex-col gap-6 overflow-x-auto px-6 py-8">{children}</main>
     </div>
   );
 }

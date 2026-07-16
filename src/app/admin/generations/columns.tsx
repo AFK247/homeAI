@@ -3,10 +3,10 @@
 import { format } from "date-fns";
 import { Check, Eye, X } from "lucide-react";
 import Link from "next/link";
-import { PAGES } from "@/config/pages";
 import type { DataTableColumn } from "@/components/data-table/data-table";
 import { Badge } from "@/components/ui/badge";
-import type { GenerationLogRow } from "../_modules/admin.service";
+import { PAGES } from "@/config/pages";
+import type { GenerationLogRow } from "./_modules/generation.router";
 
 /**
  * Real reported cost only. OpenRouter returns a $ cost; Cloudflare returns none
@@ -71,7 +71,8 @@ export const columns: DataTableColumn<GenerationLogRow>[] = [
     accessorKey: "outputWidth",
     className: "text-xs tabular-nums",
     cell: (g) => {
-      if (!g.outputWidth || !g.outputHeight) return <span className="text-muted-foreground">—</span>;
+      if (!g.outputWidth || !g.outputHeight)
+        return <span className="text-muted-foreground">—</span>;
       const mp = ((g.outputWidth * g.outputHeight) / 1_000_000).toFixed(1);
       return (
         <span className="whitespace-nowrap">

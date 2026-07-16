@@ -1,12 +1,9 @@
-"use client";
-
 import { CircleDollarSign, Clock, ImageIcon, TrendingUp } from "lucide-react";
-import { useDataProvider } from "@/providers/data.provider";
-import type { GenerationsPageData } from "./promises";
+import { serverRpc } from "@/server/rpc/server";
 
-/* Headline generation KPIs, read from the DataProvider (stats promise). */
-export function GenerationStats() {
-  const { stats } = useDataProvider<GenerationsPageData>();
+/* Headline generation KPIs — server component; reads through the oRPC router. */
+export async function GenerationStats() {
+  const stats = await serverRpc.generation.stats();
   const successRate = stats.total ? Math.round((stats.succeeded / stats.total) * 100) : 0;
 
   const cards = [

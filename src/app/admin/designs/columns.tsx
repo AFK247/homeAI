@@ -4,9 +4,9 @@ import { format } from "date-fns";
 import { Eye } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
-import { PAGES } from "@/config/pages";
 import type { DataTableColumn } from "@/components/data-table/data-table";
 import { Badge } from "@/components/ui/badge";
+import { PAGES } from "@/config/pages";
 import type { Design } from "@/db/types";
 
 const STATUS_VARIANT: Record<string, "default" | "secondary" | "destructive"> = {

@@ -1,0 +1,22 @@
+import "server-only";
+
+import { searchParamsSchema } from "@/db/helpers/search-params";
+import { publicProcedure } from "@/server/rpc/procedures";
+import { EventService } from "./event.service";
+
+/*
+ * Event oRPC router — admin event log + type breakdown.
+ * Convention (docs/module-convention.md): router validates + calls the service;
+ * never touches Drizzle. GET for reads. No auth yet (publicProcedure).
+ */
+export const eventRouter = {
+  getPaginated: publicProcedure
+    .route({ method: "GET" })
+    .input(searchParamsSchema)
+    .handler(({ input }) => EventService.listPaginated(input)),
+
+  countsByType: publicProcedure.route({ method: "GET" }).handler(() => EventService.countsByType()),
+};
+
+/** Row type for the events table — inferred, never hand-written. */
+export type EventRow = Awaited<ReturnType<typeof EventService.listPaginated>>["data"][number];

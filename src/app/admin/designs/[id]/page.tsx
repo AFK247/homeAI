@@ -2,8 +2,8 @@ import { ArrowLeft } from "lucide-react";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { PAGES } from "@/config/pages";
+import { serverRpc } from "@/server/rpc/server";
 import { DesignPanel } from "../../_components/detail/design-panel";
-import { AdminService } from "../../_modules/admin.service";
 
 /*
  * Admin — design detail. Shows ONLY this one design (images + info). Generation
@@ -15,7 +15,7 @@ export default async function AdminDesignDetailPage({
   params: Promise<{ id: string }>;
 }) {
   const { id } = await params;
-  const data = await AdminService.designDetail(id);
+  const data = await serverRpc.designAdmin.getById({ id });
   if (!data) notFound();
 
   return (

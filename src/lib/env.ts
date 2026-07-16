@@ -24,18 +24,26 @@ const serverSchema = z.object({
   GOOGLE_CLIENT_ID: z.string().optional(),
   GOOGLE_CLIENT_SECRET: z.string().optional(),
 
-  // AI provider (Fal now; provider-abstracted)
+  /*
+   * AI provider credentials. EVERY provider's keys are optional: each provider's
+   * isReady() checks its own keys and the chain skips it when absent, so a provider
+   * can be added, removed or swapped by editing the chain alone — never this file's
+   * required/optional shape. (Requiring one vendor's keys here would hard-crash the
+   * app at boot the moment you drop that provider.) At least one provider must be
+   * configured at runtime, which redesignWithFallback enforces with a clear error.
+   */
   FAL_KEY: z.string().optional(),
 
-  // AI (Cloudflare Workers AI — FLUX.2 klein, img2img)
-  CLOUDFLARE_ACCOUNT_ID: z.string(),
-  CLOUDFLARE_API_TOKEN: z.string(),
+  // Cloudflare Workers AI — image generation (FLUX.2 klein) + vision tagging
+  // (moondream). Both share one free Neuron allocation.
+  CLOUDFLARE_ACCOUNT_ID: z.string().optional(),
+  CLOUDFLARE_API_TOKEN: z.string().optional(),
 
-  // AI primary (OpenRouter Unified Image API — img2img via Gemini flash / FLUX /
-  // Seedream). Pay-as-you-go key (sk-or-v1-...) from openrouter.ai/keys; balance
-  // required (no free image tier). Without it the provider is skipped.
+  // OpenRouter Unified Image API — img2img via Gemini flash / FLUX / Seedream.
+  // Pay-as-you-go key (sk-or-v1-...) from openrouter.ai/keys; balance required (no
+  // free image tier). Without it the provider is skipped.
   OPENROUTER_API_KEY: z.string().optional(),
-  // Override the OpenRouter image model (default: gemini-3.1-flash-image).
+  // Override the OpenRouter image model (default: see openrouter.provider.ts).
   OPENROUTER_IMAGE_MODEL: z.string().optional(),
 
   // Object storage (S3-compatible: local MinIO now, R2/Supabase in prod)

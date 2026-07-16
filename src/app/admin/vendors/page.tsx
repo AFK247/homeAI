@@ -1,18 +1,19 @@
+import { Suspense } from "react";
+import { DataTableSkeleton } from "@/components/data-table/data-table-skeleton";
+import { PageHeader } from "@/components/layout/page-header";
 import type { PageSearchParams } from "@/db/helpers/search-params";
-import { QueryProvider } from "@/providers/query.provider";
 import { VendorsList } from "./list";
-import { vendorsPromises } from "./promises";
 
-/* Admin — vendors, backend-paginated via QueryProvider + useDataProvider. */
+/* Admin — vendors, backend-paginated. Reads flow through the oRPC router (serverRpc). */
 export default async function AdminVendorsPage({ searchParams }: PageSearchParams) {
-  const promises = vendorsPromises(await searchParams);
+  const params = await searchParams;
 
   return (
-    <div className="flex flex-col gap-6">
-      <h1 className="font-serif font-extrabold text-3xl text-foreground">Vendors</h1>
-      <QueryProvider promises={promises}>
-        <VendorsList />
-      </QueryProvider>
-    </div>
+    <>
+      <PageHeader title="Vendors" />
+      <Suspense fallback={<DataTableSkeleton />}>
+        <VendorsList searchParams={params} />
+      </Suspense>
+    </>
   );
 }

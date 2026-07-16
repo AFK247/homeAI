@@ -23,7 +23,13 @@ function Figure({ src, label }: { src: string; label: string }) {
   return (
     <figure className="flex flex-col gap-1.5">
       <div className="relative aspect-[4/3] w-full overflow-hidden rounded-lg border border-border bg-muted">
-        <Image src={src} alt={label} fill sizes="(max-width: 640px) 50vw, 220px" className="object-cover" />
+        <Image
+          src={src}
+          alt={label}
+          fill
+          sizes="(max-width: 640px) 50vw, 220px"
+          className="object-cover"
+        />
       </div>
       <figcaption className="text-center text-brand-body text-xs">{label}</figcaption>
     </figure>
@@ -72,7 +78,9 @@ export function DesignPanel({ design }: { design: Design }) {
             label="Session"
             value={
               <span className="font-mono text-muted-foreground text-xs">
-                {design.anonymousId ? `${design.anonymousId.slice(0, 10)}…` : (design.userId ?? "—")}
+                {design.anonymousId
+                  ? `${design.anonymousId.slice(0, 10)}…`
+                  : (design.userId ?? "—")}
               </span>
             }
           />

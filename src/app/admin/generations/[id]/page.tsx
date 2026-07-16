@@ -2,8 +2,8 @@ import { ArrowLeft } from "lucide-react";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { PAGES } from "@/config/pages";
+import { serverRpc } from "@/server/rpc/server";
 import { GenerationPanel } from "../../_components/detail/generation-panel";
-import { AdminService } from "../../_modules/admin.service";
 
 /*
  * Admin — generation detail. Shows ONLY this one generation attempt (its image +
@@ -15,7 +15,7 @@ export default async function AdminGenerationDetailPage({
   params: Promise<{ id: string }>;
 }) {
   const { id } = await params;
-  const data = await AdminService.generationDetail(id);
+  const data = await serverRpc.generation.getById({ id });
   if (!data) notFound();
 
   return (

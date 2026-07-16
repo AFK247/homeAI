@@ -73,6 +73,8 @@ export const en: Dictionary = {
     regenerating: "Regenerating…",
     versions: "Previous versions",
     fullscreen: "View fullscreen",
+    hidePins: "Hide tags",
+    showPins: "Show tags",
     otherStyle: "Other style",
     save: "Save",
     share: "Share",

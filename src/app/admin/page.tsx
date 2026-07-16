@@ -2,6 +2,7 @@ import { BarChart3, Boxes, Image as ImageIcon, Store, Users } from "lucide-react
 import Image from "next/image";
 import Link from "next/link";
 import { PAGES } from "@/config/pages";
+import { serverRpc } from "@/server/rpc/server";
 import { StatCard } from "./_components/stat-card";
 import { AdminService } from "./_modules/admin.service";
 
@@ -12,7 +13,7 @@ import { AdminService } from "./_modules/admin.service";
 export default async function AdminOverviewPage() {
   const [stats, breakdown, recent] = await Promise.all([
     AdminService.overview(),
-    AdminService.eventBreakdown(),
+    serverRpc.event.countsByType(),
     AdminService.recentDesigns(6),
   ]);
 

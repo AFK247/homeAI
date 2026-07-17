@@ -46,6 +46,6 @@ export const columns: DataTableColumn<CategoryRow>[] = [
     accessorKey: "id",
     id: "actions",
     className: "text-right",
-    cell: (c) => <CategoryRowActions id={c.id} status={c.status} />,
+    cell: (c) => <CategoryRowActions category={c} />,
   },
 ];

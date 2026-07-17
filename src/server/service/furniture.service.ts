@@ -11,6 +11,7 @@ import {
   sqlCount,
   withSorting,
 } from "@/db/helpers/with-filters";
+import { categories } from "@/db/schemas/category.schema";
 import { furnitureItems } from "@/db/schemas/furniture.schema";
 import type { Region } from "@/db/schemas/shared.schema";
 import { vendors } from "@/db/schemas/vendor.schema";
@@ -30,8 +31,8 @@ export const FurnitureService = {
       ? await db.select().from(vendors).where(eq(vendors.id, item.vendorId))
       : [];
 
-    // Similar = same category, different item (other brands / used options).
-    const similar = item.category
+    // Similar = same master category, different item (other brands / used options).
+    const similar = item.categoryId
       ? await db
           .select({
             id: furnitureItems.id,
@@ -41,7 +42,7 @@ export const FurnitureService = {
           .from(furnitureItems)
           .where(
             and(
-              eq(furnitureItems.category, item.category),
+              eq(furnitureItems.categoryId, item.categoryId),
               ne(furnitureItems.id, item.id),
               eq(furnitureItems.isActive, true),
             ),
@@ -76,17 +77,15 @@ export const FurnitureService = {
       .limit(limit);
   },
 
-  /** Paginated catalog list for admin (backend search / filter / sort). */
+  /** Paginated catalog list for admin (backend search / filter / sort). Joins the master
+   *  category name for display; filters by categoryId. */
   list: async (params: SearchParams) => {
     const where = andWhere([
-      searchFilters(
-        [furnitureItems.name, furnitureItems.brand, furnitureItems.category],
-        params.search,
-      ),
+      searchFilters([furnitureItems.name, furnitureItems.brand], params.search),
       ...equalFilters(
         {
           brand: furnitureItems.brand,
-          category: furnitureItems.category,
+          categoryId: furnitureItems.categoryId,
           condition: furnitureItems.condition,
           source: furnitureItems.source,
         },
@@ -103,8 +102,23 @@ export const FurnitureService = {
       db.select(sqlCount()).from(furnitureItems).where(where),
       (limit, offset) =>
         db
-          .select()
+          .select({
+            id: furnitureItems.id,
+            name: furnitureItems.name,
+            brand: furnitureItems.brand,
+            categoryId: furnitureItems.categoryId,
+            categoryName: categories.name,
+            priceBdt: furnitureItems.priceBdt,
+            imageUrl: furnitureItems.imageUrl,
+            productUrl: furnitureItems.productUrl,
+            condition: furnitureItems.condition,
+            source: furnitureItems.source,
+            region: furnitureItems.region,
+            isActive: furnitureItems.isActive,
+            createdAt: furnitureItems.createdAt,
+          })
           .from(furnitureItems)
+          .leftJoin(categories, eq(furnitureItems.categoryId, categories.id))
           .where(where)
           .orderBy(withSorting(sortMap, params, furnitureItems.createdAt))
           .limit(limit)

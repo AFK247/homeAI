@@ -3,6 +3,7 @@
 import type { DataTableColumn } from "@/components/data-table/data-table";
 import { Badge } from "@/components/ui/badge";
 import type { Vendor } from "@/db/types";
+import { VendorRowActions } from "./row-actions";
 
 export const columns: DataTableColumn<Vendor>[] = [
   { header: "Name", accessorKey: "name", sortable: true },
@@ -32,5 +33,12 @@ export const columns: DataTableColumn<Vendor>[] = [
         {v.isVerified ? "Verified" : "Unverified"}
       </Badge>
     ),
+  },
+  {
+    header: "",
+    accessorKey: "id",
+    id: "actions",
+    className: "text-right",
+    cell: (v) => <VendorRowActions vendor={v} />,
   },
 ];

@@ -30,7 +30,7 @@ export const furnitureRouter = {
       EventService.log({
         eventType: "tag_click",
         anonymousId: context.anonymousId,
-        metadata: { furnitureItemId: detail.id, category: detail.category },
+        metadata: { furnitureItemId: detail.id, categoryId: detail.categoryId },
       });
       return detail;
     }),

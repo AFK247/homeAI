@@ -7,7 +7,7 @@ import { columns } from "./columns";
 /* Furniture list — server component; reads through the oRPC router via serverRpc. */
 export async function FurnitureList({ searchParams }: { searchParams: RawSearchParams }) {
   const params = parseListParams(searchParams, {
-    filterKeys: ["condition", "source", "brand", "category"],
+    filterKeys: ["condition", "source", "brand", "categoryId"],
   });
   const result = await serverRpc.furniture.getPaginated(params);
   return (

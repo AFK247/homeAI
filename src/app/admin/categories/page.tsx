@@ -6,6 +6,7 @@ import { PageHeader } from "@/components/layout/page-header";
 import { PAGES } from "@/config/pages";
 import type { PageSearchParams } from "@/db/helpers/search-params";
 import { CategoriesList } from "./list";
+import { NewCategoryButton } from "./new-category-button";
 import { SeedCategoriesButton } from "./seed-button";
 
 /*
@@ -30,6 +31,7 @@ export default async function AdminCategoriesPage({ searchParams }: PageSearchPa
             >
               <Waypoints className="size-4" /> Mappings
             </Link>
+            <NewCategoryButton />
             <SeedCategoriesButton />
           </div>
         }

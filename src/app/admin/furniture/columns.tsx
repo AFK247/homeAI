@@ -2,17 +2,21 @@
 
 import type { DataTableColumn } from "@/components/data-table/data-table";
 import { Badge } from "@/components/ui/badge";
-import type { FurnitureItem } from "@/db/types";
 import { formatBdt } from "@/lib/format";
+import type { FurnitureRow } from "../../result/_modules/furniture.router";
 
 /*
  * Furniture table columns (reference convention: columns.tsx per feature).
  * Consumed by list.tsx via the shared DataTable.
  */
-export const columns: DataTableColumn<FurnitureItem>[] = [
+export const columns: DataTableColumn<FurnitureRow>[] = [
   { header: "Name", accessorKey: "name", sortable: true },
   { header: "Brand", accessorKey: "brand", cell: (r) => r.brand ?? "—" },
-  { header: "Category", accessorKey: "category", cell: (r) => r.category ?? "—" },
+  {
+    header: "Category",
+    accessorKey: "categoryName",
+    cell: (r) => (r.categoryName ? <span className="capitalize">{r.categoryName}</span> : "—"),
+  },
   {
     header: "Price",
     accessorKey: "priceBdt",

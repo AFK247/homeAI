@@ -26,7 +26,6 @@ export const furnitureItems = pgTable(
     id,
     name: text("name").notNull(),
     brand: text("brand"), // Hatil / Otobi / Regal / ...
-    category: text("category"), // legacy free-text label; superseded by categoryId
     // Master category (docs/marketplace-plan.md §3) — the join key for pin↔product matching.
     categoryId: text("category_id").references(() => categories.id, setNull),
     dimensions: jsonb("dimensions").$type<FurnitureDimensions>(),
@@ -42,7 +41,6 @@ export const furnitureItems = pgTable(
     ...timestampColumns,
   },
   (t) => [
-    index("furniture_category_idx").on(t.category),
     index("furniture_category_id_idx").on(t.categoryId),
     index("furniture_region_idx").on(t.region),
     index("furniture_condition_idx").on(t.condition),

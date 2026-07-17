@@ -2,7 +2,7 @@ import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod";
 import { skipBaseColumns } from "@/db/helpers/base.columns";
 import { categories, vendorCategoryMaps } from "@/db/schemas/category.schema";
-import { CATEGORY_SOURCES, CATEGORY_STATUSES } from "@/db/schemas/shared.schema";
+import { CATEGORY_SOURCES, CATEGORY_STATUSES, ROOM_TYPES } from "@/db/schemas/shared.schema";
 
 /*
  * Category system validations (docs/marketplace-plan.md §3). Admin-owned.
@@ -13,6 +13,7 @@ export const CreateCategorySchema = createInsertSchema(categories)
   .extend({
     // Category names are always English (join key / controlled vocabulary).
     name: z.string().min(1, "Enter a name"),
+    roomTypes: z.array(z.enum(ROOM_TYPES)).default([]),
     status: z.enum(CATEGORY_STATUSES).default("active"),
     source: z.enum(CATEGORY_SOURCES).default("manual"),
   });

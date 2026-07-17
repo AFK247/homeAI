@@ -63,7 +63,6 @@ export async function ingestProducts(
     const values = {
       name: p.name,
       brand,
-      category: p.category ?? null, // keep the raw label too (legacy/debug)
       categoryId,
       priceBdt: p.priceBdt ?? null,
       imageUrl: p.imageUrl ?? null,

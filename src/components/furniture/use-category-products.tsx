@@ -4,22 +4,22 @@ import { useModal, useSheet } from "@/components/modal";
 import { useIsDesktop } from "@/hooks/use-media-query";
 import { handleORPCError } from "@/lib/utils/error";
 import { rpc } from "@/server/rpc/client";
-import { FurnitureDetailPanel } from "./furniture-detail-panel";
+import { CategoryProductsPanel } from "./category-products-panel";
 
 /*
- * Opens the furniture detail as a centered modal on desktop, bottom sheet on
- * mobile (design §7b / plan §7c). Fetches the real detail by furniture item id
- * (which also logs a tag_click server-side), then renders the panel.
+ * Tap a furniture pin (or a "furniture in this room" row) → open the category's "shop
+ * similar" list as a centered modal on desktop / bottom sheet on mobile. Fetches a few
+ * real products in that master category (also logs a tag_click server-side).
  */
-export function useFurnitureDetail() {
+export function useCategoryProducts() {
   const isDesktop = useIsDesktop();
   const { openModal } = useModal();
   const { openSheet } = useSheet();
 
-  return async function openFurniture(furnitureItemId: string, pinIndex = 1) {
+  return async function openCategory(categoryId: string, categoryName: string) {
     try {
-      const item = await rpc.furniture.getDetail({ id: furnitureItemId });
-      const body = () => <FurnitureDetailPanel item={item} pinIndex={pinIndex} />;
+      const products = await rpc.furniture.byCategory({ categoryId });
+      const body = () => <CategoryProductsPanel categoryName={categoryName} products={products} />;
       if (isDesktop) {
         openModal({ type: "custom", component: body, className: "sm:max-w-lg" });
       } else {

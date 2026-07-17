@@ -1,5 +1,6 @@
 import "server-only";
 
+import { categoryRouter } from "@/app/admin/categories/_modules/category.router";
 import { designAdminRouter } from "@/app/admin/designs/_modules/design.router";
 import { eventRouter } from "@/app/admin/events/_modules/event.router";
 import { generationRouter } from "@/app/admin/generations/_modules/generation.router";
@@ -20,6 +21,7 @@ export const webRouter = {
   event: eventRouter,
   generation: generationRouter,
   designAdmin: designAdminRouter,
+  category: categoryRouter,
 };
 
 export type WebRouter = typeof webRouter;

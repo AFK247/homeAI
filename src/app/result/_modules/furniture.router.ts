@@ -35,6 +35,21 @@ export const furnitureRouter = {
       return detail;
     }),
 
+  // Tap a pin: return up to a few products in that master category ("shop similar") and
+  // log a tag_click. Side effect ⇒ POST.
+  byCategory: publicProcedure
+    .route({ method: "POST" })
+    .input(z.object({ categoryId: z.string().min(1) }))
+    .handler(async ({ input, context }) => {
+      const items = await FurnitureService.byCategoryId(input.categoryId);
+      EventService.log({
+        eventType: "tag_click",
+        anonymousId: context.anonymousId,
+        metadata: { categoryId: input.categoryId, count: items.length },
+      });
+      return items;
+    }),
+
   // Buy New / Buy Used clicked: log a buy_click (the conversion signal).
   logBuyClick: publicProcedure
     .route({ method: "POST" })

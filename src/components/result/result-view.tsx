@@ -6,11 +6,10 @@ import { useRouter } from "next/navigation";
 import { useState, useTransition } from "react";
 import { ImagePlaceholder } from "@/components/brand/image-placeholder";
 import { FurniturePin } from "@/components/furniture/furniture-pin";
-import { useFurnitureDetail } from "@/components/furniture/use-furniture-detail";
+import { useCategoryProducts } from "@/components/furniture/use-category-products";
 import { Button } from "@/components/ui/button";
 import { STYLE_OPTIONS } from "@/config/catalog";
-import type { DesignWithTags } from "@/db/types";
-import { formatBdt } from "@/lib/format";
+import type { DesignWithTags, ResolvedDesignTag } from "@/db/types";
 import { useTranslation } from "@/lib/i18n/client";
 import { rpc } from "@/server/rpc/client";
 import { VersionHistory } from "./version-history";
@@ -22,7 +21,7 @@ import { VersionHistory } from "./version-history";
  */
 export function ResultView({ design }: { design: DesignWithTags }) {
   const { dict, locale } = useTranslation();
-  const openFurniture = useFurnitureDetail();
+  const openCategory = useCategoryProducts();
   const router = useRouter();
   const [regenerating, startRegenerate] = useTransition();
   const [versionKey, setVersionKey] = useState(0); // bump to refetch version history
@@ -30,6 +29,13 @@ export function ResultView({ design }: { design: DesignWithTags }) {
   const [pinsVisible, setPinsVisible] = useState(true); // let the user declutter the image
   const hasPins = design.tags.length > 0;
   const styleLabel = STYLE_OPTIONS.find((s) => s.value === design.style)?.[locale] ?? design.style;
+
+  // The right-side list shows one row per DISTINCT category (6 pins may be 4 categories).
+  const categories = dedupeCategories(design.tags);
+
+  const openTagCategory = (tag: ResolvedDesignTag) => {
+    if (tag.categoryId && tag.categoryName) openCategory(tag.categoryId, tag.categoryName);
+  };
 
   function regenerate() {
     startRegenerate(async () => {
@@ -95,16 +101,7 @@ export function ResultView({ design }: { design: DesignWithTags }) {
           )}
           {pinsVisible &&
             design.tags.map((tag, i) => (
-              <FurniturePin
-                key={tag.id}
-                tag={tag}
-                index={i + 1}
-                onOpen={
-                  tag.furnitureItemId
-                    ? () => openFurniture(tag.furnitureItemId as string, i + 1)
-                    : undefined
-                }
-              />
+              <FurniturePin key={tag.id} tag={tag} index={i + 1} onOpen={openTagCategory} />
             ))}
         </div>
         <p className="mt-3 text-center text-muted-foreground text-sm">{dict.result.tapHint}</p>
@@ -116,33 +113,37 @@ export function ResultView({ design }: { design: DesignWithTags }) {
         <h2 className="font-serif font-bold text-foreground text-xl">
           {dict.result.furnitureHeading}
         </h2>
-        <div className="flex flex-col gap-3">
-          {design.tags.map((tag, i) => {
-            const item = tag.furnitureItem;
-            if (!item || !tag.furnitureItemId) return null;
-            return (
+        {categories.length === 0 ? (
+          <p className="text-muted-foreground text-sm">{dict.result.tapHint}</p>
+        ) : (
+          <div className="grid grid-cols-2 gap-3">
+            {categories.map((c) => (
               <button
                 type="button"
-                key={tag.id}
-                onClick={() => openFurniture(tag.furnitureItemId as string, i + 1)}
-                className="flex items-center gap-3 rounded-2xl bg-card p-3 text-left shadow-sm transition-shadow hover:shadow-md"
+                key={c.categoryId}
+                onClick={() => openCategory(c.categoryId, c.categoryName)}
+                className="flex items-center gap-2.5 rounded-2xl bg-card p-2.5 text-left shadow-sm transition-shadow hover:shadow-md"
               >
-                <ImagePlaceholder className="size-16 shrink-0 rounded-xl" />
-                <div className="flex-1">
-                  <div className="font-bold text-foreground text-sm">{item.name}</div>
-                  <div className="text-muted-foreground text-xs">
-                    {item.brand} · {dict.result.conditionNew}{" "}
-                    {item.priceBdt !== null ? formatBdt(item.priceBdt, locale) : ""}
+                {c.previewImageUrl ? (
+                  // biome-ignore lint/performance/noImgElement: hotlinked external vendor image
+                  <img
+                    src={c.previewImageUrl}
+                    alt={c.categoryName}
+                    className="size-12 shrink-0 rounded-xl object-cover"
+                  />
+                ) : (
+                  <ImagePlaceholder className="size-12 shrink-0 rounded-xl" />
+                )}
+                <div className="min-w-0 flex-1">
+                  <div className="truncate font-bold text-foreground text-sm capitalize">
+                    {c.categoryName}
                   </div>
-                  <div className="font-semibold text-brand-gold text-xs">
-                    Bikroy · {dict.result.conditionUsed} {formatBdt(24000, locale)}
-                  </div>
+                  <div className="truncate text-muted-foreground text-xs">Shop similar</div>
                 </div>
-                <span className="text-brand-faint text-xl">›</span>
               </button>
-            );
-          })}
-        </div>
+            ))}
+          </div>
+        )}
 
         <div className="grid grid-cols-2 gap-2.5">
           <Button className="gap-2" onClick={regenerate} disabled={regenerating}>
@@ -197,4 +198,31 @@ export function ResultView({ design }: { design: DesignWithTags }) {
       )}
     </div>
   );
+}
+
+interface CategoryRow {
+  categoryId: string;
+  categoryName: string;
+  /** A matched product's image, for the row thumbnail (hotlinked). */
+  previewImageUrl: string | null;
+}
+
+/** One row per distinct resolved category across the pins (order of first appearance). */
+function dedupeCategories(tags: ResolvedDesignTag[]): CategoryRow[] {
+  const byId = new Map<string, CategoryRow>();
+  for (const t of tags) {
+    if (!t.categoryId || !t.categoryName) continue;
+    const existing = byId.get(t.categoryId);
+    const img = t.furnitureItem?.imageUrl ?? null;
+    if (existing) {
+      if (!existing.previewImageUrl && img) existing.previewImageUrl = img;
+    } else {
+      byId.set(t.categoryId, {
+        categoryId: t.categoryId,
+        categoryName: t.categoryName,
+        previewImageUrl: img,
+      });
+    }
+  }
+  return [...byId.values()];
 }

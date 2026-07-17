@@ -5,6 +5,7 @@
  */
 export * from "./schemas/auth.schema";
 export * from "./schemas/billing.schema";
+export * from "./schemas/category.schema";
 export * from "./schemas/design.schema";
 export * from "./schemas/event.schema";
 export * from "./schemas/furniture.schema";

@@ -2,9 +2,10 @@ import "server-only";
 
 import { and, desc, eq, inArray, isNull } from "drizzle-orm";
 import { db } from "@/db/client";
+import { categories } from "@/db/schemas/category.schema";
 import { designs, designTags, designVersions } from "@/db/schemas/design.schema";
 import { furnitureItems } from "@/db/schemas/furniture.schema";
-import type { DesignStyle, RoomType } from "@/db/schemas/shared.schema";
+import type { DesignStyle, Region, RoomType } from "@/db/schemas/shared.schema";
 import { StorageService } from "@/server/service/storage/storage.service";
 
 /*
@@ -88,18 +89,33 @@ export const DesignService = {
       : [];
     const itemById = new Map(items.map((i) => [i.id, i]));
 
+    // Category name per pin (what the pin/list label shows and what the modal queries by).
+    const catIds = tagRows.map((t) => t.categoryId).filter((v): v is string => v !== null);
+    const cats = catIds.length
+      ? await db
+          .select({ id: categories.id, name: categories.name })
+          .from(categories)
+          .where(inArray(categories.id, catIds))
+      : [];
+    const catNameById = new Map(cats.map((c) => [c.id, c.name]));
+
     const tags = tagRows.map((t) => ({
       ...t,
       furnitureItem: t.furnitureItemId ? (itemById.get(t.furnitureItemId) ?? null) : null,
+      categoryName: t.categoryId ? (catNameById.get(t.categoryId) ?? null) : null,
     }));
 
     return { ...resolveUrls(row), tags };
   },
 
   /**
-   * Store the furniture pins detected for ONE version of a design. Pins carry a label
-   * + position but no catalog item yet (furnitureItemId null) — matching a pin to a
-   * real product ("shop similar") is a later phase.
+   * Store the furniture pins detected for ONE version of a design, resolving each pin to
+   * a master category and (when the catalog has one) a real product — the "shop similar"
+   * link (docs/marketplace-plan.md §5, Phases 5–6).
+   *
+   * Each pin's `label` is an exact master-category name (ROOM_TARGETS is kept aligned to
+   * the vocabulary), so we resolve label → categoryId, then pick a catalog item in that
+   * category and the viewer's region. `furnitureItemId` stays null when nothing matches.
    *
    * Scoped to the version, not the design: every render places furniture differently,
    * so each version owns its own pins and switching versions shows the right ones.
@@ -109,19 +125,54 @@ export const DesignService = {
     designId: string,
     designVersionId: string,
     pins: { label: string; xPct: number; yPct: number }[],
+    region: Region = "bd",
   ) => {
     await db.delete(designTags).where(eq(designTags.designVersionId, designVersionId));
     if (pins.length === 0) return;
+
+    // Resolve each distinct label → an ACTIVE master category id (labels are master names).
+    const labels = [...new Set(pins.map((p) => p.label.toLowerCase()))];
+    const cats = await db
+      .select({ id: categories.id, name: categories.name })
+      .from(categories)
+      .where(and(inArray(categories.name, labels), eq(categories.status, "active")));
+    const catIdByName = new Map(cats.map((c) => [c.name, c.id]));
+
+    // For each resolved category, pick one representative product in this region to link
+    // the pin to (cheapest first — a reasonable default "shop similar" entry point).
+    const catIds = [...new Set([...catIdByName.values()])];
+    const itemByCat = new Map<string, string>();
+    if (catIds.length > 0) {
+      const items = await db
+        .select({ id: furnitureItems.id, categoryId: furnitureItems.categoryId })
+        .from(furnitureItems)
+        .where(
+          and(
+            inArray(furnitureItems.categoryId, catIds),
+            eq(furnitureItems.region, region),
+            eq(furnitureItems.isActive, true),
+          ),
+        )
+        .orderBy(furnitureItems.priceBdt);
+      for (const it of items) {
+        if (it.categoryId && !itemByCat.has(it.categoryId)) itemByCat.set(it.categoryId, it.id);
+      }
+    }
+
     await db.insert(designTags).values(
-      pins.map((p) => ({
-        designId,
-        designVersionId,
-        furnitureItemId: null,
-        label: p.label,
-        // The UI positions pins with 0..1 relative coords; the detector reports 0..100.
-        xCoord: p.xPct / 100,
-        yCoord: p.yPct / 100,
-      })),
+      pins.map((p) => {
+        const categoryId = catIdByName.get(p.label.toLowerCase()) ?? null;
+        return {
+          designId,
+          designVersionId,
+          categoryId,
+          furnitureItemId: categoryId ? (itemByCat.get(categoryId) ?? null) : null,
+          label: p.label,
+          // The UI positions pins with 0..1 relative coords; the detector reports 0..100.
+          xCoord: p.xPct / 100,
+          yCoord: p.yPct / 100,
+        };
+      }),
     );
   },
 

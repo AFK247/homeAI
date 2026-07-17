@@ -19,9 +19,15 @@ export function TopProgressBar() {
   const firstRender = useRef(true);
 
   // Start: trim toward ~90% while the next route loads.
+  //
+  // The initial setProgress is deferred to a microtask: `start` is invoked synchronously
+  // from patched history.pushState/replaceState, which can fire during React's
+  // useInsertionEffect phase (e.g. some extensions/router internals call replaceState
+  // there). Scheduling a state update in that phase throws "useInsertionEffect must not
+  // schedule updates"; a microtask hop moves it safely out of that phase.
   const start = useCallback(() => {
     if (timer.current) return; // already running
-    setProgress(8);
+    queueMicrotask(() => setProgress((p) => (p === 0 ? 8 : p)));
     timer.current = setInterval(() => {
       setProgress((p) => {
         if (p >= 90) return p; // hold near the end until navigation commits

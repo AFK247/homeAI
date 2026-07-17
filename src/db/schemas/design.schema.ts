@@ -2,6 +2,7 @@ import { relations } from "drizzle-orm";
 import { boolean, index, numeric, pgTable, text, timestamp } from "drizzle-orm/pg-core";
 import { baseColumns, numericConfig, relationConfig } from "@/db/helpers/base.columns";
 import { users } from "./auth.schema";
+import { categories } from "./category.schema";
 import { furnitureItems } from "./furniture.schema";
 import { designStyleEnum, generationStatusEnum, roomTypeEnum } from "./shared.schema";
 
@@ -80,6 +81,9 @@ export const designTags = pgTable(
     // before per-version pins; new rows always set it.
     designVersionId: text("design_version_id").references(() => designVersions.id, cascade),
     furnitureItemId: text("furniture_item_id").references(() => furnitureItems.id, setNull),
+    // Master category this pin resolved to (from its detected label) — the join key that
+    // matches the pin to real catalog products. Null if the label maps to no known category.
+    categoryId: text("category_id").references(() => categories.id, setNull),
     label: text("label"), // e.g. "সোফা" — shown on the pin before item resolves
     xCoord: numeric("x_coord", numericConfig).notNull(),
     yCoord: numeric("y_coord", numericConfig).notNull(),

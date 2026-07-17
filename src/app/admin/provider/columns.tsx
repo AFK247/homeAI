@@ -12,8 +12,8 @@ export interface ProviderRow {
   label: string;
   model: string;
   ready: boolean;
-  /** What the provider does — "Image" (generation) or "Tagging" (vision). */
-  kind: "Image" | "Tagging";
+  /** What the provider does — image generation, furniture tagging, or category mapping. */
+  kind: "Image" | "Tagging" | "Category";
   /** Display string for remaining balance/quota, e.g. "$4.60". */
   balance: string;
   /** Numeric USD remaining, or null (used to colour low balances). */

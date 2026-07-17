@@ -305,8 +305,16 @@ export function DataTable<T>({
 /** Debounced, URL-driven search input (writes ?search=). */
 function SearchInput({ placeholder }: { placeholder: string }) {
   const { queryParams, updateParams } = useQueryParams();
-  const [value, setValue] = useState(queryParams.search ?? "");
+  const urlSearch = queryParams.search ?? "";
+  const [value, setValue] = useState(urlSearch);
   const mounted = useRef(false);
+
+  // Keep the box in sync when the URL's ?search changes from the outside — e.g. the
+  // "Clear" button strips it. Without this the box keeps showing the old text and Clear
+  // looks broken. We only pull the URL value in when it differs from what's typed.
+  useEffect(() => {
+    setValue((current) => (current.trim() === urlSearch ? current : urlSearch));
+  }, [urlSearch]);
 
   useEffect(() => {
     if (!mounted.current) {
@@ -315,10 +323,10 @@ function SearchInput({ placeholder }: { placeholder: string }) {
     }
     const id = setTimeout(() => {
       const next = value.trim();
-      if (next !== (queryParams.search ?? "")) updateParams({ search: next || null });
+      if (next !== urlSearch) updateParams({ search: next || null });
     }, 300);
     return () => clearTimeout(id);
-  }, [value, queryParams.search, updateParams]);
+  }, [value, urlSearch, updateParams]);
 
   return (
     <div className="relative flex-1 sm:max-w-xs">

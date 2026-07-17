@@ -8,6 +8,7 @@
  */
 import type { users } from "@/db/schemas/auth.schema";
 import type { credits, payments } from "@/db/schemas/billing.schema";
+import type { categories, vendorCategoryMaps } from "@/db/schemas/category.schema";
 import type { designs, designTags } from "@/db/schemas/design.schema";
 import type { furnitureItems } from "@/db/schemas/furniture.schema";
 import type { generationLogs } from "@/db/schemas/generation-log.schema";
@@ -19,14 +20,18 @@ export type Design = typeof designs.$inferSelect;
 export type DesignTag = typeof designTags.$inferSelect;
 export type FurnitureItem = typeof furnitureItems.$inferSelect;
 export type Vendor = typeof vendors.$inferSelect;
+export type Category = typeof categories.$inferSelect;
+export type VendorCategoryMap = typeof vendorCategoryMaps.$inferSelect;
 export type Credit = typeof credits.$inferSelect;
 export type Payment = typeof payments.$inferSelect;
 export type GenerationLog = typeof generationLogs.$inferSelect;
 
 // Composed shapes used by screens
-/** A furniture pin resolved to its catalog item (result screen). */
+/** A furniture pin resolved to its catalog item + master category (result screen). */
 export type ResolvedDesignTag = DesignTag & {
   furnitureItem: FurnitureItem | null;
+  /** Master category name (e.g. "sofa") — the pin/list label and modal query key. */
+  categoryName: string | null;
 };
 
 /** Full result-screen payload: the design plus its resolved pins. */

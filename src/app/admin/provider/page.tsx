@@ -7,6 +7,7 @@ import {
   providerChainStatus,
   providerQuotas,
 } from "@/server/service/ai/providers/status";
+import { categoryModelStatus } from "@/server/service/category/category-mapper";
 import { visionChainStatus } from "@/server/service/vision/registry";
 import { ProviderList } from "./list";
 import { ProviderCards } from "./quota-card";
@@ -57,10 +58,28 @@ export default async function AdminProviderPage() {
     usage: usage[v.model] ?? null,
   }));
 
-  // ONE table, ordered by chain: image providers first, then tagging.
+  // Category mapping — a single Cloudflare text model (shares the Cloudflare quota).
+  const cat = categoryModelStatus();
+  const categoryRows = [
+    {
+      ...cat,
+      kind: "Category" as const,
+      balance: "—",
+      balanceRemaining: null,
+      quota: null,
+      generationCount: 0,
+      usage: usage[cat.model] ?? null,
+    },
+  ];
+
+  // ONE table, ordered by role: image providers, then tagging, then category mapping.
   const rows = [
     ...imageRows.map((r, i) => ({ ...r, order: i + 1 })),
     ...visionRows.map((r, i) => ({ ...r, order: imageRows.length + i + 1 })),
+    ...categoryRows.map((r, i) => ({
+      ...r,
+      order: imageRows.length + visionRows.length + i + 1,
+    })),
   ];
 
   return (

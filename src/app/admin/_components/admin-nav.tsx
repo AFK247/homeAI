@@ -8,6 +8,7 @@ import {
   LayoutDashboard,
   Sparkles,
   Store,
+  Tags,
   Users,
 } from "lucide-react";
 import Link from "next/link";
@@ -25,6 +26,7 @@ const LINKS = [
   { href: PAGES.ADMIN.SESSIONS, label: "Sessions", icon: Users },
   { href: PAGES.ADMIN.EVENTS, label: "Events", icon: BarChart3 },
   { href: PAGES.ADMIN.FURNITURE, label: "Furniture", icon: Boxes },
+  { href: PAGES.ADMIN.CATEGORIES, label: "Categories", icon: Tags },
   { href: PAGES.ADMIN.VENDORS, label: "Vendors", icon: Store },
   { href: PAGES.ADMIN.GENERATIONS, label: "Generations", icon: Sparkles },
   { href: PAGES.ADMIN.PROVIDER, label: "AI Provider", icon: Cpu },

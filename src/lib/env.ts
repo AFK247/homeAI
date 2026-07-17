@@ -43,8 +43,6 @@ const serverSchema = z.object({
   // Pay-as-you-go key (sk-or-v1-...) from openrouter.ai/keys; balance required (no
   // free image tier). Without it the provider is skipped.
   OPENROUTER_API_KEY: z.string().optional(),
-  // Override the OpenRouter image model (default: see openrouter.provider.ts).
-  OPENROUTER_IMAGE_MODEL: z.string().optional(),
 
   // Object storage (S3-compatible: local MinIO now, R2/Supabase in prod)
   S3_ENDPOINT: z.url(),

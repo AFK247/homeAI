@@ -30,6 +30,8 @@ export const PAGES = {
     SESSIONS: "/admin/sessions",
     EVENTS: "/admin/events",
     FURNITURE: "/admin/furniture",
+    CATEGORIES: "/admin/categories",
+    CATEGORY_MAPPINGS: "/admin/categories/mappings",
     VENDORS: "/admin/vendors",
     PROVIDER: "/admin/provider",
     GENERATIONS: "/admin/generations",

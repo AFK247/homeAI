@@ -54,6 +54,20 @@ export const billingPlanEnum = pgEnum("billing_plan", BILLING_PLANS);
 export const PAYMENT_STATUSES = ["pending", "success", "failed", "cancelled"] as const;
 export const paymentStatusEnum = pgEnum("payment_status", PAYMENT_STATUSES);
 
+// Region / lane — BD (Bangladesh, ৳) vs INTL (international, $). Same-lane isolation:
+// a BD viewer only sees BD catalog. See docs/marketplace-plan.md §2.6.
+export const REGIONS = ["bd", "intl"] as const;
+export const regionEnum = pgEnum("region", REGIONS);
+
+// Approval gate for AI-proposed categories & vendor→master mappings (marketplace-plan §2.2).
+// `active` = live; `pending` = awaits admin approval before it's used.
+export const CATEGORY_STATUSES = ["active", "pending"] as const;
+export const categoryStatusEnum = pgEnum("category_status", CATEGORY_STATUSES);
+
+// Where a category / mapping came from — seeded, AI-proposed, or hand-entered.
+export const CATEGORY_SOURCES = ["seed", "ai", "manual"] as const;
+export const categorySourceEnum = pgEnum("category_source", CATEGORY_SOURCES);
+
 // Event types — THE vendor sales pitch (plan §3.2 / PROJECT_CONTEXT §10). Instrument from day one.
 export const EVENT_TYPES = [
   "generation",
@@ -73,6 +87,9 @@ export type GenerationStatus = (typeof GENERATION_STATUSES)[number];
 export type FurnitureCondition = (typeof FURNITURE_CONDITIONS)[number];
 export type FurnitureSource = (typeof FURNITURE_SOURCES)[number];
 export type VendorType = (typeof VENDOR_TYPES)[number];
+export type Region = (typeof REGIONS)[number];
+export type CategoryStatus = (typeof CATEGORY_STATUSES)[number];
+export type CategorySource = (typeof CATEGORY_SOURCES)[number];
 export type BillingPlan = (typeof BILLING_PLANS)[number];
 export type PaymentStatus = (typeof PAYMENT_STATUSES)[number];
 export type EventType = (typeof EVENT_TYPES)[number];

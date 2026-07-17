@@ -2,6 +2,7 @@ import "server-only";
 
 import { ORPCError } from "@orpc/server";
 import { z } from "zod";
+import { CategoryService } from "@/app/admin/categories/_modules/category.service";
 import {
   BUDGET_TIERS,
   type BudgetTier,
@@ -129,7 +130,10 @@ async function runRedesign(opts: {
     // real Neuron cost is added to the log so `neurons` = the WHOLE pipeline.
     if (version) {
       const versionId = version.id;
-      void TagService.detect(result.bytes, "image/png", design.roomType)
+      // Detection targets come from the DB (this room's active categories), so what the
+      // AI looks for is admin-editable, not hardcoded.
+      void CategoryService.targetsForRoom(design.roomType)
+        .then((targets) => TagService.detect(result.bytes, "image/png", design.roomType, targets))
         .then(async ({ pins, neurons }) => {
           await DesignService.setVisionTags(design.id, versionId, pins);
           if (logId && neurons) await GenerationLogService.addNeurons(logId, neurons);

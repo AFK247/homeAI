@@ -7,10 +7,8 @@ import type { AiProvider, RedesignProviderResult, RedesignRequest } from "./type
 /*
  * OpenRouter — Unified Image API (img2img / editing). Sends the source room
  * photo as a base64 data URL in `input_references` and gets the restyled image
- * back as base64. Default model is FLUX.2 [klein] 4B — verified ~$0.016/image
- * with excellent room-geometry preservation, the best quality under budget.
- * Override via OPENROUTER_IMAGE_MODEL (e.g. google/gemini-3.1-flash-image for
- * higher quality at ~$0.068/image). Endpoint: POST /api/v1/images.
+ * back as base64. Model is FLUX.2 [klein] 4B — verified ~$0.016/image with excellent
+ * room-geometry preservation, the best quality under budget. Endpoint: POST /api/v1/images.
  *
  * The incoming bytes are ALREADY normalized/downscaled by AiService
  * (image-preprocess.ts) — this provider just encodes and sends them.
@@ -18,7 +16,7 @@ import type { AiProvider, RedesignProviderResult, RedesignRequest } from "./type
  * Requires a loaded credit balance — OpenRouter has no free image tier and
  * returns 402 on an empty balance. Skipped if the key isn't set.
  */
-const DEFAULT_MODEL = "black-forest-labs/flux.2-klein-4b";
+const MODEL = "black-forest-labs/flux.2-klein-4b";
 const ENDPOINT = "https://openrouter.ai/api/v1/images";
 
 type ImageEditResponse = {
@@ -42,7 +40,7 @@ async function fetchRemaining(): Promise<number | null> {
 export const openrouterProvider: AiProvider = {
   key: "openrouter",
   label: "OpenRouter (FLUX.2 klein)",
-  model: env.OPENROUTER_IMAGE_MODEL || DEFAULT_MODEL,
+  model: MODEL,
 
   isReady() {
     return Boolean(env.OPENROUTER_API_KEY);

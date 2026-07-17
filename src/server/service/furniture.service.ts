@@ -1,6 +1,6 @@
 import "server-only";
 
-import { and, eq, inArray, ne, sql } from "drizzle-orm";
+import { and, eq, ne } from "drizzle-orm";
 import { db } from "@/db/client";
 import type { SearchParams } from "@/db/helpers/search-params";
 import {
@@ -12,7 +12,7 @@ import {
   withSorting,
 } from "@/db/helpers/with-filters";
 import { furnitureItems } from "@/db/schemas/furniture.schema";
-import type { RoomType } from "@/db/schemas/shared.schema";
+import type { Region } from "@/db/schemas/shared.schema";
 import { vendors } from "@/db/schemas/vendor.schema";
 import type { FurnitureDetail, FurnitureItem } from "@/db/types";
 
@@ -50,6 +50,30 @@ export const FurnitureService = {
       : [];
 
     return { ...item, vendor: vendor ?? null, similar };
+  },
+
+  /**
+   * "Shop similar" for a furniture pin: up to `limit` active catalog products in a master
+   * category and region, cheapest first. Powers the tap-a-pin modal. Images are the
+   * vendor's hotlinked URLs (used directly). Empty array when the category has none yet.
+   */
+  byCategoryId: async (
+    categoryId: string,
+    region: Region = "bd",
+    limit = 4,
+  ): Promise<FurnitureItem[]> => {
+    return db
+      .select()
+      .from(furnitureItems)
+      .where(
+        and(
+          eq(furnitureItems.categoryId, categoryId),
+          eq(furnitureItems.region, region),
+          eq(furnitureItems.isActive, true),
+        ),
+      )
+      .orderBy(furnitureItems.priceBdt)
+      .limit(limit);
   },
 
   /** Paginated catalog list for admin (backend search / filter / sort). */

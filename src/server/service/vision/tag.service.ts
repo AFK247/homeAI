@@ -82,17 +82,24 @@ export interface DetectResult {
 }
 
 export const TagService = {
-  /** Detect furniture pins in a generated design. Returns empty on any failure. */
+  /**
+   * Detect furniture pins in a generated design. `targets` is the list of category names
+   * to look for — the caller pulls these from the DB (a room's active categories), so
+   * what the AI detects is admin-editable, not hardcoded. Falls back to the static
+   * ROOM_TARGETS for the room if the caller passes none. Returns empty on any failure.
+   */
   detect: async (
     imageBytes: Buffer,
     imageMime: string,
     roomType: RoomType,
+    targets?: string[],
   ): Promise<DetectResult> => {
+    const effectiveTargets = targets && targets.length > 0 ? targets : ROOM_TARGETS[roomType];
     try {
       const { tags, neurons } = await detectWithFallback({
         imageBytes,
         imageMime,
-        targets: ROOM_TARGETS[roomType],
+        targets: effectiveTargets,
       });
       return { pins: toPins(tags), neurons };
     } catch (err) {

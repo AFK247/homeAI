@@ -14,7 +14,7 @@
  */
 import { closeBrowser, withPage } from "../lib/browser";
 import { writeProducts } from "../lib/save";
-import type { ScrapedProduct } from "../lib/types";
+import type { ScrapedProduct, ScrapeOptions } from "../lib/types";
 
 const BASE = "https://www.brothersfurniture.com.bd";
 // A few category listing pages to gather product links from (spread for variety).
@@ -124,19 +124,25 @@ async function scrapeOne(url: string, category: string): Promise<ScrapedProduct>
 
 /** Scrape ~13 Brothers products and return them. Reused by the ingestion script; the
  *  caller closes the browser. */
-export async function scrapeBrothers(): Promise<ScrapedProduct[]> {
+export async function scrapeBrothers(opts: ScrapeOptions = {}): Promise<ScrapedProduct[]> {
   console.log("Brothers scraper (Playwright) — collecting product links…");
-  const targets = await getProductUrls(MAX_PRODUCTS);
-  console.log(`Found ${targets.length} product URLs to scrape.`);
+  let targets = await getProductUrls(MAX_PRODUCTS);
+  if (opts.skipUrls) targets = targets.filter((t) => !opts.skipUrls?.has(t.url));
+  const total = targets.length;
+  console.log(`Found ${total} product URLs to scrape.`);
+  await opts.onUrls?.(total);
 
   const products: ScrapedProduct[] = [];
-  for (const [i, { url, category }] of targets.entries()) {
+  for (const { url, category } of targets) {
+    if (opts.signal?.aborted) break;
     try {
       const p = await scrapeOne(url, category);
       products.push(p);
-      console.log(`  [${i + 1}/${targets.length}] ${p.name} — ${p.priceBdt ?? "?"} BDT`);
+      await opts.onProduct?.(p, products.length, total);
+      console.log(`  [${products.length}/${total}] ${p.name} — ${p.priceBdt ?? "?"} BDT`);
     } catch (err) {
-      console.warn(`  [${i + 1}/${targets.length}] FAILED ${url}: ${(err as Error).message}`);
+      await opts.onFailed?.(url, (err as Error).message);
+      console.warn(`  [${products.length}/${total}] FAILED ${url}: ${(err as Error).message}`);
     }
   }
   return products;

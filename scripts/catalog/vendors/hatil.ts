@@ -10,7 +10,7 @@
  */
 import { closeBrowser, withPage } from "../lib/browser";
 import { writeProducts } from "../lib/save";
-import type { ScrapedProduct } from "../lib/types";
+import type { ScrapedProduct, ScrapeOptions } from "../lib/types";
 
 const SITEMAP_URL = "https://hatil-image.s3.ap-southeast-1.amazonaws.com/xml_files/sitemap-bd.xml";
 const VENDOR = "hatil";
@@ -48,6 +48,24 @@ function parsePrice(text: string | null | undefined): number | null {
   if (!text) return null;
   const m = text.replace(/,/g, "").match(/(\d+(?:\.\d+)?)/);
   return m?.[1] ? Math.round(Number.parseFloat(m[1])) : null;
+}
+
+/** Strip Hatil's boilerplate name suffixes: "… | HATIL" and "… Price in Bangladesh". */
+function cleanName(raw: string): string {
+  return raw
+    .replace(/\s*\|\s*HATIL\s*$/i, "")
+    .replace(/\s+Price in Bangladesh\s*$/i, "")
+    .trim();
+}
+
+/** A real dimension string (e.g. "L1000 X W600 X H420 mm"), NOT a price fragment. The
+ *  measurement locator occasionally matches "1 x 14,150 BDT" — reject anything carrying a
+ *  currency marker so garbage prices never land in the dimensions field. */
+function cleanDimensions(raw: string | null | undefined): string | null {
+  const text = raw?.trim();
+  if (!text) return null;
+  if (/৳|Tk\.?|BDT/i.test(text)) return null;
+  return text;
 }
 
 async function getProductUrls(): Promise<string[]> {
@@ -117,11 +135,11 @@ async function scrapeOne(url: string): Promise<ScrapedProduct> {
     // We HOTLINK the vendor image (store the URL only) — never download the file.
     return {
       vendor: VENDOR,
-      name: (name ?? "").trim() || "(unknown)",
+      name: cleanName(name ?? "") || "(unknown)",
       priceBdt: parsePrice(priceText),
       currency: "BDT",
       category: categoryFromUrl(url),
-      dimensions: dimensions?.trim() ?? null,
+      dimensions: cleanDimensions(dimensions),
       sourceUrl: url,
       imageUrl,
       imageFile: null,
@@ -130,19 +148,27 @@ async function scrapeOne(url: string): Promise<ScrapedProduct> {
 }
 
 /** Scrape all urls with a bounded concurrency pool (fast, still polite). */
-async function scrapePool(urls: string[], concurrency: number): Promise<ScrapedProduct[]> {
+async function scrapePool(
+  urls: string[],
+  concurrency: number,
+  total: number,
+  opts: ScrapeOptions,
+): Promise<ScrapedProduct[]> {
   const results: ScrapedProduct[] = [];
   let next = 0;
   async function worker() {
     while (next < urls.length) {
+      if (opts.signal?.aborted) return;
       const i = next++;
       const url = urls[i];
       if (!url) continue;
       try {
         const p = await scrapeOne(url);
         results.push(p);
-        console.log(`  [${results.length}/${urls.length}] ${p.name} — ${p.priceBdt ?? "?"} BDT`);
+        await opts.onProduct?.(p, results.length, total);
+        console.log(`  [${results.length}/${total}] ${p.name} — ${p.priceBdt ?? "?"} BDT`);
       } catch (err) {
+        await opts.onFailed?.(url, (err as Error).message);
         console.warn(`  FAILED ${url}: ${(err as Error).message}`);
       }
     }
@@ -152,12 +178,15 @@ async function scrapePool(urls: string[], concurrency: number): Promise<ScrapedP
 }
 
 /** Scrape ~12 Hatil products and return them. Reused by the ingestion script; the caller
- *  closes the browser. */
-export async function scrapeHatil(): Promise<ScrapedProduct[]> {
+ *  closes the browser. `opts` streams live progress + supports resume/stop for the admin UI. */
+export async function scrapeHatil(opts: ScrapeOptions = {}): Promise<ScrapedProduct[]> {
   console.log("Hatil scraper (Playwright) — reading sitemap…");
-  const urls = await getProductUrls();
-  console.log(`Found ${urls.length} product URLs to scrape (concurrency ${CONCURRENCY}).`);
-  return scrapePool(urls, CONCURRENCY);
+  let urls = await getProductUrls();
+  if (opts.skipUrls) urls = urls.filter((u) => !opts.skipUrls?.has(u));
+  const total = urls.length;
+  console.log(`Found ${total} product URLs to scrape (concurrency ${CONCURRENCY}).`);
+  await opts.onUrls?.(total);
+  return scrapePool(urls, CONCURRENCY, total, opts);
 }
 
 async function main() {

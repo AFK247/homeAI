@@ -1,24 +1,13 @@
 [
   {
     "vendor": "otobi",
-    "name": "FUSHION-OTOBI WARDROBE- P059",
-    "priceBdt": 57800,
-    "currency": "BDT",
-    "category": "wardrobe",
-    "dimensions": "Product Code: FUSHION CBDP059WD",
-    "sourceUrl": "https://www.otobi.com/Products.aspx?p=1006",
-    "imageUrl": "https://www.otobi.com/data_images/1006-pimage1-fushion-w.jpg",
-    "imageFile": null
-  },
-  {
-    "vendor": "otobi",
-    "name": "MISSISSIPPI-OTOBI BED SIDE CABINET- A037",
-    "priceBdt": 14700,
+    "name": "ROYAL-OTOBI BEDROOM SET-P014",
+    "priceBdt": 483000,
     "currency": "BDT",
     "category": "bed",
-    "dimensions": "Product Code: MISSISSIPPI BCDA037WD",
-    "sourceUrl": "https://www.otobi.com/Products.aspx?p=615",
-    "imageUrl": "https://www.otobi.com/data_images/615-pimage1-otobi-bed-side-cabinet-a037.jpg",
+    "dimensions": "Product Code: ROYAL BKDP014WD I CBDP065WD I DTDP055WD",
+    "sourceUrl": "https://www.otobi.com/Products.aspx?p=1060",
+    "imageUrl": "https://www.otobi.com/data_images/1060-pimage1-royal.jpg",
     "imageFile": null
   },
   {
@@ -34,13 +23,13 @@
   },
   {
     "vendor": "otobi",
-    "name": "ROYAL-OTOBI BEDROOM SET-P014",
-    "priceBdt": 483000,
+    "name": "FUSHION-OTOBI WARDROBE- P059",
+    "priceBdt": 57800,
     "currency": "BDT",
-    "category": "bed",
-    "dimensions": "Product Code: ROYAL BKDP014WD I CBDP065WD I DTDP055WD",
-    "sourceUrl": "https://www.otobi.com/Products.aspx?p=1060",
-    "imageUrl": "https://www.otobi.com/data_images/1060-pimage1-royal.jpg",
+    "category": "wardrobe",
+    "dimensions": "Product Code: FUSHION CBDP059WD",
+    "sourceUrl": "https://www.otobi.com/Products.aspx?p=1006",
+    "imageUrl": "https://www.otobi.com/data_images/1006-pimage1-fushion-w.jpg",
     "imageFile": null
   },
   {
@@ -67,13 +56,13 @@
   },
   {
     "vendor": "otobi",
-    "name": "(unknown)",
-    "priceBdt": null,
+    "name": "MISSISSIPPI-OTOBI BED SIDE CABINET- A037",
+    "priceBdt": 14700,
     "currency": "BDT",
-    "category": "other",
-    "dimensions": "Product Code: Dimension (WxDxH):",
-    "sourceUrl": "https://www.otobi.com/Products.aspx?p=1003",
-    "imageUrl": null,
+    "category": "bed",
+    "dimensions": "Product Code: MISSISSIPPI BCDA037WD",
+    "sourceUrl": "https://www.otobi.com/Products.aspx?p=615",
+    "imageUrl": "https://www.otobi.com/data_images/615-pimage1-otobi-bed-side-cabinet-a037.jpg",
     "imageFile": null
   },
   {
@@ -85,28 +74,6 @@
     "dimensions": "Product Code: VIRGINIA DTDA032LB",
     "sourceUrl": "https://www.otobi.com/Products.aspx?p=1285",
     "imageUrl": "https://www.otobi.com/data_images/1285-pimage1-ddtda032lb.jpg",
-    "imageFile": null
-  },
-  {
-    "vendor": "otobi",
-    "name": "COLUMBUS -OTOBI SINGLE SEATER SOFA P023",
-    "priceBdt": 70000,
-    "currency": "BDT",
-    "category": "sofa",
-    "dimensions": "Product Code: COLUMBUS SSCP023LE",
-    "sourceUrl": "https://www.otobi.com/Products.aspx?p=2772",
-    "imageUrl": "https://www.otobi.com/data_images/2772-pimage1-sscp023.jpg",
-    "imageFile": null
-  },
-  {
-    "vendor": "otobi",
-    "name": "NEWPORT-OTOBI DRESSING TABLE- B002",
-    "priceBdt": 9700,
-    "currency": "BDT",
-    "category": "table",
-    "dimensions": "Product Code: NEWPORT DTDB002LB",
-    "sourceUrl": "https://www.otobi.com/Products.aspx?p=1299",
-    "imageUrl": "https://www.otobi.com/data_images/1299-pimage1-dtdb002.jpg",
     "imageFile": null
   },
   {
@@ -127,8 +94,41 @@
     "currency": "BDT",
     "category": "other",
     "dimensions": "Product Code: Dimension (WxDxH):",
+    "sourceUrl": "https://www.otobi.com/Products.aspx?p=1003",
+    "imageUrl": null,
+    "imageFile": null
+  },
+  {
+    "vendor": "otobi",
+    "name": "(unknown)",
+    "priceBdt": null,
+    "currency": "BDT",
+    "category": "other",
+    "dimensions": "Product Code: Dimension (WxDxH):",
     "sourceUrl": "https://www.otobi.com/Products.aspx?p=1642",
     "imageUrl": null,
+    "imageFile": null
+  },
+  {
+    "vendor": "otobi",
+    "name": "NEWPORT-OTOBI DRESSING TABLE- B002",
+    "priceBdt": 9700,
+    "currency": "BDT",
+    "category": "table",
+    "dimensions": "Product Code: NEWPORT DTDB002LB",
+    "sourceUrl": "https://www.otobi.com/Products.aspx?p=1299",
+    "imageUrl": "https://www.otobi.com/data_images/1299-pimage1-dtdb002.jpg",
+    "imageFile": null
+  },
+  {
+    "vendor": "otobi",
+    "name": "COLUMBUS -OTOBI SINGLE SEATER SOFA P023",
+    "priceBdt": 70000,
+    "currency": "BDT",
+    "category": "sofa",
+    "dimensions": "Product Code: COLUMBUS SSCP023LE",
+    "sourceUrl": "https://www.otobi.com/Products.aspx?p=2772",
+    "imageUrl": "https://www.otobi.com/data_images/2772-pimage1-sscp023.jpg",
     "imageFile": null
   }
 ]

@@ -9,7 +9,7 @@
  */
 import { fetchHtml, fetchText, parsePrice, sitemapLocs } from "../lib/http";
 import { writeProducts } from "../lib/save";
-import type { ScrapedProduct } from "../lib/types";
+import type { ScrapedProduct, ScrapeOptions } from "../lib/types";
 
 const BASE = "https://www.otobi.com";
 const SITEMAP = `${BASE}/sitemap.xml`;
@@ -96,24 +96,31 @@ async function scrapeOne(url: string): Promise<ScrapedProduct | null> {
   } satisfies ScrapedProduct;
 }
 
-/** Scrape ~12 Otobi products with a small concurrency pool. */
-export async function scrapeOtobi(): Promise<ScrapedProduct[]> {
+/** Scrape ~12 Otobi products with a small concurrency pool. `opts` streams live progress and
+ *  supports resume (skipUrls) / stop (signal) for the admin UI; absent for the CLI. */
+export async function scrapeOtobi(opts: ScrapeOptions = {}): Promise<ScrapedProduct[]> {
   console.log("Otobi scraper (HTTP) — reading sitemap…");
-  const urls = await getProductUrls();
-  console.log(`Found ${urls.length} product URLs to scrape.`);
+  let urls = await getProductUrls();
+  if (opts.skipUrls) urls = urls.filter((u) => !opts.skipUrls?.has(u));
+  const total = urls.length;
+  console.log(`Found ${total} product URLs to scrape.`);
+  await opts.onUrls?.(total);
 
   const results: ScrapedProduct[] = [];
   let next = 0;
   async function worker() {
     while (next < urls.length) {
+      if (opts.signal?.aborted) return;
       const i = next++;
       const url = urls[i];
       if (!url) continue;
       const p = await scrapeOne(url);
       if (p) {
         results.push(p);
-        console.log(`  [${results.length}/${urls.length}] ${p.name} — ${p.priceBdt ?? "?"} BDT`);
+        await opts.onProduct?.(p, results.length, total);
+        console.log(`  [${results.length}/${total}] ${p.name} — ${p.priceBdt ?? "?"} BDT`);
       } else {
+        await opts.onFailed?.(url, "no product parsed");
         console.warn(`  FAILED ${url}`);
       }
     }

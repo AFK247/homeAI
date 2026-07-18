@@ -36,6 +36,7 @@ export const PAGES = {
     CATEGORIES: "/admin/categories",
     CATEGORY_MAPPINGS: "/admin/categories/mappings",
     VENDORS: "/admin/vendors",
+    CATALOG: "/admin/catalog",
     PROVIDER: "/admin/provider",
     GENERATIONS: "/admin/generations",
     DESIGN_DETAIL: (id: string) => `/admin/designs/${id}`,

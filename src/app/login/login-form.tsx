@@ -4,26 +4,35 @@ import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useState, useTransition } from "react";
 import { toast } from "sonner";
+import { z } from "zod";
+import { type FieldConfig, FieldFactory, FormFactory } from "@/components/form";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import { PAGES } from "@/config/pages";
 import { authClient } from "@/lib/auth/client";
 
 /*
  * Login form (Stage D). Facebook + Google (BD audience) + email/password, wired to Better
- * Auth. On success, returns to `?next=` (or home). Login is OPTIONAL app-wide — this screen
- * is reached from the header or when an admin route requires it.
+ * Auth via the form factory. On success, returns to `?next=` (or home). Login is OPTIONAL
+ * app-wide — this screen is reached from the header or when an admin route requires it.
+ *
+ * One schema covers both modes: `name` is optional (only shown/used when signing up). Mode
+ * drives which fields the FieldFactory renders; the social buttons, submit, forgot-password
+ * link and mode toggle are custom chrome rendered as siblings inside the FormFactory.
  */
+
+const LoginSchema = z.object({
+  name: z.string().optional(),
+  email: z.email(),
+  password: z.string().min(8),
+});
+type LoginValues = z.infer<typeof LoginSchema>;
+
 export function LoginForm({ dict }: { dict: LoginDict }) {
   const router = useRouter();
   const params = useSearchParams();
   const next = params.get("next") || PAGES.HOME;
   const [pending, start] = useTransition();
   const [mode, setMode] = useState<"signin" | "signup">("signin");
-  const [name, setName] = useState("");
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
 
   function social(provider: "google" | "facebook") {
     start(async () => {
@@ -31,8 +40,7 @@ export function LoginForm({ dict }: { dict: LoginDict }) {
     });
   }
 
-  function submit(e: React.FormEvent) {
-    e.preventDefault();
+  function onSubmit({ name, email, password }: LoginValues) {
     start(async () => {
       const res =
         mode === "signin"
@@ -50,6 +58,20 @@ export function LoginForm({ dict }: { dict: LoginDict }) {
       router.refresh();
     });
   }
+
+  const fields: FieldConfig<LoginValues>[] = [
+    ...(mode === "signup"
+      ? [{ name: "name", label: dict.name, type: "text" } as FieldConfig<LoginValues>]
+      : []),
+    {
+      name: "email",
+      label: dict.email,
+      type: "email",
+      placeholder: "you@example.com",
+      isRequired: true,
+    },
+    { name: "password", label: dict.password, type: "password", isRequired: true },
+  ];
 
   return (
     <>
@@ -81,48 +103,24 @@ export function LoginForm({ dict }: { dict: LoginDict }) {
         <span className="h-px flex-1 bg-border" />
       </div>
 
-      <form className="flex flex-col gap-4" onSubmit={submit}>
-        {mode === "signup" ? (
-          <div className="flex flex-col gap-1.5">
-            <Label htmlFor="name">{dict.name}</Label>
-            <Input id="name" value={name} onChange={(e) => setName(e.target.value)} />
-          </div>
+      <FormFactory
+        schema={LoginSchema}
+        defaultValues={{ name: "", email: "", password: "" }}
+        onSubmit={onSubmit}
+      >
+        <FieldFactory fields={fields} />
+        {mode === "signin" ? (
+          <Link
+            href={PAGES.FORGOT_PASSWORD}
+            className="-mt-2 self-end text-primary text-xs hover:underline"
+          >
+            {dict.forgotPassword}
+          </Link>
         ) : null}
-        <div className="flex flex-col gap-1.5">
-          <Label htmlFor="email">{dict.email}</Label>
-          <Input
-            id="email"
-            type="email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            placeholder="you@example.com"
-            required
-          />
-        </div>
-        <div className="flex flex-col gap-1.5">
-          <Label htmlFor="password">{dict.password}</Label>
-          <Input
-            id="password"
-            type="password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            placeholder="••••••••"
-            required
-            minLength={8}
-          />
-          {mode === "signin" ? (
-            <Link
-              href={PAGES.FORGOT_PASSWORD}
-              className="self-end text-primary text-xs hover:underline"
-            >
-              {dict.forgotPassword}
-            </Link>
-          ) : null}
-        </div>
         <Button size="lg" type="submit" disabled={pending} className="mt-1 w-full">
           {pending ? "…" : mode === "signin" ? dict.continue : dict.createAccount}
         </Button>
-      </form>
+      </FormFactory>
 
       <button
         type="button"

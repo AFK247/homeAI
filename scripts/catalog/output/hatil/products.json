@@ -1,0 +1,134 @@
+[
+  {
+    "vendor": "hatil",
+    "name": "Rhyme-182 Center Table",
+    "priceBdt": 5850,
+    "currency": "BDT",
+    "category": "center table",
+    "dimensions": "L1000 X  W600  X H420 mm",
+    "sourceUrl": "https://hatil.com/Center-Table/rhyme-182",
+    "imageUrl": "https://hatil-image.s3.ap-southeast-1.amazonaws.com/master_image/Rhyme-182.png",
+    "imageFile": null
+  },
+  {
+    "vendor": "hatil",
+    "name": "BED | Capsicum-127 (Metal Folding Bed+Mattress)",
+    "priceBdt": 23850,
+    "currency": "BDT",
+    "category": "folding bed",
+    "dimensions": null,
+    "sourceUrl": "https://hatil.com/Folding-Bed/capsicum-127-metal-folding-bedmattress",
+    "imageUrl": "https://hatil-image.s3.ap-southeast-1.amazonaws.com/Nop_Image/Capsicum-127.webp",
+    "imageFile": null
+  },
+  {
+    "vendor": "hatil",
+    "name": "MULTI PURPOSE SHELF | Alps-108",
+    "priceBdt": 23950,
+    "currency": "BDT",
+    "category": "multipurpose shelf",
+    "dimensions": "L800 X W378 X H1838mm",
+    "sourceUrl": "https://hatil.com/Multipurpose-Shelf/alps-108-0",
+    "imageUrl": "https://hatil-image.s3.ap-southeast-1.amazonaws.com/Nop_Image/Alps-108-MFC-AT.png",
+    "imageFile": null
+  },
+  {
+    "vendor": "hatil",
+    "name": "Folding Chair Oahu-215",
+    "priceBdt": 11300,
+    "currency": "BDT",
+    "category": "folding chair",
+    "dimensions": "L-480 X W-570 X S.H-460 X B.H-710 mm",
+    "sourceUrl": "https://hatil.com/Folding-Chair/oahu-215",
+    "imageUrl": "https://hatil-image.s3.ap-southeast-1.amazonaws.com/Nop_Image/Oahu-215.jpg",
+    "imageFile": null
+  },
+  {
+    "vendor": "hatil",
+    "name": "SIDE RACK | Blueberry-113",
+    "priceBdt": 21450,
+    "currency": "BDT",
+    "category": "side rack",
+    "dimensions": null,
+    "sourceUrl": "https://hatil.com/Side-Rack/blueberry-113",
+    "imageUrl": "https://hatil-image.s3.ap-southeast-1.amazonaws.com/Nop_Image/Blueberry-113-MFC(American%20Teak).png",
+    "imageFile": null
+  },
+  {
+    "vendor": "hatil",
+    "name": "Virgo-103 Bar Stool",
+    "priceBdt": 16432,
+    "currency": "BDT",
+    "category": "bar stool",
+    "dimensions": null,
+    "sourceUrl": "https://hatil.com/Bar-Stool/virgo-103",
+    "imageUrl": "https://hatil-image.s3.ap-southeast-1.amazonaws.com/Nop_Image/Virgo-103.jpg",
+    "imageFile": null
+  },
+  {
+    "vendor": "hatil",
+    "name": "Office Almirah | Bedrock-110",
+    "priceBdt": 28950,
+    "currency": "BDT",
+    "category": "almirah",
+    "dimensions": "L900 X W500 X H1850 mm (A)",
+    "sourceUrl": "https://hatil.com/almirah/bedrock-110",
+    "imageUrl": "https://hatil-image.s3.ap-southeast-1.amazonaws.com/master_image/Bedrock-110.png",
+    "imageFile": null
+  },
+  {
+    "vendor": "hatil",
+    "name": "Auditorium Chair | Archimedes-301",
+    "priceBdt": 18900,
+    "currency": "BDT",
+    "category": "auditorium chair",
+    "dimensions": "L650 X W550 X SH450 X TH1000 mm",
+    "sourceUrl": "https://hatil.com/auditorium-chair/archimedes-301",
+    "imageUrl": "https://hatil-image.s3.ap-southeast-1.amazonaws.com/Nop_Image/Archimedes-301%20single%20blc.jpg",
+    "imageFile": null
+  },
+  {
+    "vendor": "hatil",
+    "name": "Horace-118 Accent Chair",
+    "priceBdt": 38861,
+    "currency": "BDT",
+    "category": "accent chair",
+    "dimensions": "L850 X W850 X SH440-BH930 mm",
+    "sourceUrl": "https://hatil.com/accent-chair/horace-118",
+    "imageUrl": "https://hatil-image.s3.ap-southeast-1.amazonaws.com/Nop_Image/Horace-118.webp",
+    "imageFile": null
+  },
+  {
+    "vendor": "hatil",
+    "name": "Bar Cabinet | Helios-102",
+    "priceBdt": 60500,
+    "currency": "BDT",
+    "category": "bar cabinet",
+    "dimensions": "L1055 X W540 X H960 mm",
+    "sourceUrl": "https://hatil.com/bar-cabinet/helios-102",
+    "imageUrl": "https://hatil-image.s3.ap-southeast-1.amazonaws.com/master_image/Helios-102%20.png",
+    "imageFile": null
+  },
+  {
+    "vendor": "hatil",
+    "name": "Bed Room Set-3 (Bed +Bed Side Table +Dressing Table +Wardrobe)",
+    "priceBdt": 163600,
+    "currency": "BDT",
+    "category": "bed room set",
+    "dimensions": null,
+    "sourceUrl": "https://hatil.com/bed-room-set/bed-room-set-3-bed-162bed-side-table-121dressing-table-144wardrobe-152",
+    "imageUrl": "https://hatil-image.s3.ap-southeast-1.amazonaws.com/Nop_Image/Bedroom%20set%203%20LQ.png",
+    "imageFile": null
+  },
+  {
+    "vendor": "hatil",
+    "name": "Bed Cum Divan | Juvenile-198-A",
+    "priceBdt": 41300,
+    "currency": "BDT",
+    "category": "bed cum divan",
+    "dimensions": null,
+    "sourceUrl": "https://hatil.com/bed-cum-divan/juvenile-198-52",
+    "imageUrl": "https://hatil-image.s3.ap-southeast-1.amazonaws.com/Nop_Image/Juvenile-198.webp",
+    "imageFile": null
+  }
+]

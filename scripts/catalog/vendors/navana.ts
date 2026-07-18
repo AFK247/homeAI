@@ -9,7 +9,7 @@
  * Ingestion imports `scrapeNavana()` (see scripts/catalog/ingest.ts).
  */
 import { writeProducts } from "../lib/save";
-import type { ScrapedProduct } from "../lib/types";
+import type { ScrapedProduct, ScrapeOptions } from "../lib/types";
 
 const API = "https://www.navanafurniture.com/wp-json/wc/store/products";
 const VENDOR = "navana";
@@ -41,7 +41,7 @@ function bestCategory(cats: WcProduct["categories"]): string | null {
 }
 
 /** Scrape ~12 Navana products via the WooCommerce Store API (one request). */
-export async function scrapeNavana(): Promise<ScrapedProduct[]> {
+export async function scrapeNavana(opts: ScrapeOptions = {}): Promise<ScrapedProduct[]> {
   console.log("Navana scraper (WooCommerce Store API)…");
   const res = await fetch(`${API}?per_page=${MAX_PRODUCTS}&orderby=popularity`, {
     headers: { accept: "application/json" },
@@ -50,10 +50,14 @@ export async function scrapeNavana(): Promise<ScrapedProduct[]> {
     console.warn(`API returned ${res.status}`);
     return [];
   }
-  const products = (await res.json()) as WcProduct[];
+  let products = (await res.json()) as WcProduct[];
+  if (opts.skipUrls) products = products.filter((p) => !opts.skipUrls?.has(p.permalink));
+  const total = products.length;
+  await opts.onUrls?.(total);
 
   const out: ScrapedProduct[] = [];
   for (const p of products) {
+    if (opts.signal?.aborted) break;
     const item: ScrapedProduct = {
       vendor: VENDOR,
       name: p.name?.trim() || "(unknown)",
@@ -66,7 +70,8 @@ export async function scrapeNavana(): Promise<ScrapedProduct[]> {
       imageFile: null,
     };
     out.push(item);
-    console.log(`  [${out.length}/${products.length}] ${item.name} — ${item.priceBdt ?? "?"} BDT`);
+    await opts.onProduct?.(item, out.length, total);
+    console.log(`  [${out.length}/${total}] ${item.name} — ${item.priceBdt ?? "?"} BDT`);
   }
   return out;
 }

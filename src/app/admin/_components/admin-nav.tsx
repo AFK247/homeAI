@@ -4,6 +4,7 @@ import {
   BarChart3,
   Boxes,
   Cpu,
+  DownloadCloud,
   Image,
   LayoutDashboard,
   Sparkles,
@@ -28,6 +29,7 @@ const LINKS = [
   { href: PAGES.ADMIN.FURNITURE, label: "Furniture", icon: Boxes },
   { href: PAGES.ADMIN.CATEGORIES, label: "Categories", icon: Tags },
   { href: PAGES.ADMIN.VENDORS, label: "Vendors", icon: Store },
+  { href: PAGES.ADMIN.CATALOG, label: "Catalog scraping", icon: DownloadCloud },
   { href: PAGES.ADMIN.GENERATIONS, label: "Generations", icon: Sparkles },
   { href: PAGES.ADMIN.PROVIDER, label: "AI Provider", icon: Cpu },
 ];

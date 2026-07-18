@@ -4,6 +4,7 @@ import type { FieldPath, FieldValues } from "react-hook-form";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
 import { NativeSelect, type SelectOption } from "@/components/ui/native-select";
+import { PasswordInput } from "@/components/ui/password-input";
 import { Switch } from "@/components/ui/switch";
 import { Textarea } from "@/components/ui/textarea";
 import { cn } from "@/lib/utils";
@@ -24,11 +25,13 @@ export function FieldInput({
   inputFilter,
   ...props
 }: FieldProps<{ type?: string; placeholder?: string; inputFilter?: (v: string) => string }>) {
+  // Password fields get the reveal/hide toggle; everything else is a plain Input.
+  const InputComponent = type === "password" ? PasswordInput : Input;
   return (
     <FormBase {...props}>
       {({ callback, onChange, value, ...field }) => (
-        <Input
-          type={type ?? "text"}
+        <InputComponent
+          {...(type === "password" ? {} : { type: type ?? "text" })}
           placeholder={placeholder}
           value={(value as string) ?? ""}
           onChange={(e) => {

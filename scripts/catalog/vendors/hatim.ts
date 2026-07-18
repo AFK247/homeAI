@@ -10,7 +10,7 @@
  */
 import { fetchHtml, fetchText, parsePrice, sitemapLocs } from "../lib/http";
 import { writeProducts } from "../lib/save";
-import type { ScrapedProduct } from "../lib/types";
+import type { ScrapedProduct, ScrapeOptions } from "../lib/types";
 
 const SITEMAP = "https://hatimfurniturebd.com/sitemap.xml";
 const VENDOR = "hatim";
@@ -106,23 +106,29 @@ async function scrapeOne(url: string): Promise<ScrapedProduct | null> {
 }
 
 /** Scrape ~12 Hatim products with a small concurrency pool. */
-export async function scrapeHatim(): Promise<ScrapedProduct[]> {
+export async function scrapeHatim(opts: ScrapeOptions = {}): Promise<ScrapedProduct[]> {
   console.log("Hatim scraper (HTTP) — reading sitemap…");
-  const urls = await getProductUrls();
-  console.log(`Found ${urls.length} product URLs to scrape.`);
+  let urls = await getProductUrls();
+  if (opts.skipUrls) urls = urls.filter((u) => !opts.skipUrls?.has(u));
+  const total = urls.length;
+  console.log(`Found ${total} product URLs to scrape.`);
+  await opts.onUrls?.(total);
 
   const results: ScrapedProduct[] = [];
   let next = 0;
   async function worker() {
     while (next < urls.length) {
+      if (opts.signal?.aborted) return;
       const i = next++;
       const url = urls[i];
       if (!url) continue;
       const p = await scrapeOne(url);
       if (p) {
         results.push(p);
-        console.log(`  [${results.length}/${urls.length}] ${p.name} — ${p.priceBdt ?? "?"} BDT`);
+        await opts.onProduct?.(p, results.length, total);
+        console.log(`  [${results.length}/${total}] ${p.name} — ${p.priceBdt ?? "?"} BDT`);
       } else {
+        await opts.onFailed?.(url, "no product parsed");
         console.warn(`  FAILED ${url}`);
       }
     }

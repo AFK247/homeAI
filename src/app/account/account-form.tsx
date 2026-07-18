@@ -2,20 +2,22 @@
 
 import { useRouter } from "next/navigation";
 import { useState, useTransition } from "react";
+import { useFormContext } from "react-hook-form";
 import { toast } from "sonner";
+import { z } from "zod";
+import { type FieldConfig, FieldFactory, FormFactory } from "@/components/form";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import { changePassword, revokeOtherSessions, updateUser } from "@/lib/auth/client";
 import type { Dictionary } from "@/lib/i18n/types";
 
 /*
- * Account management form. Three independent sections, each with its own submit + pending
- * state so one failing doesn't block the others:
+ * Account management form. Three independent sections, each its own form-factory instance +
+ * pending state so one failing doesn't block the others:
  *   1. Profile  — change display name (all users)
  *   2. Password — change password (email/password users only; hidden for social-only)
  *   3. Security — sign out of all other devices
- * Email + role are read-only. On name change we router.refresh() so the header reflects it.
+ * Email + role are read-only display, rendered as chrome alongside the factory fields. On
+ * name change we router.refresh() so the header reflects it.
  */
 
 type AccountDict = Dictionary["account"];
@@ -57,6 +59,26 @@ function Section({ title, children }: { title: string; children: React.ReactNode
   );
 }
 
+/** Submit button that disables itself while the form is pristine (reads RHF context). */
+function DirtyAwareSubmit({
+  pending,
+  idle,
+  busy,
+}: {
+  pending: boolean;
+  idle: string;
+  busy: string;
+}) {
+  const {
+    formState: { isDirty },
+  } = useFormContext();
+  return (
+    <Button type="submit" disabled={pending || !isDirty} className="w-fit">
+      {pending ? busy : idle}
+    </Button>
+  );
+}
+
 function ProfileSection({
   dict,
   initialName,
@@ -69,11 +91,12 @@ function ProfileSection({
   role: string;
 }) {
   const router = useRouter();
-  const [name, setName] = useState(initialName);
   const [pending, start] = useTransition();
 
-  function save(e: React.FormEvent) {
-    e.preventDefault();
+  const schema = z.object({ name: z.string().min(1) });
+  type Values = z.infer<typeof schema>;
+
+  function onSubmit({ name }: Values) {
     start(async () => {
       const res = await updateUser({ name });
       if (res.error) {
@@ -85,16 +108,17 @@ function ProfileSection({
     });
   }
 
+  const fields: FieldConfig<Values>[] = [
+    { name: "name", label: dict.nameLabel, type: "text", isRequired: true },
+  ];
+
   return (
     <Section title={dict.profileHeading}>
-      <form className="flex flex-col gap-4" onSubmit={save}>
+      <FormFactory schema={schema} defaultValues={{ name: initialName }} onSubmit={onSubmit}>
+        <FieldFactory fields={fields} />
         <div className="flex flex-col gap-1.5">
-          <Label htmlFor="name">{dict.nameLabel}</Label>
-          <Input id="name" value={name} onChange={(e) => setName(e.target.value)} required />
-        </div>
-        <div className="flex flex-col gap-1.5">
-          <Label htmlFor="email">{dict.emailLabel}</Label>
-          <Input id="email" value={email} disabled readOnly />
+          <span className="font-medium text-foreground text-sm">{dict.emailLabel}</span>
+          <span className="text-muted-foreground text-sm">{email}</span>
         </div>
         <div className="flex flex-col gap-1.5">
           <span className="font-medium text-foreground text-sm">{dict.roleLabel}</span>
@@ -108,26 +132,30 @@ function ProfileSection({
             {role === "admin" ? dict.roleAdmin : dict.roleUser}
           </span>
         </div>
-        <Button type="submit" disabled={pending || name === initialName} className="w-fit">
-          {pending ? dict.saving : dict.saveName}
-        </Button>
-      </form>
+        <DirtyAwareSubmit pending={pending} idle={dict.saveName} busy={dict.saving} />
+      </FormFactory>
     </Section>
   );
 }
 
 function PasswordSection({ dict }: { dict: AccountDict }) {
-  const [current, setCurrent] = useState("");
-  const [next, setNext] = useState("");
-  const [confirm, setConfirm] = useState("");
   const [pending, start] = useTransition();
+  // Bump to remount the FormFactory (clearing all fields) after a successful change.
+  const [formKey, setFormKey] = useState(0);
 
-  function submit(e: React.FormEvent) {
-    e.preventDefault();
-    if (next !== confirm) {
-      toast.error(dict.passwordMismatch);
-      return;
-    }
+  const schema = z
+    .object({
+      current: z.string().min(1),
+      next: z.string().min(8),
+      confirm: z.string().min(8),
+    })
+    .refine((v) => v.next === v.confirm, {
+      message: dict.passwordMismatch,
+      path: ["confirm"],
+    });
+  type Values = z.infer<typeof schema>;
+
+  function onSubmit({ current, next }: Values) {
     start(async () => {
       const res = await changePassword({
         currentPassword: current,
@@ -139,51 +167,29 @@ function PasswordSection({ dict }: { dict: AccountDict }) {
         return;
       }
       toast.success(dict.passwordChanged);
-      setCurrent("");
-      setNext("");
-      setConfirm("");
+      setFormKey((k) => k + 1); // remount → clears the password fields
     });
   }
 
+  const fields: FieldConfig<Values>[] = [
+    { name: "current", label: dict.currentPassword, type: "password", isRequired: true },
+    { name: "next", label: dict.newPassword, type: "password", isRequired: true },
+    { name: "confirm", label: dict.confirmPassword, type: "password", isRequired: true },
+  ];
+
   return (
     <Section title={dict.passwordHeading}>
-      <form className="flex flex-col gap-4" onSubmit={submit}>
-        <div className="flex flex-col gap-1.5">
-          <Label htmlFor="current">{dict.currentPassword}</Label>
-          <Input
-            id="current"
-            type="password"
-            value={current}
-            onChange={(e) => setCurrent(e.target.value)}
-            required
-          />
-        </div>
-        <div className="flex flex-col gap-1.5">
-          <Label htmlFor="new">{dict.newPassword}</Label>
-          <Input
-            id="new"
-            type="password"
-            value={next}
-            onChange={(e) => setNext(e.target.value)}
-            required
-            minLength={8}
-          />
-        </div>
-        <div className="flex flex-col gap-1.5">
-          <Label htmlFor="confirm">{dict.confirmPassword}</Label>
-          <Input
-            id="confirm"
-            type="password"
-            value={confirm}
-            onChange={(e) => setConfirm(e.target.value)}
-            required
-            minLength={8}
-          />
-        </div>
+      <FormFactory
+        key={formKey}
+        schema={schema}
+        defaultValues={{ current: "", next: "", confirm: "" }}
+        onSubmit={onSubmit}
+      >
+        <FieldFactory fields={fields} />
         <Button type="submit" disabled={pending} className="w-fit">
           {pending ? dict.saving : dict.changePassword}
         </Button>
-      </form>
+      </FormFactory>
     </Section>
   );
 }

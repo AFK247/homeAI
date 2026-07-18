@@ -24,3 +24,22 @@ export interface ScrapedProduct {
   /** Local filename the image was downloaded to (relative to the brand's images/ dir). */
   imageFile: string | null;
 }
+
+/**
+ * Optional streaming hooks passed to a scraper (observer pattern). Absent for the CLI path
+ * (scrapers behave exactly as before); the admin/catalog SSE route passes them to checkpoint
+ * each product and stream live progress. Keeping them OPTIONAL means one signature serves both
+ * callers without touching the CLI behaviour.
+ */
+export interface ScrapeOptions {
+  /** Fired once the full product-URL list is known, so the UI can show the denominator. */
+  onUrls?: (total: number) => void | Promise<void>;
+  /** Fired as each product finishes. `index` is 1-based over the URLs actually scraped. */
+  onProduct?: (product: ScrapedProduct, index: number, total: number) => void | Promise<void>;
+  /** Fired when a single URL fails (skipped, not fatal) so the UI can count it. */
+  onFailed?: (url: string, error: string) => void | Promise<void>;
+  /** Resume support: URLs already staged are skipped before scraping begins. */
+  skipUrls?: Set<string>;
+  /** Abort signal — checked between products so the operator's Stop takes effect promptly. */
+  signal?: AbortSignal;
+}

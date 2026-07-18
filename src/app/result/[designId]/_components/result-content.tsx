@@ -1,16 +1,15 @@
 "use client";
 
 import { notFound } from "next/navigation";
-import type { DesignDetailData } from "@/app/create/_modules/promises";
+import type { DesignRow } from "@/app/create/_modules/design.service";
 import { ResultView } from "@/components/result/result-view";
-import { useDataProvider } from "@/providers/data.provider";
 
 /*
- * Client consumer: reads the server-resolved design (with its resolved furniture
- * pins) from the DataProvider and renders ResultView.
+ * Client wrapper: receives the server-resolved design (with resolved furniture pins) as a
+ * prop from the page and renders ResultView. No DataProvider — the page reads via serverRpc
+ * and passes data down, per the oRPC convention.
  */
-export function ResultContent() {
-  const { design } = useDataProvider<DesignDetailData>();
+export function ResultContent({ design }: { design: DesignRow }) {
   if (!design) notFound();
 
   return <ResultView design={design} />;

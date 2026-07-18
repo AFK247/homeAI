@@ -2,21 +2,19 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import type { DesignListData } from "@/app/create/_modules/promises";
+import type { DesignList } from "@/app/create/_modules/design.service";
 import { ImagePlaceholder } from "@/components/brand/image-placeholder";
 import { ROOM_OPTIONS, STYLE_OPTIONS } from "@/config/catalog";
 import { PAGES } from "@/config/pages";
 import { useTranslation } from "@/lib/i18n/client";
-import { useDataProvider } from "@/providers/data.provider";
 
 /*
- * Client consumer: reads the anon's real designs from the DataProvider and
- * renders a grid of cards, each linking to its /result/[id]. Shows the actual
- * generated image when present, else the striped placeholder.
+ * Client consumer: receives the anon's real designs as a prop from the page and renders a
+ * grid of cards, each linking to its /result/[id]. Shows the actual generated image when
+ * present, else the striped placeholder.
  */
-export function DesignsGrid() {
+export function DesignsGrid({ designs }: { designs: DesignList }) {
   const { dict, locale } = useTranslation();
-  const { designs } = useDataProvider<DesignListData>();
 
   if (designs.length === 0) {
     return <p className="mt-16 text-center text-brand-body">{dict.designs.empty}</p>;

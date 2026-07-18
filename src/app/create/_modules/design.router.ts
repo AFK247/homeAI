@@ -305,6 +305,14 @@ export const designRouter = {
       DesignService.getById({ id: input.id, anonymousId: context.anonymousId }),
     ),
 
+  // PUBLIC read for the shareable /share/<id> page — NOT anon-scoped, so anyone can view it.
+  // The service returns a narrowed shape (generated image + room/style + pins only; never the
+  // original photo, owner ids, or prompt). Only finished designs resolve; else null → 404.
+  getPublicById: publicProcedure
+    .route({ method: "GET" })
+    .input(z.object({ id: z.string().min(1) }))
+    .handler(({ input }) => DesignService.getPublicById({ id: input.id })),
+
   list: publicProcedure
     .route({ method: "GET" })
     .handler(({ context }) => DesignService.listByAnon({ anonymousId: context.anonymousId })),

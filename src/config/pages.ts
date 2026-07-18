@@ -20,6 +20,11 @@ export const PAGES = {
     VIEW: (designId: string) => `/result/${designId}`,
   },
 
+  // Public, read-only share page — safe to hand to anyone (see design.service getPublicById).
+  SHARE: {
+    VIEW: (designId: string) => `/share/${designId}`,
+  },
+
   DESIGNS: "/designs",
   PRICING: "/pricing",
   LOGIN: "/login",

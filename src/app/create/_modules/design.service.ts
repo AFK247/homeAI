@@ -33,6 +33,47 @@ function resolveUrls<T extends { originalImageUrl: string; generatedImageUrl: st
   };
 }
 
+/**
+ * Resolve a design's ACTIVE-version furniture pins into their catalog items + category
+ * names (the DesignWithTags `tags` shape). Shared by the owner read (getById) and the
+ * public share read (getPublicById) so both render identical pins. Pins are per-version:
+ * only the active version's pins are returned; falls back to designId for legacy rows.
+ */
+async function resolveActivePins(designId: string) {
+  const [activeVersion] = await db
+    .select({ id: designVersions.id })
+    .from(designVersions)
+    .where(and(eq(designVersions.designId, designId), eq(designVersions.isActive, true)));
+
+  const tagRows = activeVersion
+    ? await db.select().from(designTags).where(eq(designTags.designVersionId, activeVersion.id))
+    : await db
+        .select()
+        .from(designTags)
+        .where(and(eq(designTags.designId, designId), isNull(designTags.designVersionId)));
+
+  const itemIds = tagRows.map((t) => t.furnitureItemId).filter((v): v is string => v !== null);
+  const items = itemIds.length
+    ? await db.select().from(furnitureItems).where(inArray(furnitureItems.id, itemIds))
+    : [];
+  const itemById = new Map(items.map((i) => [i.id, i]));
+
+  const catIds = tagRows.map((t) => t.categoryId).filter((v): v is string => v !== null);
+  const cats = catIds.length
+    ? await db
+        .select({ id: categories.id, name: categories.name })
+        .from(categories)
+        .where(inArray(categories.id, catIds))
+    : [];
+  const catNameById = new Map(cats.map((c) => [c.id, c.name]));
+
+  return tagRows.map((t) => ({
+    ...t,
+    furnitureItem: t.furnitureItemId ? (itemById.get(t.furnitureItemId) ?? null) : null,
+    categoryName: t.categoryId ? (catNameById.get(t.categoryId) ?? null) : null,
+  }));
+}
+
 interface CreateInput extends Scope {
   originalImageUrl: string;
   roomType: RoomType;
@@ -42,6 +83,25 @@ interface CreateInput extends Scope {
 }
 
 export const DesignService = {
+  /**
+   * Claim all designs made under an anonymous session for a newly signed-up / logged-in
+   * user: stamp `userId` on every not-yet-claimed row for that `anonymousId`. This is what
+   * makes `userId IS NULL` a reliable "nobody signed up for this" signal — after a user logs
+   * in, their anonymous work carries their real id and is safe from anonymous cleanup.
+   *
+   * Idempotent (only touches rows still missing a userId) and safe to call on every login.
+   * Returns the number of designs claimed.
+   */
+  claimForUser: async ({ anonymousId, userId }: { anonymousId: string; userId: string }) => {
+    if (!anonymousId || !userId) return 0;
+    const claimed = await db
+      .update(designs)
+      .set({ userId })
+      .where(and(eq(designs.anonymousId, anonymousId), isNull(designs.userId)))
+      .returning({ id: designs.id });
+    return claimed.length;
+  },
+
   create: async (input: CreateInput) => {
     const [row] = await db
       .insert(designs)
@@ -98,45 +158,38 @@ export const DesignService = {
       );
     if (!row) return null;
 
-    // Pins are per-version: show only the ACTIVE version's pins so switching
-    // versions shows the matching furniture positions (not stale ones).
-    const [activeVersion] = await db
-      .select({ id: designVersions.id })
-      .from(designVersions)
-      .where(and(eq(designVersions.designId, row.id), eq(designVersions.isActive, true)));
-
-    // Resolve the active version's pins to their catalog items (DesignWithTags).
-    // Fall back to designId for legacy rows with no version link.
-    const tagRows = activeVersion
-      ? await db.select().from(designTags).where(eq(designTags.designVersionId, activeVersion.id))
-      : await db
-          .select()
-          .from(designTags)
-          .where(and(eq(designTags.designId, row.id), isNull(designTags.designVersionId)));
-
-    const itemIds = tagRows.map((t) => t.furnitureItemId).filter((v): v is string => v !== null);
-    const items = itemIds.length
-      ? await db.select().from(furnitureItems).where(inArray(furnitureItems.id, itemIds))
-      : [];
-    const itemById = new Map(items.map((i) => [i.id, i]));
-
-    // Category name per pin (what the pin/list label shows and what the modal queries by).
-    const catIds = tagRows.map((t) => t.categoryId).filter((v): v is string => v !== null);
-    const cats = catIds.length
-      ? await db
-          .select({ id: categories.id, name: categories.name })
-          .from(categories)
-          .where(inArray(categories.id, catIds))
-      : [];
-    const catNameById = new Map(cats.map((c) => [c.id, c.name]));
-
-    const tags = tagRows.map((t) => ({
-      ...t,
-      furnitureItem: t.furnitureItemId ? (itemById.get(t.furnitureItemId) ?? null) : null,
-      categoryName: t.categoryId ? (catNameById.get(t.categoryId) ?? null) : null,
-    }));
-
+    const tags = await resolveActivePins(row.id);
     return { ...resolveUrls(row), tags };
+  },
+
+  /**
+   * PUBLIC read for the shareable /share/<id> page — fetched by id ONLY, with NO anonymous
+   * scoping, so anyone with the link can view it. Because it bypasses ownership, it returns
+   * a deliberately NARROWED shape: the generated image + room/style only. It NEVER exposes
+   * the user's original room photo (originalImageUrl), the owning anon/user ids, the prompt,
+   * furniture pins, or provider internals. Only finished designs (status=done with a
+   * generated image) are shareable; anything else returns null → 404.
+   */
+  getPublicById: async ({ id }: { id: string }) => {
+    const [row] = await db
+      .select({
+        id: designs.id,
+        generatedImageUrl: designs.generatedImageUrl,
+        roomType: designs.roomType,
+        style: designs.style,
+        isPanorama: designs.isPanorama,
+      })
+      .from(designs)
+      .where(and(eq(designs.id, id), eq(designs.status, "done"), isNull(designs.deletedAt)));
+    if (!row?.generatedImageUrl) return null;
+
+    return {
+      id: row.id,
+      generatedImageUrl: StorageService.publicUrl(row.generatedImageUrl),
+      roomType: row.roomType,
+      style: row.style,
+      isPanorama: row.isPanorama,
+    };
   },
 
   /**
@@ -314,4 +367,8 @@ export const DesignService = {
   },
 };
 
+// Inferred row/list/public shapes — never hand-written (golden rule). Consumers import these
+// instead of the removed *.queries.ts / promises.ts types.
 export type DesignRow = Awaited<ReturnType<typeof DesignService.getById>>;
+export type DesignList = Awaited<ReturnType<typeof DesignService.listByAnon>>;
+export type DesignPublicRow = NonNullable<Awaited<ReturnType<typeof DesignService.getPublicById>>>;

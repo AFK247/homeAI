@@ -94,6 +94,20 @@ export const en: Dictionary = {
     copyLink: "Copy link",
     download: "Download",
   },
+  share: {
+    badge: "Shared design",
+    metaTitle: "A room design made with Home AI",
+    metaDescription:
+      "Redesign your room instantly with AI — complete with the price of every piece of furniture.",
+    heroEyebrow: "Made with Home AI",
+    heroTitle: "This room was redesigned with AI",
+    heroSubtitle:
+      "Snap a photo of your room and AI redesigns it in seconds — complete with the price of every piece of furniture.",
+    tryCta: "Try it on your room",
+    ctaHeading: "Try it on your own room",
+    ctaSubtitle: "Take a photo, pick a style — AI redesigns it in seconds.",
+    ctaButton: "Try it free",
+  },
   landing: {
     cta: "Start with a photo",
     heroTitle: "See your room's new look before spending a single taka",

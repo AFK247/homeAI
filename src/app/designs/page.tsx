@@ -1,31 +1,21 @@
-import { cookies } from "next/headers";
 import Link from "next/link";
 import { Suspense } from "react";
-import { designListPromises } from "@/app/create/_modules/promises";
 import { SiteHeader } from "@/components/layout/site-header";
 import { Button } from "@/components/ui/button";
 import { PAGES } from "@/config/pages";
 import { getDictionary } from "@/lib/i18n/server";
-import { QueryProvider } from "@/providers/query.provider";
+import { serverRpc } from "@/server/rpc/server";
 import { DesignsGrid } from "./_components/designs-grid";
 
 /*
- * My Designs gallery. Follows the reference server-loading pattern:
- *   page → <Suspense> → async Content → designListPromises → <QueryProvider>
- *        → <DesignsGrid> (client, useDataProvider). Anonymous-scoped.
+ * My Designs gallery. Server component reads the anon's designs directly through the design
+ * router (serverRpc.design.list) and passes them to the client grid as a prop — the app-wide
+ * oRPC convention (no queries.ts / QueryProvider).
  */
-const ANON_COOKIE = "anon_id";
 
 async function Content() {
-  const store = await cookies();
-  const anonymousId = store.get(ANON_COOKIE)?.value ?? "";
-  const promises = designListPromises(anonymousId);
-
-  return (
-    <QueryProvider promises={promises}>
-      <DesignsGrid />
-    </QueryProvider>
-  );
+  const designs = await serverRpc.design.list();
+  return <DesignsGrid designs={designs} />;
 }
 
 export default async function DesignsPage() {

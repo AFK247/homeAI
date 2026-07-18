@@ -1,14 +1,16 @@
 "use client";
 
-import { Expand, Eye, EyeOff, Loader2, X } from "lucide-react";
+import { Check, Copy, Download, Expand, Eye, EyeOff, Loader2, X } from "lucide-react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useEffect, useState, useTransition } from "react";
+import { toast } from "sonner";
 import { GeneratingLoader } from "@/components/brand/generating-loader";
 import { ImagePlaceholder } from "@/components/brand/image-placeholder";
 import { DesignWorkspace } from "@/components/design/design-workspace";
 import { FurniturePin } from "@/components/furniture/furniture-pin";
 import { useCategoryProducts } from "@/components/furniture/use-category-products";
+import { IconButton } from "@/components/ui/icon-button";
 import { PAGES } from "@/config/pages";
 import type { BudgetTier, DesignStyle, RoomType } from "@/db/schemas/shared.schema";
 import type { DesignWithTags, ResolvedDesignTag } from "@/db/types";
@@ -33,6 +35,8 @@ export function ResultView({ design }: { design: DesignWithTags }) {
   const [versionKey, setVersionKey] = useState(0);
   const [fullscreen, setFullscreen] = useState(false);
   const [pinsVisible, setPinsVisible] = useState(true);
+  const [downloading, setDownloading] = useState(false);
+  const [copied, setCopied] = useState(false);
 
   // Editable controls, seeded from the saved design. Budget isn't persisted (per-render),
   // so it defaults to medium each load.
@@ -92,6 +96,60 @@ export function ResultView({ design }: { design: DesignWithTags }) {
     });
   }
 
+  // Download the generated PNG. Fetch it as a blob so the browser SAVES the file (an <a
+  // download> to a cross-origin URL would just navigate). Falls back to opening the image
+  // in a new tab if the fetch is blocked.
+  async function download() {
+    const url = design.generatedImageUrl;
+    if (!url || downloading) return;
+    setDownloading(true);
+    try {
+      const res = await fetch(url);
+      if (!res.ok) throw new Error(`status ${res.status}`);
+      const blob = await res.blob();
+      const objectUrl = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = objectUrl;
+      a.download = `home-ai-${design.id}.png`;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      URL.revokeObjectURL(objectUrl);
+    } catch {
+      // Storage/CORS hiccup — at least let the user reach the image.
+      window.open(url, "_blank", "noopener,noreferrer");
+    } finally {
+      setDownloading(false);
+    }
+  }
+
+  // Copy the PUBLIC SHARE link — /share/<id>, a read-only page anyone can open (unlike this
+  // result page, which is cookie-scoped and 404s for others). Not the raw storage URL, which
+  // is unauthenticated, guessable and rotates on regenerate. Async clipboard API where
+  // available (needs a secure context) with a legacy fallback for http/older browsers.
+  async function copyLink() {
+    const link = `${window.location.origin}${PAGES.SHARE.VIEW(design.id)}`;
+    try {
+      if (navigator.clipboard && window.isSecureContext) {
+        await navigator.clipboard.writeText(link);
+      } else {
+        const ta = document.createElement("textarea");
+        ta.value = link;
+        ta.style.position = "fixed";
+        ta.style.opacity = "0";
+        document.body.appendChild(ta);
+        ta.select();
+        document.execCommand("copy");
+        ta.remove();
+      }
+      setCopied(true);
+      toast.success(dict.result.copyLink);
+      setTimeout(() => setCopied(false), 2000);
+    } catch {
+      toast.error(dict.result.copyLink);
+    }
+  }
+
   const canvas = (
     <div className="relative h-[340px] overflow-hidden rounded-2xl lg:h-[470px]">
       {design.generatedImageUrl ? (
@@ -110,25 +168,22 @@ export function ResultView({ design }: { design: DesignWithTags }) {
       {design.generatedImageUrl && (
         <div className="absolute top-3 right-3 flex items-center gap-2">
           {hasPins && (
-            <button
-              type="button"
+            <IconButton
+              label={pinsVisible ? dict.result.hidePins : dict.result.showPins}
               onClick={() => setPinsVisible((v) => !v)}
-              aria-label={pinsVisible ? dict.result.hidePins : dict.result.showPins}
-              title={pinsVisible ? dict.result.hidePins : dict.result.showPins}
-              className="flex size-9 items-center justify-center rounded-full bg-[rgba(22,44,36,0.72)] text-white transition-colors hover:bg-[rgba(22,44,36,0.9)]"
             >
-              {pinsVisible ? <EyeOff className="size-4" /> : <Eye className="size-4" />}
-            </button>
+              {pinsVisible ? <EyeOff /> : <Eye />}
+            </IconButton>
           )}
-          <button
-            type="button"
-            onClick={() => setFullscreen(true)}
-            aria-label={dict.result.fullscreen}
-            title={dict.result.fullscreen}
-            className="flex size-9 items-center justify-center rounded-full bg-[rgba(22,44,36,0.72)] text-white transition-colors hover:bg-[rgba(22,44,36,0.9)]"
-          >
-            <Expand className="size-4" />
-          </button>
+          <IconButton label={dict.result.copyLink} onClick={copyLink}>
+            {copied ? <Check /> : <Copy />}
+          </IconButton>
+          <IconButton label={dict.result.download} onClick={download} disabled={downloading}>
+            {downloading ? <Loader2 className="animate-spin" /> : <Download />}
+          </IconButton>
+          <IconButton label={dict.result.fullscreen} onClick={() => setFullscreen(true)}>
+            <Expand />
+          </IconButton>
         </div>
       )}
 

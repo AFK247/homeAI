@@ -9,9 +9,12 @@ import { ImagePlaceholder } from "@/components/brand/image-placeholder";
 import { DesignWorkspace } from "@/components/design/design-workspace";
 import { FurniturePin } from "@/components/furniture/furniture-pin";
 import { useCategoryProducts } from "@/components/furniture/use-category-products";
+import { PAGES } from "@/config/pages";
 import type { BudgetTier, DesignStyle, RoomType } from "@/db/schemas/shared.schema";
 import type { DesignWithTags, ResolvedDesignTag } from "@/db/types";
 import { useTranslation } from "@/lib/i18n/client";
+import { handleORPCError } from "@/lib/utils/error";
+import { handleRateLimitError } from "@/lib/utils/rate-limit-error";
 import { rpc } from "@/server/rpc/client";
 import { VersionHistory } from "./version-history";
 
@@ -79,8 +82,12 @@ export function ResultView({ design }: { design: DesignWithTags }) {
         setVersionKey((k) => k + 1);
         setPollsLeft(6); // new render → detect pins again
         router.refresh();
-      } catch {
-        // Swallow; the button re-enables.
+      } catch (err) {
+        // Surface abuse-defense denials (free cap / burst / daily cap) with a clear toast;
+        // any other failure gets the generic handler. The button re-enables either way.
+        if (!handleRateLimitError(err, dict.rateLimit, () => router.push(PAGES.LOGIN))) {
+          handleORPCError(err);
+        }
       }
     });
   }

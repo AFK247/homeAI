@@ -49,6 +49,17 @@ export const en: Dictionary = {
     uploadFirst: "Upload a room photo to start",
     failed: "Redesign failed — please try again.",
   },
+  rateLimit: {
+    freeLimitTitle: "Free designs used up",
+    freeLimitBody: "You've used all your free designs. Sign in to get more.",
+    rateLimitedTitle: "Slow down a moment",
+    rateLimitedBody: "You're generating too fast. Please wait a moment and try again.",
+    rateLimitedWait: "Try again in {seconds} seconds.",
+    dailyCapTitle: "Today's limit reached",
+    dailyCapBody: "We've hit today's free-design limit. Please try again tomorrow.",
+    blocked: "Request blocked. Please try again in a little while.",
+    signIn: "Sign in",
+  },
   generating: {
     title: "Redesigning your room",
     subtitle: "Please wait — this usually takes 15–30 seconds.",

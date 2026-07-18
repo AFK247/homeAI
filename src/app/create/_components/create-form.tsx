@@ -7,6 +7,7 @@ import { DesignWorkspace } from "@/components/design/design-workspace";
 import { PAGES } from "@/config/pages";
 import { useTranslation } from "@/lib/i18n/client";
 import { handleORPCError } from "@/lib/utils/error";
+import { handleRateLimitError } from "@/lib/utils/rate-limit-error";
 import { rpc } from "@/server/rpc/client";
 import { useCreateStore } from "../_modules/create-store";
 import { UploadPanel } from "./upload-panel";
@@ -52,7 +53,11 @@ export function CreateForm() {
         useCreateStore.getState().reset();
         router.replace(PAGES.RESULT.VIEW(design.id));
       } catch (err) {
-        handleORPCError(err);
+        // Abuse-defense denials get a tailored toast (with a Sign-in CTA on the free cap);
+        // anything else falls through to the generic handler.
+        if (!handleRateLimitError(err, dict.rateLimit, () => router.push(PAGES.LOGIN))) {
+          handleORPCError(err);
+        }
       }
     });
   }

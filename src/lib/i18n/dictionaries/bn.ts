@@ -49,6 +49,19 @@ export const bn = {
     uploadFirst: "শুরু করতে ঘরের একটি ছবি আপলোড করুন",
     failed: "রিডিজাইন ব্যর্থ হয়েছে — আবার চেষ্টা করুন।",
   },
+  // Shown when the abuse-defense guard chain blocks a generation. Keyed by the guard's
+  // machine `code`; `blocked` is the generic fallback for any unknown code.
+  rateLimit: {
+    freeLimitTitle: "ফ্রি ডিজাইন শেষ",
+    freeLimitBody: "আপনার সব ফ্রি ডিজাইন ব্যবহার হয়ে গেছে। আরও পেতে সাইন ইন করুন।",
+    rateLimitedTitle: "একটু ধীরে",
+    rateLimitedBody: "আপনি খুব দ্রুত তৈরি করছেন। একটু পরে আবার চেষ্টা করুন।",
+    rateLimitedWait: "{seconds} সেকেন্ড পরে আবার চেষ্টা করুন।",
+    dailyCapTitle: "আজকের সীমা শেষ",
+    dailyCapBody: "আজকের ফ্রি ডিজাইনের সীমা শেষ। আগামীকাল আবার চেষ্টা করুন।",
+    blocked: "অনুরোধটি আটকে দেওয়া হয়েছে। একটু পরে আবার চেষ্টা করুন।",
+    signIn: "সাইন ইন",
+  },
   generating: {
     title: "আপনার ঘর সাজানো হচ্ছে",
     subtitle: "একটু অপেক্ষা করুন — সাধারণত ১৫–৩০ সেকেন্ড সময় লাগে।",

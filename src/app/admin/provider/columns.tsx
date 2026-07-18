@@ -43,11 +43,6 @@ export const columns: DataTableColumn<ProviderRow>[] = [
     ),
   },
   {
-    header: "Model",
-    accessorKey: "model",
-    cell: (p) => <code className="rounded bg-muted px-1.5 py-0.5 text-xs">{p.model}</code>,
-  },
-  {
     header: "Configured",
     accessorKey: "ready",
     cell: (p) =>
@@ -72,65 +67,44 @@ export const columns: DataTableColumn<ProviderRow>[] = [
     ),
   },
   {
-    header: "Real cost / call",
+    // Total Neurons this model has spent (all history Cloudflare retains, ~31 days).
+    header: "Total neurons",
     accessorKey: "usage",
-    id: "usage",
-    className: "text-right text-xs tabular-nums",
-    // Real measured Neurons + $ per call over the last 24h (Cloudflare only).
+    id: "usageTotal",
+    className: "text-right tabular-nums",
     cell: (p) =>
       p.usage ? (
-        <span className="whitespace-nowrap">
-          <span className="font-semibold text-foreground">~{fmt(p.usage.avgNeuronsPerCall)} N</span>
-          <span className="ml-1 text-muted-foreground">
-            (~${p.usage.avgCostUsdPerCall.toFixed(4)})
-          </span>
-        </span>
+        <span className="font-semibold text-foreground">{fmt(p.usage.neurons)}</span>
       ) : (
         <span className="text-muted-foreground">—</span>
       ),
   },
   {
-    header: "Balance",
-    accessorKey: "balance",
-    className: "tabular-nums",
-    cell: (p) => {
-      const low = p.balanceRemaining != null && p.balanceRemaining < 5;
-      const veryLow = p.balanceRemaining != null && p.balanceRemaining < 1;
-      return (
-        <span
-          className={`font-semibold ${
-            veryLow
-              ? "text-destructive"
-              : low
-                ? "text-amber-600 dark:text-amber-500"
-                : "text-foreground"
-          }`}
-        >
-          {p.balance}
-        </span>
-      );
-    },
+    // Total API calls to this model (Cloudflare-level).
+    header: "Calls",
+    accessorKey: "usage",
+    id: "usageCalls",
+    className: "text-right tabular-nums",
+    cell: (p) =>
+      p.usage ? (
+        <span className="text-foreground">{p.usage.calls.toLocaleString("en-US")}</span>
+      ) : (
+        <span className="text-muted-foreground">—</span>
+      ),
   },
   {
-    header: "Daily quota left",
-    accessorKey: "quota",
-    className: "tabular-nums",
-    // The provider's real remaining free-tier quota. Amber ≥70%
-    // used, red ≥90%. Other providers show "—".
-    cell: (p) => {
-      const q = p.quota;
-      if (!q) return <span className="text-muted-foreground text-xs">—</span>;
-      const color =
-        q.usedPct >= 90
-          ? "text-destructive"
-          : q.usedPct >= 70
-            ? "text-amber-600 dark:text-amber-500"
-            : "text-foreground";
-      return (
-        <span className={`font-semibold ${color}`}>
-          {fmt(q.left)} <span className="font-normal text-muted-foreground">/ {fmt(q.total)}</span>
-        </span>
-      );
-    },
+    // Average Neurons per single call.
+    header: "Avg / call",
+    accessorKey: "usage",
+    id: "usageAvg",
+    className: "text-right tabular-nums",
+    cell: (p) =>
+      p.usage ? (
+        <span className="text-muted-foreground">~{fmt(p.usage.avgNeuronsPerCall)} N</span>
+      ) : (
+        <span className="text-muted-foreground">—</span>
+      ),
   },
+  // Balance + Daily quota columns are intentionally omitted here — they're already shown
+  // in the cards above the table, so repeating them in the row is redundant.
 ];

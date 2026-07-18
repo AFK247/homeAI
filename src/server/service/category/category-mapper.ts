@@ -17,7 +17,7 @@ import { logger } from "@/lib/logger";
 // vendor data): ~8.4 neurons/call — basically the same as the 3B (~7.8) but WITHOUT the
 // 3B's habit of inventing duplicate categories, and 6× cheaper than the 70B for
 // equal/better quality.
-export const CATEGORY_MODEL = "@cf/meta/llama-3.1-8b-instruct-fast";
+export const CATEGORY_MODEL = "@cf/meta/llama-3.1-8b-instruct-fp8-fast";
 const TIMEOUT_MS = 30_000;
 
 /** Admin-surface status for the category-mapping model (shown on the AI Provider page). */

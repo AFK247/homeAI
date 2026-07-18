@@ -43,7 +43,10 @@ export const openrouterProvider: AiProvider = {
   model: MODEL,
 
   isReady() {
-    return Boolean(env.OPENROUTER_API_KEY);
+    // Disabled for now — we run Cloudflare only. Even with a key present, OpenRouter is
+    // NOT used (kept in the codebase for a future paid fallback). Flip this to
+    // `Boolean(env.OPENROUTER_API_KEY)` to re-enable it in the chain + admin.
+    return false;
   },
 
   async balance() {

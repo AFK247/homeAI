@@ -66,13 +66,17 @@ export interface ModelUsage {
 }
 
 /**
- * Real Neuron consumption per model over the trailing 24h, keyed by model id — so
- * the admin can see actual cost/call for image generation vs furniture tagging.
- * Empty map when analytics is unavailable. Never throws.
+ * Real Neuron consumption per model, keyed by model id — so the admin can see actual
+ * total + per-call cost for image generation vs furniture tagging vs category mapping.
+ *
+ * Window: the FULL history Cloudflare retains. The `aiInferenceAdaptiveGroups` dataset
+ * only keeps ~31 days, so "all" here means the last 31 days (its maximum) — that's the
+ * most complete picture the analytics API can give. Empty map when analytics is
+ * unavailable. Never throws.
  */
 export async function modelNeuronUsage(): Promise<Record<string, ModelUsage>> {
   const now = new Date();
-  const start = new Date(now.getTime() - 24 * 60 * 60 * 1000);
+  const start = new Date(now.getTime() - 31 * 24 * 60 * 60 * 1000); // max retention
   const usage = await cloudflareNeuronUsage(start, now);
   const map: Record<string, ModelUsage> = {};
   for (const u of usage) {

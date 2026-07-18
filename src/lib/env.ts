@@ -19,6 +19,9 @@ const serverSchema = z.object({
   // Better Auth
   BETTER_AUTH_SECRET: z.string().min(1).optional(),
   BETTER_AUTH_URL: z.url().optional(),
+  // Admin seed (scripts/seed-admin.ts) — the first admin account, created idempotently.
+  ADMIN_EMAIL: z.email().optional(),
+  ADMIN_PASSWORD: z.string().min(8).optional(),
   FACEBOOK_CLIENT_ID: z.string().optional(),
   FACEBOOK_CLIENT_SECRET: z.string().optional(),
   GOOGLE_CLIENT_ID: z.string().optional(),

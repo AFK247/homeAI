@@ -2,30 +2,30 @@ import "server-only";
 
 import { z } from "zod";
 import { searchParamsSchema } from "@/db/helpers/search-params";
-import { publicProcedure } from "@/server/rpc/procedures";
+import { adminProcedure } from "@/server/rpc/procedures";
 import { GenerationService } from "./generation.service";
 
 /*
  * Generation oRPC router — admin AI-generation logs (list, stats, per-provider
  * counts, detail). Convention (docs/module-convention.md): router validates + calls
- * the service; never touches Drizzle. GET for reads. No auth yet (publicProcedure).
+ * the service; never touches Drizzle. GET for reads. Admin-only: every procedure requires role=admin (adminProcedure).
  */
 export const generationRouter = {
-  getPaginated: publicProcedure
+  getPaginated: adminProcedure
     .route({ method: "GET" })
     .input(searchParamsSchema)
     .handler(({ input }) => GenerationService.listPaginated(input)),
 
-  stats: publicProcedure
+  stats: adminProcedure
     .route({ method: "GET" })
     .input(searchParamsSchema)
     .handler(({ input }) => GenerationService.stats(input)),
 
-  countsByProvider: publicProcedure
+  countsByProvider: adminProcedure
     .route({ method: "GET" })
     .handler(() => GenerationService.countsByProvider()),
 
-  getById: publicProcedure
+  getById: adminProcedure
     .route({ method: "GET" })
     .input(z.object({ id: z.string().min(1) }))
     .handler(({ input }) => GenerationService.getById(input.id)),

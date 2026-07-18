@@ -3,19 +3,20 @@ import "server-only";
 import { ORPCError } from "@orpc/server";
 import { z } from "zod";
 import { searchParamsSchema } from "@/db/helpers/search-params";
-import { publicProcedure } from "@/server/rpc/procedures";
+import { adminProcedure, publicProcedure } from "@/server/rpc/procedures";
 import { EventService } from "@/server/service/event.service";
 import { FurnitureService } from "@/server/service/furniture.service";
 
 /*
- * Furniture router — the catalog admin list plus the customer-facing tap-a-pin
- * detail panel (which also logs the product events we sell to vendors).
- * Convention: GET for reads, POST for anything with a side effect (getDetail logs
- * an event, so it's a POST despite reading).
+ * Furniture router — mixes an ADMIN catalog list with CUSTOMER-facing tap-a-pin endpoints.
+ *  - getPaginated: admin catalog management → adminProcedure (role=admin).
+ *  - getDetail / byCategory / logBuyClick: public "shop the look" — furniture is public
+ *    product data any shopper can browse; events are scoped by the caller's anonymousId.
+ * Convention: GET for reads, POST for anything with a side effect.
  */
 export const furnitureRouter = {
-  // Admin catalog list — backend search/filter/sort/pagination.
-  getPaginated: publicProcedure
+  // Admin catalog list — backend search/filter/sort/pagination. Admin-only.
+  getPaginated: adminProcedure
     .route({ method: "GET" })
     .input(searchParamsSchema)
     .handler(({ input }) => FurnitureService.list(input)),

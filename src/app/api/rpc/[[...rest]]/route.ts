@@ -1,14 +1,16 @@
 import { RPCHandler } from "@orpc/server/fetch";
 import { createId } from "@paralleldrive/cuid2";
-import { cookies } from "next/headers";
-import type { RpcContext } from "@/server/rpc/procedures";
+import { cookies, headers } from "next/headers";
+import { auth } from "@/lib/auth/auth";
+import type { AuthUser, RpcContext } from "@/server/rpc/procedures";
 import { webRouter } from "@/server/rpc/router";
 
 /*
  * oRPC fetch handler (plan §5.4). Serves the whole webRouter at /api/rpc.
  *
- * Anonymous-first: resolves (or mints) an `anon_id` cookie and passes it as
- * context.anonymousId so every request is scoped without login.
+ * Builds the request context: the anonymous session id (cookie-backed, so logged-out
+ * users are still scoped) AND the resolved Better Auth user (null when anonymous). The
+ * procedure tiers (public/protected/admin) enforce access from there.
  */
 
 const handler = new RPCHandler(webRouter);
@@ -27,7 +29,12 @@ async function resolveContext(): Promise<RpcContext> {
       path: "/",
     });
   }
-  return { anonymousId, userId: null };
+
+  const session = await auth.api.getSession({ headers: await headers() });
+  const u = session?.user as (AuthUser & { role?: string }) | undefined;
+  const user: AuthUser | null = u ? { id: u.id, email: u.email, role: u.role ?? "user" } : null;
+
+  return { anonymousId, user };
 }
 
 async function handle(request: Request): Promise<Response> {

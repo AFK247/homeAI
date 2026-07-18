@@ -3,74 +3,74 @@ import "server-only";
 import { z } from "zod";
 import { searchParamsSchema } from "@/db/helpers/search-params";
 import { CreateCategorySchema, UpdateCategorySchema } from "@/db/validations/category.validation";
-import { publicProcedure } from "@/server/rpc/procedures";
+import { adminProcedure } from "@/server/rpc/procedures";
 import { CategoryService } from "./category.service";
 
 /*
  * Category oRPC router — the master furniture vocabulary + vendor→master mappings
  * (docs/marketplace-plan.md §3). Router validates + calls the service; never touches
- * Drizzle. GET for reads, POST for mutations. No auth yet (publicProcedure).
+ * Drizzle. GET for reads, POST for mutations. Admin-only: every procedure requires role=admin (adminProcedure).
  */
 export const categoryRouter = {
   // ── categories: reads ──────────────────────────────────
-  getPaginated: publicProcedure
+  getPaginated: adminProcedure
     .route({ method: "GET" })
     .input(searchParamsSchema)
     .handler(({ input }) => CategoryService.listPaginated(input)),
 
-  getById: publicProcedure
+  getById: adminProcedure
     .route({ method: "GET" })
     .input(z.object({ id: z.string().min(1) }))
     .handler(({ input }) => CategoryService.getById(input.id)),
 
-  listActive: publicProcedure.route({ method: "GET" }).handler(() => CategoryService.listActive()),
+  listActive: adminProcedure.route({ method: "GET" }).handler(() => CategoryService.listActive()),
 
   // ── categories: mutations ──────────────────────────────
-  create: publicProcedure
+  create: adminProcedure
     .route({ method: "POST" })
     .input(CreateCategorySchema)
     .handler(({ input }) => CategoryService.create(input)),
 
-  update: publicProcedure
+  update: adminProcedure
     .route({ method: "POST" })
     .input(UpdateCategorySchema)
     .handler(({ input }) => CategoryService.update(input)),
 
-  approve: publicProcedure
+  approve: adminProcedure
     .route({ method: "POST" })
     .input(z.object({ id: z.string().min(1) }))
     .handler(({ input }) => CategoryService.approve(input.id)),
 
-  delete: publicProcedure
+  delete: adminProcedure
     .route({ method: "POST" })
     .input(z.object({ id: z.string().min(1) }))
     .handler(({ input }) => CategoryService.remove(input.id)),
 
-  seed: publicProcedure.route({ method: "POST" }).handler(() => CategoryService.seed()),
+  seed: adminProcedure.route({ method: "POST" }).handler(() => CategoryService.seed()),
 
   // ── vendor→master mappings ─────────────────────────────
-  getMapsPaginated: publicProcedure
+  getMapsPaginated: adminProcedure
     .route({ method: "GET" })
     .input(searchParamsSchema)
     .handler(({ input }) => CategoryService.listMapsPaginated(input)),
 
-  approveMap: publicProcedure
+  approveMap: adminProcedure
     .route({ method: "POST" })
     .input(z.object({ id: z.string().min(1) }))
     .handler(({ input }) => CategoryService.approveMap(input.id)),
 
-  updateMap: publicProcedure
+  updateMap: adminProcedure
     .route({ method: "POST" })
     .input(z.object({ id: z.string().min(1), categoryId: z.string().min(1) }))
     .handler(({ input }) => CategoryService.updateMap(input.id, input.categoryId)),
 
-  deleteMap: publicProcedure
+  deleteMap: adminProcedure
     .route({ method: "POST" })
     .input(z.object({ id: z.string().min(1) }))
     .handler(({ input }) => CategoryService.removeMap(input.id)),
 
   // AI-map a vendor's raw categories → master (writes pending for review).
-  mapVendorCategories: publicProcedure
+  mapVendorCategories: adminProcedure
     .route({ method: "POST" })
     .input(z.object({ vendorId: z.string().min(1), rawCategories: z.array(z.string()) }))
     .handler(({ input }) =>

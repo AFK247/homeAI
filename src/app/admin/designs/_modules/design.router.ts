@@ -2,22 +2,22 @@ import "server-only";
 
 import { z } from "zod";
 import { searchParamsSchema } from "@/db/helpers/search-params";
-import { publicProcedure } from "@/server/rpc/procedures";
+import { adminProcedure } from "@/server/rpc/procedures";
 import { DesignAdminService } from "./design.service";
 
 /*
  * Design (admin) oRPC router — admin-scoped design list + detail, across all
  * sessions. Distinct from the customer `design` router (anon-scoped, in create/).
  * Convention (docs/module-convention.md): router validates + calls the service;
- * never touches Drizzle. GET for reads. No auth yet (publicProcedure).
+ * never touches Drizzle. GET for reads. Admin-only: every procedure requires role=admin (adminProcedure).
  */
 export const designAdminRouter = {
-  getPaginated: publicProcedure
+  getPaginated: adminProcedure
     .route({ method: "GET" })
     .input(searchParamsSchema)
     .handler(({ input }) => DesignAdminService.listPaginated(input)),
 
-  getById: publicProcedure
+  getById: adminProcedure
     .route({ method: "GET" })
     .input(z.object({ id: z.string().min(1) }))
     .handler(({ input }) => DesignAdminService.getById(input.id)),

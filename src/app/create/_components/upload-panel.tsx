@@ -92,7 +92,7 @@ export function UploadPanel() {
       <button
         type="button"
         onClick={() => inputRef.current?.click()}
-        className="flex flex-col items-center gap-4 overflow-hidden rounded-3xl border-2 border-[#C4CCBF] border-dashed p-6 text-center"
+        className="relative flex flex-col items-center gap-4 overflow-hidden rounded-3xl border-2 border-[#C4CCBF] border-dashed p-6 text-center"
         style={
           image
             ? undefined

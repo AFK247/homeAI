@@ -58,6 +58,37 @@ export const DesignService = {
     return row ?? null;
   },
 
+  /**
+   * Update a design's editable parameters (room / style / prompt / panorama), scoped to
+   * the session. Used when the user tweaks controls on the result screen and regenerates —
+   * the new render then reflects the changed settings. Only provided fields change.
+   */
+  updateParams: async ({
+    id,
+    anonymousId,
+    roomType,
+    style,
+    prompt,
+    isPanorama,
+  }: { id: string } & Scope & {
+      roomType?: RoomType;
+      style?: DesignStyle;
+      prompt?: string | null;
+      isPanorama?: boolean;
+    }) => {
+    const [row] = await db
+      .update(designs)
+      .set({
+        ...(roomType !== undefined && { roomType }),
+        ...(style !== undefined && { style }),
+        ...(prompt !== undefined && { prompt }),
+        ...(isPanorama !== undefined && { isPanorama }),
+      })
+      .where(and(eq(designs.anonymousId, anonymousId), eq(designs.id, id)))
+      .returning();
+    return row ?? null;
+  },
+
   getById: async ({ id, anonymousId }: { id: string } & Scope) => {
     const [row] = await db
       .select()

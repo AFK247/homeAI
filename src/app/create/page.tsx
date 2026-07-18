@@ -12,7 +12,7 @@ export default async function CreatePage() {
   return (
     <>
       <SiteHeader />
-      <main className="mx-auto w-full max-w-5xl flex-1 px-6 py-8">
+      <main className="mx-auto w-full max-w-6xl flex-1 px-4 py-8 md:px-10">
         <h1 className="font-serif font-extrabold text-3xl text-foreground">{dict.upload.title}</h1>
         <p className="mt-1.5 text-brand-body">{dict.upload.subtitle}</p>
 

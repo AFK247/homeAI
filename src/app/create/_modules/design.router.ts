@@ -205,22 +205,50 @@ export const designRouter = {
       return done ?? design;
     }),
 
-  // Re-run the AI on an existing design's ORIGINAL image + same settings, replacing
-  // its generated image in place. Budget isn't persisted on designs, so it defaults
-  // to "medium" (or an optional client override).
+  // Re-run the AI on an existing design's ORIGINAL image, producing a NEW version. The
+  // user can change room / style / prompt / panorama on the result screen; any provided
+  // values are persisted onto the design first so the new render (and future ones) reflect
+  // them. Budget isn't persisted (per-render only) and defaults to "medium". Omitting all
+  // params reproduces the old "same settings" behaviour.
   regenerate: publicProcedure
     .route({ method: "POST" })
-    .input(z.object({ id: z.string().min(1), budget: z.enum(BUDGET_TIERS).default("medium") }))
+    .input(
+      z.object({
+        id: z.string().min(1),
+        budget: z.enum(BUDGET_TIERS).default("medium"),
+        roomType: z.enum(ROOM_TYPES).optional(),
+        style: z.enum(DESIGN_STYLES).optional(),
+        prompt: z.string().max(500).optional(),
+        isPanorama: z.boolean().optional(),
+      }),
+    )
     .handler(async ({ input, context }) => {
-      const design = await DesignService.getById({
+      const existing = await DesignService.getById({
         id: input.id,
         anonymousId: context.anonymousId,
       });
-      if (!design) throw new ORPCError("NOT_FOUND", { message: "design not found" });
+      if (!existing) throw new ORPCError("NOT_FOUND", { message: "design not found" });
+
+      // Persist any changed parameters before re-rendering.
+      const hasChanges =
+        input.roomType !== undefined ||
+        input.style !== undefined ||
+        input.prompt !== undefined ||
+        input.isPanorama !== undefined;
+      const design = hasChanges
+        ? ((await DesignService.updateParams({
+            id: input.id,
+            anonymousId: context.anonymousId,
+            roomType: input.roomType,
+            style: input.style,
+            prompt: input.prompt,
+            isPanorama: input.isPanorama,
+          })) ?? existing)
+        : existing;
 
       // getById resolves originalImageUrl to a public URL; recover the key to
       // fetch the raw source bytes from storage.
-      const originalKey = StorageService.keyFromUrl(design.originalImageUrl);
+      const originalKey = StorageService.keyFromUrl(existing.originalImageUrl);
       const sourceBytes = await StorageService.get(originalKey);
 
       await runRedesign({
@@ -233,7 +261,7 @@ export const designRouter = {
         anonymousId: context.anonymousId,
         sourceBytes,
         sourceMime: "image/jpeg",
-        sourceUrl: design.originalImageUrl,
+        sourceUrl: existing.originalImageUrl,
         budget: input.budget,
       });
 

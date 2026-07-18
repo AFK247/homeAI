@@ -1,19 +1,42 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { useState, useTransition } from "react";
+import { useTransition } from "react";
+import { toast } from "sonner";
+import { type FieldConfig, FieldFactory, FormFactory } from "@/components/form";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import { ROOM_TYPES, type RoomType } from "@/db/schemas/shared.schema";
 import type { Category } from "@/db/types";
+import {
+  type CreateCategoryInput,
+  CreateCategorySchema,
+} from "@/db/validations/category.validation";
 import { rpc } from "@/server/rpc/client";
 
 /*
- * Create / edit a master category. `name` is English (the join key); `roomTypes` picks
- * which rooms the AI detects it in. Rendered inside the imperative modal. Editing keeps
- * the existing status; new categories are created active (admin-made, not AI-proposed).
+ * Create / edit a master category — built on the ported FormFactory convention. `name` is
+ * English (the join key); `roomTypes` picks which rooms the AI detects it in.
  */
+
+const FIELDS: FieldConfig<CreateCategoryInput>[] = [
+  {
+    name: "name",
+    label: "Name (English)",
+    type: "text",
+    isRequired: true,
+    placeholder: "e.g. sofa",
+    inputFilter: (v) => v.toLowerCase(),
+  },
+  {
+    name: "roomTypes",
+    label: "AI-detected in rooms",
+    description:
+      "Rooms where the vision detector looks for this category. Empty = not auto-detected.",
+    type: "multiselect",
+    options: ROOM_TYPES.map((r) => ({ label: r.replace(/_/g, " "), value: r })),
+  },
+];
+
 export function CategoryForm({
   category,
   closeModal,
@@ -23,35 +46,31 @@ export function CategoryForm({
 }) {
   const router = useRouter();
   const [pending, start] = useTransition();
-  const [error, setError] = useState<string | null>(null);
-  const [name, setName] = useState(category?.name ?? "");
-  const [rooms, setRooms] = useState<RoomType[]>((category?.roomTypes as RoomType[]) ?? []);
 
-  const toggleRoom = (r: RoomType) =>
-    setRooms((cur) => (cur.includes(r) ? cur.filter((x) => x !== r) : [...cur, r]));
+  const defaultValues: CreateCategoryInput = {
+    name: category?.name ?? "",
+    roomTypes: (category?.roomTypes as RoomType[]) ?? [],
+    status: category?.status ?? "active",
+    source: category?.source ?? "manual",
+  };
 
-  function submit() {
-    setError(null);
-    if (!name.trim()) {
-      setError("Name is required");
-      return;
-    }
+  function onSubmit(data: CreateCategoryInput) {
     start(async () => {
       try {
         if (category) {
-          await rpc.category.update({ id: category.id, name: name.trim(), roomTypes: rooms });
-        } else {
-          await rpc.category.create({
-            name: name.trim(),
-            roomTypes: rooms,
-            status: "active",
-            source: "manual",
+          await rpc.category.update({
+            id: category.id,
+            name: data.name,
+            roomTypes: data.roomTypes,
           });
+        } else {
+          await rpc.category.create(data);
         }
+        toast.success(category ? "Category updated" : "Category created");
         closeModal();
         router.refresh();
       } catch {
-        setError("Could not save. The name may already exist.");
+        toast.error("Could not save. The name may already exist.");
       }
     });
   }
@@ -61,55 +80,17 @@ export function CategoryForm({
       <h2 className="font-serif font-bold text-foreground text-xl">
         {category ? "Edit category" : "New category"}
       </h2>
-
-      <div className="flex flex-col gap-1.5">
-        <Label htmlFor="c-name">Name (English)</Label>
-        <Input
-          id="c-name"
-          value={name}
-          onChange={(e) => setName(e.target.value.toLowerCase())}
-          placeholder="e.g. sofa"
-          autoFocus
-        />
-      </div>
-
-      <div className="flex flex-col gap-1.5">
-        <Label>AI-detected in rooms</Label>
-        <div className="flex flex-wrap gap-2">
-          {ROOM_TYPES.map((r) => {
-            const on = rooms.includes(r);
-            return (
-              <button
-                key={r}
-                type="button"
-                onClick={() => toggleRoom(r)}
-                className={`rounded-full border px-3 py-1 text-xs capitalize transition-colors ${
-                  on
-                    ? "border-primary bg-primary text-primary-foreground"
-                    : "border-border bg-background text-brand-body hover:bg-muted"
-                }`}
-              >
-                {r.replace(/_/g, " ")}
-              </button>
-            );
-          })}
+      <FormFactory schema={CreateCategorySchema} defaultValues={defaultValues} onSubmit={onSubmit}>
+        <FieldFactory fields={FIELDS} />
+        <div className="flex justify-end gap-2 pt-1">
+          <Button type="button" variant="outline" onClick={closeModal} disabled={pending}>
+            Cancel
+          </Button>
+          <Button type="submit" disabled={pending}>
+            {pending ? "Saving…" : category ? "Save" : "Create"}
+          </Button>
         </div>
-        <p className="text-muted-foreground text-xs">
-          Rooms where the vision detector looks for this category. Leave empty to keep it in the
-          catalog but not auto-detect it.
-        </p>
-      </div>
-
-      {error ? <p className="text-destructive text-sm">{error}</p> : null}
-
-      <div className="flex justify-end gap-2 pt-2">
-        <Button variant="outline" onClick={closeModal} disabled={pending}>
-          Cancel
-        </Button>
-        <Button onClick={submit} disabled={pending}>
-          {pending ? "Saving…" : category ? "Save" : "Create"}
-        </Button>
-      </div>
+      </FormFactory>
     </div>
   );
 }

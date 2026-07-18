@@ -23,6 +23,9 @@ export const PAGES = {
   DESIGNS: "/designs",
   PRICING: "/pricing",
   LOGIN: "/login",
+  ACCOUNT: "/account",
+  FORGOT_PASSWORD: "/forgot-password",
+  RESET_PASSWORD: "/reset-password",
 
   ADMIN: {
     INDEX: "/admin",

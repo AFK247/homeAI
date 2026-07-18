@@ -5,6 +5,8 @@ import { drizzleAdapter } from "better-auth/adapters/drizzle";
 import { nextCookies } from "better-auth/next-js";
 import { db } from "@/db/client";
 import { accounts, sessions, users, verifications } from "@/db/schemas/auth.schema";
+import { sendEmail } from "@/lib/email/resend";
+import { resetPasswordEmail } from "@/lib/email/templates";
 import { env } from "@/lib/env";
 
 /*
@@ -40,7 +42,16 @@ export const auth = betterAuth({
     schema: { user: users, session: sessions, account: accounts, verification: verifications },
   }),
 
-  emailAndPassword: { enabled: true },
+  emailAndPassword: {
+    enabled: true,
+    // Forgot-password flow: Better Auth mints a one-time token and calls this with the ready
+    // reset URL (points at our /reset-password page via the client's redirectTo). We just
+    // deliver it. sendEmail fails-open in dev (logs the link) — see lib/email/resend.ts.
+    sendResetPassword: async ({ user, url }) => {
+      const { subject, html } = resetPasswordEmail(url);
+      await sendEmail({ to: user.email, subject, html });
+    },
+  },
   socialProviders,
 
   // Expose our custom `role` column to the session/user object.

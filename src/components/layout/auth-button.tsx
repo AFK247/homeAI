@@ -1,16 +1,25 @@
 "use client";
 
-import { LayoutDashboard, LogOut } from "lucide-react";
+import { ChevronDown, LayoutDashboard, LogOut, User } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useTransition } from "react";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import { PAGES } from "@/config/pages";
 import { authClient, useSession } from "@/lib/auth/client";
 import { useTranslation } from "@/lib/i18n/client";
 
 /*
- * Header auth control. Signed out → a Login link. Signed in → the user's first name + a
- * logout button. Client component (reads the live session). Login is optional app-wide.
+ * Header auth control. Signed out → a Login link. Signed in → an avatar button that opens a
+ * dropdown with the user's name/email, Profile, an Admin shortcut (admins only) and Log out.
+ * Client component (reads the live session). Login is optional app-wide.
  */
 export function AuthButton() {
   const { dict } = useTranslation();
@@ -28,36 +37,60 @@ export function AuthButton() {
     );
   }
 
-  const firstName = session.user.name?.split(" ")[0] ?? session.user.email;
+  const { name, email } = session.user;
+  const firstName = name?.split(" ")[0] ?? email;
   const isAdmin = (session.user as { role?: string }).role === "admin";
 
+  function logout() {
+    startLogout(async () => {
+      await authClient.signOut();
+      router.refresh();
+    });
+  }
+
   return (
-    <div className="flex items-center gap-3">
-      {isAdmin ? (
-        <Link
-          href={PAGES.ADMIN.INDEX}
-          className="flex items-center gap-1 rounded-full bg-secondary px-3 py-1 font-semibold text-secondary-foreground text-sm hover:bg-secondary/80"
+    <DropdownMenu>
+      <DropdownMenuTrigger asChild>
+        <button
+          type="button"
+          aria-label={dict.account.accountLink}
+          className="group flex items-center gap-1.5 rounded-full border border-border px-3 py-1.5 font-semibold text-foreground text-sm transition-colors outline-none hover:bg-muted"
         >
-          <LayoutDashboard className="size-4" />
-          <span className="hidden sm:inline">Admin</span>
-        </Link>
-      ) : null}
-      <span className="hidden font-semibold text-foreground text-sm sm:inline">{firstName}</span>
-      <button
-        type="button"
-        disabled={loggingOut}
-        onClick={() =>
-          startLogout(async () => {
-            await authClient.signOut();
-            router.refresh();
-          })
-        }
-        className="flex items-center gap-1 font-medium text-brand-body text-sm hover:text-foreground"
-        title={dict.login.logout}
-      >
-        <LogOut className="size-4" />
-        <span className="hidden sm:inline">{dict.login.logout}</span>
-      </button>
-    </div>
+          {firstName}
+          <ChevronDown className="size-4 text-muted-foreground transition-transform group-data-[state=open]:rotate-180" />
+        </button>
+      </DropdownMenuTrigger>
+
+      <DropdownMenuContent align="end" className="min-w-[14rem]">
+        <DropdownMenuLabel className="flex flex-col gap-0.5">
+          <span className="truncate font-semibold text-foreground">{name || firstName}</span>
+          <span className="truncate font-normal text-muted-foreground text-xs">{email}</span>
+        </DropdownMenuLabel>
+        <DropdownMenuSeparator />
+
+        <DropdownMenuItem asChild>
+          <Link href={PAGES.ACCOUNT}>
+            <User />
+            {dict.account.accountLink}
+          </Link>
+        </DropdownMenuItem>
+
+        {isAdmin ? (
+          <DropdownMenuItem asChild>
+            <Link href={PAGES.ADMIN.INDEX}>
+              <LayoutDashboard />
+              {dict.account.adminDashboard}
+            </Link>
+          </DropdownMenuItem>
+        ) : null}
+
+        <DropdownMenuSeparator />
+
+        <DropdownMenuItem variant="destructive" disabled={loggingOut} onSelect={logout}>
+          <LogOut />
+          {dict.login.logout}
+        </DropdownMenuItem>
+      </DropdownMenuContent>
+    </DropdownMenu>
   );
 }

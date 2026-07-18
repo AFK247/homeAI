@@ -70,8 +70,11 @@ const serverSchema = z.object({
     .default("false")
     .transform((v) => v === "true"),
 
-  // Email
+  // Email (Resend). RESEND_API_KEY optional — when absent, transactional email is skipped
+  // (logged) instead of crashing, so local dev works without it. EMAIL_FROM is the verified
+  // sender address; defaults to a Resend sandbox address for local testing.
   RESEND_API_KEY: z.string().optional(),
+  EMAIL_FROM: z.string().default("Home AI <onboarding@resend.dev>"),
 
   // Cron auth (protects /api/cron/*)
   CRON_SECRET: z.string().optional(),

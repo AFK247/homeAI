@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useState, useTransition } from "react";
 import { toast } from "sonner";
@@ -109,6 +110,14 @@ export function LoginForm({ dict }: { dict: LoginDict }) {
             required
             minLength={8}
           />
+          {mode === "signin" ? (
+            <Link
+              href={PAGES.FORGOT_PASSWORD}
+              className="self-end text-primary text-xs hover:underline"
+            >
+              {dict.forgotPassword}
+            </Link>
+          ) : null}
         </div>
         <Button size="lg" type="submit" disabled={pending} className="mt-1 w-full">
           {pending ? "…" : mode === "signin" ? dict.continue : dict.createAccount}
@@ -172,4 +181,5 @@ export interface LoginDict {
   createAccount: string;
   needAccount: string;
   haveAccount: string;
+  forgotPassword: string;
 }

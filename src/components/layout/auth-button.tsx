@@ -1,6 +1,6 @@
 "use client";
 
-import { LogOut } from "lucide-react";
+import { LayoutDashboard, LogOut } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useTransition } from "react";
@@ -29,9 +29,19 @@ export function AuthButton() {
   }
 
   const firstName = session.user.name?.split(" ")[0] ?? session.user.email;
+  const isAdmin = (session.user as { role?: string }).role === "admin";
 
   return (
     <div className="flex items-center gap-3">
+      {isAdmin ? (
+        <Link
+          href={PAGES.ADMIN.INDEX}
+          className="flex items-center gap-1 rounded-full bg-secondary px-3 py-1 font-semibold text-secondary-foreground text-sm hover:bg-secondary/80"
+        >
+          <LayoutDashboard className="size-4" />
+          <span className="hidden sm:inline">Admin</span>
+        </Link>
+      ) : null}
       <span className="hidden font-semibold text-foreground text-sm sm:inline">{firstName}</span>
       <button
         type="button"

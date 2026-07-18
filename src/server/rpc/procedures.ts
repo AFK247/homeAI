@@ -28,6 +28,10 @@ export interface RpcContext {
   anonymousId: string;
   /** The signed-in user, or null when anonymous. */
   user: AuthUser | null;
+  /** Best-effort client IP (from x-forwarded-for) — used by the abuse guards. */
+  ip: string | null;
+  /** Client device fingerprint (sent as a header) — used by the abuse guards. */
+  fingerprint: string | null;
 }
 
 /** Base builder carrying our context type. */

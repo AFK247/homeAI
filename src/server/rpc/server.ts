@@ -28,7 +28,8 @@ async function serverContext(): Promise<RpcContext> {
   const u = session?.user as (AuthUser & { role?: string }) | undefined;
   const user: AuthUser | null = u ? { id: u.id, email: u.email, role: u.role ?? "user" } : null;
 
-  return { anonymousId, user };
+  // serverRpc is read-only (server components); the abuse guards never run here.
+  return { anonymousId, user, ip: null, fingerprint: null };
 }
 
 export const serverRpc = createRouterClient(webRouter, {

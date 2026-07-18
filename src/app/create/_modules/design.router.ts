@@ -12,13 +12,37 @@ import {
   type RoomType,
 } from "@/db/schemas/shared.schema";
 import { logger } from "@/lib/logger";
-import { publicProcedure } from "@/server/rpc/procedures";
+import { publicProcedure, type RpcContext } from "@/server/rpc/procedures";
 import { AiService } from "@/server/service/ai/ai.service";
 import { measureImage } from "@/server/service/ai/image-preprocess";
 import { GenerationLogService } from "@/server/service/generation-log.service";
+import { checkGuards, recordUsage } from "@/server/service/rate-limit/registry";
 import { StorageService } from "@/server/service/storage/storage.service";
 import { TagService } from "@/server/service/vision/tag.service";
 import { DesignService } from "./design.service";
+
+/*
+ * Abuse defense: run the guard chain (global cap → burst → free cap) before an AI action
+ * and record the (permitted) attempt so it counts next time. Throws a clear oRPC error the
+ * UI can show. See src/server/service/rate-limit — adding a layer never touches this code.
+ */
+async function enforceGuards(context: RpcContext, action: "generate" | "regenerate") {
+  const guardCtx = {
+    action,
+    anonymousId: context.anonymousId,
+    userId: context.user?.id ?? null,
+    ip: context.ip,
+    fingerprint: context.fingerprint,
+  };
+  const verdict = await checkGuards(guardCtx);
+  if (!verdict.allowed) {
+    throw new ORPCError(verdict.code === "rate_limited" ? "TOO_MANY_REQUESTS" : "FORBIDDEN", {
+      message: verdict.message ?? "Request blocked.",
+      data: { code: verdict.code, retryAfterSeconds: verdict.retryAfterSeconds },
+    });
+  }
+  await recordUsage(guardCtx);
+}
 
 /*
  * Design router (plan §5.2), adapted to the SYNCHRONOUS Cloudflare flow:
@@ -170,6 +194,9 @@ export const designRouter = {
     .route({ method: "POST" })
     .input(GenerateInput)
     .handler(async ({ input, context }) => {
+      // Abuse defense — before spending any AI budget.
+      await enforceGuards(context, "generate");
+
       const bytes = decodeImage(input.image);
 
       // 1. store the original upload — persist the KEY, not a full URL
@@ -223,6 +250,9 @@ export const designRouter = {
       }),
     )
     .handler(async ({ input, context }) => {
+      // Abuse defense — regenerate spends AI budget too.
+      await enforceGuards(context, "regenerate");
+
       const existing = await DesignService.getById({
         id: input.id,
         anonymousId: context.anonymousId,

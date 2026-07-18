@@ -30,11 +30,17 @@ async function resolveContext(): Promise<RpcContext> {
     });
   }
 
-  const session = await auth.api.getSession({ headers: await headers() });
+  const h = await headers();
+  const session = await auth.api.getSession({ headers: h });
   const u = session?.user as (AuthUser & { role?: string }) | undefined;
   const user: AuthUser | null = u ? { id: u.id, email: u.email, role: u.role ?? "user" } : null;
 
-  return { anonymousId, user };
+  // Client signals for the abuse guards. IP: the first hop in x-forwarded-for (the real
+  // client behind the proxy chain). Fingerprint: a client-sent device hash (ThumbmarkJS).
+  const ip = h.get("x-forwarded-for")?.split(",")[0]?.trim() || h.get("x-real-ip") || null;
+  const fingerprint = h.get("x-device-fingerprint") || null;
+
+  return { anonymousId, user, ip, fingerprint };
 }
 
 async function handle(request: Request): Promise<Response> {

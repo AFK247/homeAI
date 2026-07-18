@@ -29,6 +29,7 @@ export const columns: DataTableColumn<MapRow>[] = [
     header: "",
     accessorKey: "id",
     id: "actions",
+    stickyRight: true,
     className: "text-right",
     cell: (m) => (
       <MapActions

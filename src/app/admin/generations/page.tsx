@@ -18,7 +18,7 @@ export default async function AdminGenerationsPage({ searchParams }: PageSearchP
     <>
       <PageHeader title="Generations" />
       <Suspense fallback={<DataTableSkeleton />}>
-        <GenerationStats />
+        <GenerationStats searchParams={raw} />
         <GenerationsList searchParams={raw} />
       </Suspense>
     </>

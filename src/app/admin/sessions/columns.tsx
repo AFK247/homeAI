@@ -26,6 +26,7 @@ export const columns: DataTableColumn<SessionRow>[] = [
     header: "",
     accessorKey: "anonymousId",
     id: "actions", // distinct key — shares accessorKey with the session-id column
+    stickyRight: true,
     className: "w-10 text-right",
     // Drill into this session's designs (filtered).
     cell: (s) =>

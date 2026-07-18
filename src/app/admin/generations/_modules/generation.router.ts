@@ -16,7 +16,10 @@ export const generationRouter = {
     .input(searchParamsSchema)
     .handler(({ input }) => GenerationService.listPaginated(input)),
 
-  stats: publicProcedure.route({ method: "GET" }).handler(() => GenerationService.stats()),
+  stats: publicProcedure
+    .route({ method: "GET" })
+    .input(searchParamsSchema)
+    .handler(({ input }) => GenerationService.stats(input)),
 
   countsByProvider: publicProcedure
     .route({ method: "GET" })

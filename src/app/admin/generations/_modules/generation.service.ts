@@ -14,7 +14,7 @@ import { GenerationLogService } from "@/server/service/generation-log.service";
  */
 export const GenerationService = {
   listPaginated: (params: SearchParams) => GenerationLogService.listPaginated(params),
-  stats: () => GenerationLogService.stats(),
+  stats: (params: SearchParams) => GenerationLogService.stats(params),
   countsByProvider: () => GenerationLogService.countsByProvider(),
 
   /** One attempt plus its parent design (if any), for the detail page. */

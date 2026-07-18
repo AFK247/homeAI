@@ -38,6 +38,7 @@ export const columns: DataTableColumn<Vendor>[] = [
     header: "",
     accessorKey: "id",
     id: "actions",
+    stickyRight: true,
     className: "text-right",
     cell: (v) => <VendorRowActions vendor={v} />,
   },

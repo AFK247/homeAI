@@ -18,6 +18,12 @@ import { useQueryParams } from "@/hooks/use-query-params";
 import { cn } from "@/lib/utils";
 
 /*
+ * Classes for a column pinned to the right edge (the actions column) so it stays visible
+ * and reachable during horizontal scroll. Opaque card bg so rows scroll cleanly behind it.
+ */
+const STICKY_RIGHT = "sticky right-0 border-border border-l bg-card last:border-r-0";
+
+/*
  * Reusable data table (reference convention). ONE component handles everything:
  * search + filters + clear + the table + pagination. Consumers pass config, not
  * assembled JSX — every list is a single <DataTable ... /> call.
@@ -43,6 +49,11 @@ export interface DataTableColumn<T> {
   size?: number;
   sortable?: boolean;
   className?: string;
+  /**
+   * Pin this column to the right edge so it stays visible while the table scrolls
+   * horizontally — use for the actions column so its buttons are always reachable.
+   */
+  stickyRight?: boolean;
 }
 
 export interface DataTableFilter {
@@ -212,7 +223,12 @@ export function DataTable<T>({
                   <th
                     key={colKey}
                     style={{ width: col.size }}
-                    className="whitespace-nowrap border-border border-r px-4 py-3 text-left align-middle font-semibold text-[#6B7280] last:border-r-0"
+                    className={cn(
+                      "whitespace-nowrap border-border border-r px-4 py-3 text-left align-middle font-semibold text-[#6B7280] last:border-r-0",
+                      // Pin to the right edge. A soft left shadow (before:) hints that the
+                      // table scrolls behind this column — so it doesn't look like the end.
+                      col.stickyRight && cn(STICKY_RIGHT, "z-20"),
+                    )}
                   >
                     {col.sortable ? (
                       <button
@@ -271,7 +287,7 @@ export function DataTable<T>({
                   key={key(row, i)}
                   onClick={onRowClick ? () => onRowClick(row) : undefined}
                   className={cn(
-                    "border-border border-b transition-colors last:border-b-0 hover:bg-muted/50",
+                    "group border-border border-b transition-colors last:border-b-0 hover:bg-muted/50",
                     onRowClick && "cursor-pointer",
                   )}
                 >
@@ -280,6 +296,10 @@ export function DataTable<T>({
                       key={col.id ?? String(col.accessorKey)}
                       className={cn(
                         "relative whitespace-nowrap border-border border-r px-4 py-2.5 align-middle text-foreground tabular-nums last:border-r-0",
+                        // Pin the actions column right; opaque bg so rows scroll behind it,
+                        // a soft left shadow hints there's more table, and the row-hover bg
+                        // is matched via group so the sticky cell doesn't look detached.
+                        col.stickyRight && cn(STICKY_RIGHT, "z-10 group-hover:bg-muted"),
                         col.className,
                       )}
                     >

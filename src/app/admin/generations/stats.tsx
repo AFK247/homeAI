@@ -1,13 +1,23 @@
-import { CircleDollarSign, Clock, ImageIcon, TrendingUp } from "lucide-react";
+import { Clock, Cpu, ImageIcon, TrendingUp } from "lucide-react";
+import { parseListParams, type RawSearchParams } from "@/db/helpers/search-params";
 import { serverRpc } from "@/server/rpc/server";
 
-/* Headline generation KPIs — server component; reads through the oRPC router. */
-export async function GenerationStats() {
-  const stats = await serverRpc.generation.stats();
+/* Headline generation KPIs — server component; scoped to the SAME filters as the table so
+ * the cards reflect the currently-filtered rows. */
+export async function GenerationStats({ searchParams }: { searchParams: RawSearchParams }) {
+  const params = parseListParams(searchParams, {
+    filterKeys: ["provider", "style", "roomType", "session", "designId"],
+  });
+  const stats = await serverRpc.generation.stats(params);
   const successRate = stats.total ? Math.round((stats.succeeded / stats.total) * 100) : 0;
 
   const cards = [
-    { label: "Total spend", value: `$${stats.totalCostUsd.toFixed(2)}`, icon: CircleDollarSign },
+    {
+      // Cloudflare bills in Neurons (not $), so the meaningful total is neurons spent.
+      label: "Total neurons",
+      value: Math.round(stats.totalNeurons).toLocaleString("en-US"),
+      icon: Cpu,
+    },
     { label: "Generations", value: String(stats.total), icon: ImageIcon },
     { label: "Success rate", value: `${successRate}%`, icon: TrendingUp },
     { label: "Avg latency", value: `${(stats.avgLatencyMs / 1000).toFixed(1)}s`, icon: Clock },

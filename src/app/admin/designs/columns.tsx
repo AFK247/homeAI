@@ -70,6 +70,8 @@ export const columns: DataTableColumn<Design>[] = [
   {
     header: "",
     accessorKey: "id",
+    id: "actions",
+    stickyRight: true,
     className: "w-10 text-right",
     cell: (d) => (
       <Link

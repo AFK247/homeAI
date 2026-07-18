@@ -45,6 +45,7 @@ export const columns: DataTableColumn<CategoryRow>[] = [
     header: "",
     accessorKey: "id",
     id: "actions",
+    stickyRight: true,
     className: "text-right",
     cell: (c) => <CategoryRowActions category={c} />,
   },

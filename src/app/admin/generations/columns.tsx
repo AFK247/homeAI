@@ -116,6 +116,8 @@ export const columns: DataTableColumn<GenerationLogRow>[] = [
   {
     header: "",
     accessorKey: "id",
+    id: "actions",
+    stickyRight: true,
     className: "w-10 text-right",
     cell: (g) => (
       <Link

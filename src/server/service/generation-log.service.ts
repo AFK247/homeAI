@@ -50,6 +50,30 @@ export interface GenerationLogInput {
   outputHeight?: number | null;
 }
 
+/**
+ * The shared filter/search predicate for generation logs. Used by BOTH the paginated
+ * table and the stats KPIs, so the headline numbers always reflect the same filtered set
+ * the table shows (provider / style / room / session / design + search).
+ */
+function generationWhere(params: SearchParams) {
+  return andWhere([
+    searchFilters(
+      [generationLogs.model, generationLogs.provider, generationLogs.anonymousId],
+      params.search,
+    ),
+    ...equalFilters(
+      {
+        provider: generationLogs.provider,
+        style: generationLogs.style,
+        roomType: generationLogs.roomType,
+        session: generationLogs.anonymousId,
+        designId: generationLogs.designId,
+      },
+      params.filters,
+    ),
+  ]);
+}
+
 export const GenerationLogService = {
   /** Insert a generation-attempt row; returns its id (null if the write failed). */
   log: async (input: GenerationLogInput): Promise<string | null> => {
@@ -107,22 +131,7 @@ export const GenerationLogService = {
 
   /** Paginated generation logs with backend search / filter / sort (admin table). */
   listPaginated: async (params: SearchParams) => {
-    const where = andWhere([
-      searchFilters(
-        [generationLogs.model, generationLogs.provider, generationLogs.anonymousId],
-        params.search,
-      ),
-      ...equalFilters(
-        {
-          provider: generationLogs.provider,
-          style: generationLogs.style,
-          roomType: generationLogs.roomType,
-          session: generationLogs.anonymousId,
-          designId: generationLogs.designId,
-        },
-        params.filters,
-      ),
-    ]);
+    const where = generationWhere(params);
     const sortMap = {
       createdAt: generationLogs.createdAt,
       costUsd: generationLogs.costUsd,
@@ -150,17 +159,26 @@ export const GenerationLogService = {
     return { ...row, imageUrl: StorageService.publicUrl(row.imageUrl) };
   },
 
-  /** Headline KPIs: total spend, count, success rate, avg latency. */
-  stats: async () => {
+  /**
+   * Headline KPIs (total neurons, count, success rate, avg latency) — scoped to the SAME
+   * filters as the table so the cards update when the admin filters/searches. Pass the
+   * parsed list params; omit for global totals.
+   */
+  stats: async (params?: SearchParams) => {
+    const where = params ? generationWhere(params) : undefined;
     const [row] = await db
       .select({
         total: sql<number>`count(*)::int`,
         succeeded: sql<number>`count(*) filter (where ${generationLogs.success})::int`,
         totalCostUsd: sql<number>`coalesce(sum(${generationLogs.costUsd}), 0)::float`,
+        // Real Neurons spent across every logged generation (image + tagging). This is the
+        // meaningful cost figure for Cloudflare, which bills in Neurons (costUsd is null).
+        totalNeurons: sql<number>`coalesce(sum(${generationLogs.neurons}), 0)::float`,
         avgLatencyMs: sql<number>`coalesce(round(avg(${generationLogs.latencyMs})), 0)::int`,
       })
-      .from(generationLogs);
-    return row ?? { total: 0, succeeded: 0, totalCostUsd: 0, avgLatencyMs: 0 };
+      .from(generationLogs)
+      .where(where);
+    return row ?? { total: 0, succeeded: 0, totalCostUsd: 0, totalNeurons: 0, avgLatencyMs: 0 };
   },
 
   /** Successful generation count per provider, keyed by provider. */

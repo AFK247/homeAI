@@ -107,24 +107,73 @@ export const CreditService = {
   },
 
   /**
-   * First-visit anonymous grant of `free` credits — ONCE per anon identity. Idempotent: if the
-   * account already exists (i.e. already granted), this is a no-op. Composite-identity
-   * hardening (IP/fingerprint) is applied by the caller before invoking this.
+   * First-visit anonymous grant of `free` credits — ONCE per composite identity (§5). Two guards:
+   *   1. Per anonymousId — already has an account → no-op (idempotent).
+   *   2. Anti-farming — if a PRIOR anon account shares this IP OR fingerprint, we still create the
+   *      account (so the session works) but grant it ZERO credits. This stops "clear cookies →
+   *      fresh 10 credits": a new anonymousId doesn't escape a device/network that already claimed
+   *      its free grant. IP/fingerprint are captured on the FIRST grant for the match.
+   *
+   * `signals` come from the request (rate-limit context). Null signals simply don't match — a
+   * client that sends neither IP nor fingerprint is only protected by the cookie (best-effort).
    */
-  grantAnon: async (anonymousId: string) => {
+  grantAnon: async (
+    anonymousId: string,
+    signals?: { ip?: string | null; fingerprint?: string | null },
+  ) => {
+    const ip = signals?.ip ?? null;
+    const fingerprint = signals?.fingerprint ?? null;
     return db.transaction(async (tx) => {
       const existing = await findAccount(tx, { anonymousId });
-      if (existing) return existing; // already granted
-      const [acc] = await tx.insert(creditAccounts).values({ anonymousId }).returning();
+      if (existing) return existing; // already granted for this session
+
+      /*
+       * Anti-farming, tuned for shared WiFi (common in BD — households, offices, carrier CGNAT
+       * share one IP across many real users). The DEVICE FINGERPRINT is the strong signal; IP is
+       * only a weak fallback:
+       *   - fingerprint present → block iff the SAME fingerprint already got a grant. Different
+       *     real users on one WiFi have different fingerprints, so they're NOT blocked; a farmer
+       *     clearing cookies on the same device IS blocked.
+       *   - fingerprint absent → we can't tell devices apart, so fall back to blocking on IP.
+       * We deliberately do NOT block on IP when a fingerprint is present.
+       */
+      const matchClause = fingerprint
+        ? eq(creditAccounts.grantFingerprint, fingerprint)
+        : ip
+          ? eq(creditAccounts.grantIp, ip)
+          : undefined;
+      let alreadyGranted = false;
+      if (matchClause) {
+        const [prior] = await tx
+          .select({ id: creditAccounts.id })
+          .from(creditAccounts)
+          .where(matchClause)
+          .limit(1);
+        alreadyGranted = Boolean(prior);
+      }
+
+      const grant = alreadyGranted ? 0 : ANON_GRANT_CREDITS;
+      const [acc] = await tx
+        .insert(creditAccounts)
+        .values({
+          anonymousId,
+          freeBalance: grant,
+          grantIp: ip,
+          grantFingerprint: fingerprint,
+        })
+        .returning();
       if (!acc) throw new Error("failed to create anon account");
-      await writeLedger(tx, acc.id, {
-        delta: ANON_GRANT_CREDITS,
-        kind: "free",
-        reason: "anon_grant",
-        freeAfter: ANON_GRANT_CREDITS,
-        paidAfter: 0,
-      });
-      return { ...acc, freeBalance: ANON_GRANT_CREDITS };
+      // Only write a ledger row when credits are actually granted.
+      if (grant > 0) {
+        await writeLedger(tx, acc.id, {
+          delta: grant,
+          kind: "free",
+          reason: "anon_grant",
+          freeAfter: grant,
+          paidAfter: 0,
+        });
+      }
+      return acc;
     });
   },
 

@@ -29,11 +29,18 @@ export const creditAccounts = pgTable(
     // Cached balances (fast reads). `free` credits run free-tier models only; `paid` any model.
     freeBalance: integer("free_balance").notNull().default(0),
     paidBalance: integer("paid_balance").notNull().default(0),
+    // Composite identity captured at the anon grant, so clearing cookies (new anonymousId) can't
+    // farm a fresh free grant — a prior account with the same IP OR fingerprint blocks a re-grant
+    // (docs/CREDIT_SYSTEM.md §5). Null for user accounts / legacy rows.
+    grantIp: text("grant_ip"),
+    grantFingerprint: text("grant_fingerprint"),
     ...timestampColumns,
   },
   (t) => [
     index("credit_accounts_user_idx").on(t.userId),
     index("credit_accounts_anon_idx").on(t.anonymousId),
+    index("credit_accounts_grant_ip_idx").on(t.grantIp),
+    index("credit_accounts_grant_fp_idx").on(t.grantFingerprint),
   ],
 );
 

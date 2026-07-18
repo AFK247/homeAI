@@ -3,7 +3,6 @@ import "server-only";
 import { ORPCError } from "@orpc/server";
 import { z } from "zod";
 import { CategoryService } from "@/app/admin/categories/_modules/category.service";
-import { DEFAULT_MODEL, type ModelId, modelTier } from "@/server/service/credit/models";
 import {
   BUDGET_TIERS,
   type BudgetTier,
@@ -21,6 +20,7 @@ import {
   InsufficientCreditsError,
   type Owner,
 } from "@/server/service/credit/credit.service";
+import { DEFAULT_MODEL, type ModelId, modelTier } from "@/server/service/credit/models";
 import { GenerationLogService } from "@/server/service/generation-log.service";
 import { checkGuards, recordUsage } from "@/server/service/rate-limit/registry";
 import { StorageService } from "@/server/service/storage/storage.service";
@@ -73,9 +73,14 @@ async function reserveCredits(context: RpcContext, requested?: string) {
       ? (requested as ModelId)
       : DEFAULT_MODEL;
 
-  // First-visit anon grant (idempotent) so a new anonymous user has their free credits to spend.
-  // TODO(§5): harden the grant against cookie-clearing with IP/fingerprint composite identity.
-  if (!context.user?.id) await CreditService.grantAnon(context.anonymousId);
+  // First-visit anon grant, hardened against cookie-clearing via IP/fingerprint (§5): a device
+  // or network that already claimed its free grant can't farm a fresh 10 by clearing cookies.
+  if (!context.user?.id) {
+    await CreditService.grantAnon(context.anonymousId, {
+      ip: context.ip,
+      fingerprint: context.fingerprint,
+    });
+  }
 
   try {
     return await CreditService.reserve(ownerFrom(context), model);

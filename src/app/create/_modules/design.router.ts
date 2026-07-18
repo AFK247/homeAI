@@ -3,7 +3,7 @@ import "server-only";
 import { ORPCError } from "@orpc/server";
 import { z } from "zod";
 import { CategoryService } from "@/app/admin/categories/_modules/category.service";
-import { DEFAULT_MODEL, type ModelId, modelTier } from "@/config/credits";
+import { DEFAULT_MODEL, type ModelId, modelTier } from "@/server/service/credit/models";
 import {
   BUDGET_TIERS,
   type BudgetTier,

@@ -3,15 +3,13 @@ import "server-only";
 import { and, desc, eq } from "drizzle-orm";
 import {
   ANON_GRANT_CREDITS,
-  type ModelId,
-  modelCost,
-  modelTier,
   RESET_BALANCE_ON_PURCHASE,
   SIGNUP_GRANT_CREDITS,
 } from "@/config/credits";
 import { db } from "@/db/client";
 import { creditAccounts, creditTransactions } from "@/db/schemas/billing.schema";
 import type { CreditKind, CreditReason } from "@/db/schemas/shared.schema";
+import { type ModelId, modelCost, modelTier } from "./models";
 
 /*
  * CreditService (docs/CREDIT_SYSTEM.md §8). All credit reads/writes live here. Every balance

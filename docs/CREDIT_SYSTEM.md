@@ -108,28 +108,27 @@ Premium model = 40 credits/img.
 images but the **same margin %** — credits scale with model cost. Enterprise is a 4th pricing-page
 card with a contact CTA, not a fixed price.
 
-### 4b. Open top-up ("prepaid bridge card" — enter any amount)
-The customer **enters any amount from $5 (≈৳600) upward** — $5, $7, $10, $20, $50, $100,
-whatever — and gets credits at a **flat ৳2/credit ($0.0167)**. Exactly how Leonardo/OpenAI/
-Anthropic sell PAYG credits. This is a **first-class purchase path**, not a fallback.
+### 4b. Open top-up ("prepaid bridge card" — enter any amount, USD)
+The customer **enters any USD amount from $5 upward** — $5, $7, $10, $20, $50, whatever — and
+gets credits at **exactly the pack rate**. A first-class purchase path, not a fallback.
 
-| Enter | Credits | ~Premium imgs |
+**No discrepancy with the packs (this is a hard rule).** `creditsForUsd(amount)` **mirrors the
+packs**: it interpolates along the packs' own price→credits curve, so entering a pack's price
+yields exactly that pack's credits. Between packs it interpolates linearly; above the priciest
+pack it extends that segment's marginal rate. It is **derived from `CREDIT_PACKS`** in config, so
+the two can never drift.
+
+| Enter | Credits | On the curve |
 |---|---|---|
-| $5 (৳600) — **minimum** | 300 | ~50 |
-| $7 (৳840) | 420 | ~70 |
-| $10 (৳1,200) | 600 | ~100 |
-| $20 (৳2,400) | 1,200 | ~200 |
-| $50 (৳6,000) | 3,000 | ~500 |
-| $100 (৳12,000) | 6,000 | ~1,000 |
+| $5 — **minimum** | 1,300 | = Popular pack exactly |
+| $7 | 1,900 | interpolated (Popular→Pro) |
+| $10 | 2,800 | = Pro pack exactly |
+| $20 | 5,800 | Pro marginal rate extended |
+| $50 | 14,800 | " |
 
-- **Flat rate:** `credits = floor(amountBdt / RATE)`, `RATE = ৳2`. Margin is identical to the
-  Starter pack (60%+) at every amount.
-- **Deliberately the flat ৳2 rate** (= Starter, worse than bulk packs) so the curated packs stay
-  the better per-credit deal and open top-up is the flexible "any amount" option.
-- **Min = $5 (৳600)** — below this, bKash/Nagad/card gateway fees eat the margin. **Max** (e.g.
-  $500) as a fraud ceiling.
-- Optional later: a small volume-bonus curve above some threshold (e.g. +5% over $50) so large
-  top-ups still feel rewarded without undercutting packs — deferred; flat for v1.
+- **Min = $5**, **max = $500** (fraud ceiling).
+- Because the top-up equals the packs, a user never gets a worse deal by typing an amount than by
+  clicking a card — the earlier "$5 → 1250 vs Popular 1300" bug is gone.
 
 Both packs and open top-up credits are **`paid` credits** (§5) — they unlock premium/flagship
 models and never expire (§6).
@@ -151,9 +150,10 @@ box below):
      fingerprint** — the exact pattern `free-cap.guard.ts` already uses. Clearing cookies /
      incognito does NOT re-grant (IP+fingerprint match blocks a second grant). Trade-off: shared
      IPs (offices, BD mobile networks) may under-grant; fingerprint disambiguates most cases.
-2. **Signup opening grant** — **SET balance to 70 `free` credits** at account creation (~35 free
+2. **Signup opening grant** — **SET balance to 20 `free` credits** at account creation (~10 free
    renders), via the claim-on-signup hook (`auth.ts`). **Once per account, ever.** It **REPLACES**
-   the leftover anon balance (not summed) — so "farm anon → sign up to stack" gains nothing.
+   the leftover anon balance (not summed) — so "farm anon → sign up to stack" gains nothing. A
+   modest ~2× bump over the anon 10, so signup is worthwhile without giving away too much.
 3. **Purchase** — pack / open-top-up (§4). **SET balance to the purchased `paid` amount** — this
    **REPLACES everything, including leftover paid credits** (see box).
 
@@ -178,7 +178,7 @@ Not all credits are equal. Every credit has a **kind**:
 **Why:** premium models are both *better* and pricier. If free credits could buy premium, the
 grant → ~1 premium image, which feels broken. Instead, **free credits only run the standard/free
 model; premium is unlocked by PAID credits.** This is Firefly's / Canva's model (§9). Messaging:
-- Free user: *"70 free credits → ~35 redesigns on our standard AI."*
+- Free user: *"20 free credits → ~10 redesigns on our standard AI."*
 - Paid user: *"Buy credits to unlock premium AI — sharper, more realistic."*
 
 **Spend rule:** a **free-tier** model spends **`free` credits** (falls back to paid only if free
@@ -186,7 +186,7 @@ is empty and the user has paid). A **premium/flagship** model spends **`paid` cr
 and is not offered to a user with zero paid credits. (Because purchases REPLACE the balance,
 free and paid rarely coexist — but the kind check still governs which models are reachable.)
 
-Example: anon granted 10 `free` → uses ~2 renders (~4 credits) → ~6 left → signs up → **SET to 70
+Example: anon granted 10 `free` → uses ~2 renders (~4 credits) → ~6 left → signs up → **SET to 20
 `free`** (replaces the 6) → buys ৳500 pack → **SET to 1200 `paid`** (the leftover free is wiped +
 logged as an `expire` row). Now premium renders (40 cr) draw from the 1200 paid.
 

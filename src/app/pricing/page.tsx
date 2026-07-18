@@ -1,126 +1,29 @@
-import { Check } from "lucide-react";
 import { HeaderCreditBadge } from "@/components/layout/header-credit-badge";
 import { SiteHeader } from "@/components/layout/site-header";
-import { Button } from "@/components/ui/button";
-import { formatBdt, localeDigits } from "@/lib/format";
-import { getDictionary } from "@/lib/i18n/server";
-import { cn } from "@/lib/utils";
+import { PricingCards } from "./_components/pricing-cards";
 
 /*
- * Pricing / credits (design). Free tier + two paid credit packs; bKash + Nagad
- * shown clearly. Consumer pricing is low/free by design (PROJECT_CONTEXT §10) —
- * monetize supply side later.
+ * Pricing / credits (docs/CREDIT_SYSTEM.md §4). USD-ONLY, English-only (international-first) — it
+ * intentionally does not use the i18n dict, so the language toggle never turns it Bengali. A
+ * separate BD/taka pricing page can come later. Free (auto-granted on signup) + two credit packs
+ * + Enterprise, then an open "enter any amount" top-up. Config-driven via CREDIT_PACKS. Card
+ * checkout is wired in the client PricingCards (payment init is Phase 2).
  */
-export default async function PricingPage() {
-  const { dict, locale } = await getDictionary();
-  const num = (n: number) => localeDigits(n, locale);
-
-  const plans = [
-    {
-      name: dict.pricing.freePlanName,
-      price: 0,
-      designs: 5,
-      highlight: false,
-      popular: false,
-      features: [
-        `${num(5)}${dict.pricing.freeFeature1Suffix}`,
-        dict.pricing.starterFeature2,
-        dict.pricing.starterFeature3,
-      ],
-      cta: dict.pricing.freeCta,
-    },
-    {
-      name: dict.pricing.packName,
-      price: 200,
-      designs: 50,
-      highlight: true,
-      popular: true,
-      features: [
-        `${num(50)}${dict.pricing.packFeature1Suffix}`,
-        dict.pricing.packFeature2,
-        dict.pricing.packFeature3,
-        dict.pricing.packFeature4,
-      ],
-      cta: dict.pricing.buyCta,
-    },
-    {
-      name: dict.pricing.proName,
-      price: 800,
-      designs: 250,
-      highlight: false,
-      popular: false,
-      features: [
-        `${num(250)}${dict.pricing.packFeature1Suffix}`,
-        dict.pricing.proFeature2,
-        dict.pricing.proFeature3,
-        dict.pricing.proFeature4,
-      ],
-      cta: dict.pricing.buyCta,
-    },
-  ];
-
+export default function PricingPage() {
   return (
     <>
       <SiteHeader rightSlot={<HeaderCreditBadge />} />
-      <main className="mx-auto w-full max-w-5xl flex-1 px-6 py-14 text-center">
+      <main className="mx-auto w-full max-w-6xl flex-1 px-6 py-14 text-center">
         <h1 className="font-serif font-extrabold text-3xl text-foreground md:text-4xl">
-          {dict.pricing.title}
+          Simple, affordable credits
         </h1>
         <p className="mt-2 text-brand-body">
-          {dict.pricing.subtitlePrefix}
-          {num(5)}
-          {dict.pricing.subtitleSuffix}
+          Sign up for free credits. Buy more any time — they never expire.
         </p>
 
-        <div className="mt-10 grid gap-5 md:grid-cols-3">
-          {plans.map((plan) => (
-            <div
-              key={plan.name}
-              className={cn(
-                "relative flex flex-col gap-5 rounded-2xl bg-card p-7 text-left shadow-sm",
-                plan.highlight && "ring-2 ring-primary",
-              )}
-            >
-              {plan.popular ? (
-                <span className="-top-3 -translate-x-1/2 absolute left-1/2 rounded-full bg-primary px-3 py-1 font-bold text-[11px] text-primary-foreground">
-                  {dict.pricing.popularBadge}
-                </span>
-              ) : null}
-              <div>
-                <div className="font-bold text-foreground text-lg">{plan.name}</div>
-                <div className="mt-2 flex items-baseline gap-1.5">
-                  <span className="font-serif font-extrabold text-3xl text-foreground">
-                    {plan.price === 0 ? dict.pricing.free : formatBdt(plan.price, locale)}
-                  </span>
-                  <span className="text-muted-foreground text-sm">
-                    / {num(plan.designs)}
-                    {dict.pricing.packUnitSuffix}
-                  </span>
-                </div>
-                {plan.price > 0 ? (
-                  <div className="mt-1 text-brand-faint text-xs">
-                    ~{formatBdt(plan.price / plan.designs, locale)} {dict.pricing.perDesignSuffix}
-                  </div>
-                ) : null}
-              </div>
-              <ul className="flex flex-col gap-2.5">
-                {plan.features.map((f) => (
-                  <li key={f} className="flex items-center gap-2 text-brand-body text-sm">
-                    <Check className="size-4 text-primary" /> {f}
-                  </li>
-                ))}
-              </ul>
-              <Button
-                size="lg"
-                variant={plan.highlight ? "default" : "outline"}
-                className="mt-auto w-full"
-              >
-                {plan.cta}
-              </Button>
-            </div>
-          ))}
-        </div>
-        <p className="mt-6 text-brand-faint text-xs">{dict.pricing.footer}</p>
+        <PricingCards />
+
+        <p className="mt-6 text-brand-faint text-xs">Secure payment via card, bKash & Nagad.</p>
       </main>
     </>
   );

@@ -6,7 +6,7 @@
  *   bun --conditions=react-server run scripts/verify-credit-gate.ts
  */
 import { eq } from "drizzle-orm";
-import { DEFAULT_MODEL } from "@/config/credits";
+import { DEFAULT_MODEL } from "@/server/service/credit/models";
 import { db } from "@/db/client";
 import { creditAccounts } from "@/db/schemas/billing.schema";
 import { CreditService, InsufficientCreditsError } from "@/server/service/credit/credit.service";

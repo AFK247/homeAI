@@ -1,0 +1,134 @@
+[
+  {
+    "vendor": "navana",
+    "name": "Patient Examination Bed (MBE 5060)",
+    "priceBdt": 13427,
+    "currency": "BDT",
+    "category": "patient examination bed",
+    "dimensions": null,
+    "sourceUrl": "https://www.navanafurniture.com/product/double-fowler-bed-mbe-5060/",
+    "imageUrl": "https://www.navanafurniture.com/wp-content/uploads/2020/10/MBE-5060-min.jpg",
+    "imageFile": null
+  },
+  {
+    "vendor": "navana",
+    "name": "DINING CHAIR (HDC 6147)",
+    "priceBdt": 7299,
+    "currency": "BDT",
+    "category": "dining chair",
+    "dimensions": null,
+    "sourceUrl": "https://www.navanafurniture.com/product/dining-chair-hdc-6147/",
+    "imageUrl": "https://www.navanafurniture.com/wp-content/uploads/2020/09/WEB-HDC-6147-A-min.jpg",
+    "imageFile": null
+  },
+  {
+    "vendor": "navana",
+    "name": "DINING CHAIR (HDC 6138)",
+    "priceBdt": 6762,
+    "currency": "BDT",
+    "category": "dining chair",
+    "dimensions": null,
+    "sourceUrl": "https://www.navanafurniture.com/product/dining-chair-hdc-6138/",
+    "imageUrl": "https://www.navanafurniture.com/wp-content/uploads/2020/09/WEB-HDC-6138-A-min.jpg",
+    "imageFile": null
+  },
+  {
+    "vendor": "navana",
+    "name": "DINING CHAIR (HDC 6134)",
+    "priceBdt": 6869,
+    "currency": "BDT",
+    "category": "dining chair",
+    "dimensions": null,
+    "sourceUrl": "https://www.navanafurniture.com/product/dining-chair-hdc-6134/",
+    "imageUrl": "https://www.navanafurniture.com/wp-content/uploads/2020/09/WEB-HDC-6134-A-min.jpg",
+    "imageFile": null
+  },
+  {
+    "vendor": "navana",
+    "name": "DINING CHAIR (HDC 6136)",
+    "priceBdt": 6547,
+    "currency": "BDT",
+    "category": "dining chair",
+    "dimensions": null,
+    "sourceUrl": "https://www.navanafurniture.com/product/dining-chair-hdc-6136/",
+    "imageUrl": "https://www.navanafurniture.com/wp-content/uploads/2020/09/WEB-HDC-6136-A-min.jpg",
+    "imageFile": null
+  },
+  {
+    "vendor": "navana",
+    "name": "DINING CHAIR (HDC 6150)",
+    "priceBdt": 9664,
+    "currency": "BDT",
+    "category": "dining chair",
+    "dimensions": null,
+    "sourceUrl": "https://www.navanafurniture.com/product/dining-chair-hdc-6155/",
+    "imageUrl": "https://www.navanafurniture.com/wp-content/uploads/2020/10/WEB-HDC-6150-A-min.jpg",
+    "imageFile": null
+  },
+  {
+    "vendor": "navana",
+    "name": "SHOE RACK (HSR 6603)",
+    "priceBdt": 14932,
+    "currency": "BDT",
+    "category": "shoe rack",
+    "dimensions": null,
+    "sourceUrl": "https://www.navanafurniture.com/product/shoe-rack-hsr-6603/",
+    "imageUrl": "https://www.navanafurniture.com/wp-content/uploads/2020/08/WEB-Shoe-Rack-HSR-66041-min.jpg",
+    "imageFile": null
+  },
+  {
+    "vendor": "navana",
+    "name": "DINING CHAIR (HDC 2110 LR)",
+    "priceBdt": 3537,
+    "currency": "BDT",
+    "category": "dining chair",
+    "dimensions": null,
+    "sourceUrl": "https://www.navanafurniture.com/product/dining-chair-hdc-2110-lr/",
+    "imageUrl": "https://www.navanafurniture.com/wp-content/uploads/2020/10/WEB-2110-A-min.jpg",
+    "imageFile": null
+  },
+  {
+    "vendor": "navana",
+    "name": "DINING CHAIR (HDC 2109 LR)",
+    "priceBdt": 3429,
+    "currency": "BDT",
+    "category": "dining chair",
+    "dimensions": null,
+    "sourceUrl": "https://www.navanafurniture.com/product/dining-chair-hdc-2109-lr/",
+    "imageUrl": "https://www.navanafurniture.com/wp-content/uploads/2020/10/WEB-2109-A-min.jpg",
+    "imageFile": null
+  },
+  {
+    "vendor": "navana",
+    "name": "BED 6348",
+    "priceBdt": 35249,
+    "currency": "BDT",
+    "category": "bed room",
+    "dimensions": null,
+    "sourceUrl": "https://www.navanafurniture.com/product/bed-6348/",
+    "imageUrl": "https://www.navanafurniture.com/wp-content/uploads/2020/09/WEB-6348-A-min-1.jpg",
+    "imageFile": null
+  },
+  {
+    "vendor": "navana",
+    "name": "EXECUTIVE TABLE (FTM 0594 AN GR)",
+    "priceBdt": 11599,
+    "currency": "BDT",
+    "category": "office table",
+    "dimensions": null,
+    "sourceUrl": "https://www.navanafurniture.com/product/office-table-ftl-0594/",
+    "imageUrl": "https://www.navanafurniture.com/wp-content/uploads/2020/10/FTM-0594.jpg",
+    "imageFile": null
+  },
+  {
+    "vendor": "navana",
+    "name": "BED 6344",
+    "priceBdt": 33744,
+    "currency": "BDT",
+    "category": "bed room",
+    "dimensions": null,
+    "sourceUrl": "https://www.navanafurniture.com/product/bed-6344/",
+    "imageUrl": "https://www.navanafurniture.com/wp-content/uploads/2020/09/WEB-6344-B-min.jpg",
+    "imageFile": null
+  }
+]

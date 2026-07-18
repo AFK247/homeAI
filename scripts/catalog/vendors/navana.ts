@@ -1,0 +1,79 @@
+/**
+ * Navana Furniture vendor adapter. Navana (navanafurniture.com) runs WooCommerce, which
+ * exposes a clean public Store API — so this adapter needs NO HTML scraping at all: it
+ * reads structured JSON (name, price, image, categories) straight from
+ * /wp-json/wc/store/products. The cleanest of all our vendors.
+ *
+ * Run standalone to preview as JSON:  bun run scripts/catalog/vendors/navana.ts
+ * Out:                                 scripts/catalog/output/navana/products.json
+ * Ingestion imports `scrapeNavana()` (see scripts/catalog/ingest.ts).
+ */
+import { writeProducts } from "../lib/save";
+import type { ScrapedProduct } from "../lib/types";
+
+const API = "https://www.navanafurniture.com/wp-json/wc/store/products";
+const VENDOR = "navana";
+const MAX_PRODUCTS = 12;
+
+interface WcProduct {
+  name: string;
+  permalink: string;
+  prices?: { price?: string; currency_minor_unit?: number };
+  images?: Array<{ src?: string }>;
+  categories?: Array<{ name?: string }>;
+}
+
+/** WooCommerce prices are integer minor units (paisa) — scale by currency_minor_unit. */
+function toBdt(prices: WcProduct["prices"]): number | null {
+  if (!prices?.price) return null;
+  const raw = Number.parseInt(prices.price, 10);
+  if (!Number.isFinite(raw)) return null;
+  const minor = prices.currency_minor_unit ?? 2;
+  return Math.round(raw / 10 ** minor);
+}
+
+/** The most specific (last) WooCommerce category, skipping the generic top buckets. */
+function bestCategory(cats: WcProduct["categories"]): string | null {
+  const names = (cats ?? []).map((c) => c.name).filter((n): n is string => !!n);
+  const skip = new Set(["All Furniture", "Home Furniture", "Office Furniture"]);
+  const specific = names.filter((n) => !skip.has(n));
+  return (specific.at(-1) ?? names.at(-1) ?? null)?.toLowerCase() ?? null;
+}
+
+/** Scrape ~12 Navana products via the WooCommerce Store API (one request). */
+export async function scrapeNavana(): Promise<ScrapedProduct[]> {
+  console.log("Navana scraper (WooCommerce Store API)…");
+  const res = await fetch(`${API}?per_page=${MAX_PRODUCTS}&orderby=popularity`, {
+    headers: { accept: "application/json" },
+  });
+  if (!res.ok) {
+    console.warn(`API returned ${res.status}`);
+    return [];
+  }
+  const products = (await res.json()) as WcProduct[];
+
+  const out: ScrapedProduct[] = [];
+  for (const p of products) {
+    const item: ScrapedProduct = {
+      vendor: VENDOR,
+      name: p.name?.trim() || "(unknown)",
+      priceBdt: toBdt(p.prices),
+      currency: "BDT",
+      category: bestCategory(p.categories),
+      dimensions: null,
+      sourceUrl: p.permalink,
+      imageUrl: p.images?.[0]?.src ?? null,
+      imageFile: null,
+    };
+    out.push(item);
+    console.log(`  [${out.length}/${products.length}] ${item.name} — ${item.priceBdt ?? "?"} BDT`);
+  }
+  return out;
+}
+
+if (import.meta.main) {
+  const products = await scrapeNavana();
+  const file = await writeProducts(VENDOR, products);
+  console.log(`\nDone. ${products.length} products → ${file}`);
+  process.exit(0);
+}

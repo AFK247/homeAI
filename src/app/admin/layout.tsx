@@ -1,15 +1,22 @@
 import Link from "next/link";
+import { redirect } from "next/navigation";
 import { Logo } from "@/components/brand/logo";
 import { PAGES } from "@/config/pages";
+import { getCurrentUser } from "@/lib/auth/session";
 import { AdminNav } from "./_components/admin-nav";
 
 /*
  * Admin shell — sidebar + content. Wraps every /admin/* page.
  *
- * NOTE: unprotected for now (no auth). Gate behind admin auth (withRole('admin'))
- * once Better Auth lands.
+ * GUARDED: requires a signed-in user with role="admin". Middleware already bounced
+ * cookie-less visitors to login; this is the authoritative role check (DB-backed). A
+ * signed-in non-admin is sent home.
  */
-export default function AdminLayout({ children }: { children: React.ReactNode }) {
+export default async function AdminLayout({ children }: { children: React.ReactNode }) {
+  const user = await getCurrentUser();
+  if (!user) redirect("/login?next=/admin");
+  if ((user as { role?: string }).role !== "admin") redirect(PAGES.HOME);
+
   return (
     <div className="flex min-h-dvh">
       <aside className="hidden w-56 shrink-0 flex-col gap-6 border-border border-r bg-card px-4 py-5 md:flex">

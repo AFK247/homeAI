@@ -23,6 +23,9 @@ import type { ScrapedProduct } from "./lib/types";
 const VENDOR_NAMES: Record<string, string> = {
   hatil: "Hatil",
   brothers: "Brothers Furniture",
+  otobi: "Otobi",
+  navana: "Navana Furniture",
+  hatim: "Hatim Furniture",
 };
 
 async function main() {

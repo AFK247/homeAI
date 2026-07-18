@@ -4,6 +4,7 @@ import Link from "next/link";
 import { Logo } from "@/components/brand/logo";
 import { PAGES } from "@/config/pages";
 import { useTranslation } from "@/lib/i18n/client";
+import { AuthButton } from "./auth-button";
 import { LanguageToggle } from "./language-toggle";
 
 /**
@@ -43,9 +44,7 @@ export function SiteHeader({
       <div className="flex items-center gap-4">
         {rightSlot}
         <LanguageToggle />
-        <Link href={PAGES.LOGIN} className="font-bold text-primary text-sm">
-          {dict.common.login}
-        </Link>
+        <AuthButton />
       </div>
     </header>
   );

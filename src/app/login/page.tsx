@@ -1,13 +1,12 @@
 import Link from "next/link";
+import { Suspense } from "react";
 import { Logo } from "@/components/brand/logo";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import { getDictionary } from "@/lib/i18n/server";
+import { LoginForm } from "./login-form";
 
 /*
- * Auth screen (design). Facebook + Google prominent (BD audience), plus email/password.
- * Presentational for Stage C; Better Auth wired in Stage D.
+ * Auth screen. Facebook + Google (BD audience) + email/password, wired to Better Auth.
+ * Login is OPTIONAL app-wide — reached from the header or an admin route that needs it.
  */
 export default async function LoginPage() {
   const { dict } = await getDictionary();
@@ -20,33 +19,9 @@ export default async function LoginPage() {
           <p className="text-brand-body text-sm">{dict.login.subtitle}</p>
         </div>
 
-        <div className="flex flex-col gap-3">
-          <Button size="lg" className="w-full bg-[#1877F2] text-white hover:bg-[#1877F2]/90">
-            {dict.login.facebook}
-          </Button>
-          <Button size="lg" variant="outline" className="w-full">
-            {dict.login.google}
-          </Button>
-        </div>
-
-        <div className="my-6 flex items-center gap-3 text-brand-faint text-xs">
-          <span className="h-px flex-1 bg-border" /> {dict.login.or}{" "}
-          <span className="h-px flex-1 bg-border" />
-        </div>
-
-        <form className="flex flex-col gap-4">
-          <div className="flex flex-col gap-1.5">
-            <Label htmlFor="email">{dict.login.email}</Label>
-            <Input id="email" type="email" placeholder="you@example.com" />
-          </div>
-          <div className="flex flex-col gap-1.5">
-            <Label htmlFor="password">{dict.login.password}</Label>
-            <Input id="password" type="password" placeholder="••••••••" />
-          </div>
-          <Button size="lg" className="mt-1 w-full">
-            {dict.login.continue}
-          </Button>
-        </form>
+        <Suspense>
+          <LoginForm dict={dict.login} />
+        </Suspense>
 
         <p className="mt-6 text-center text-brand-faint text-xs">
           {dict.login.termsPrefix}

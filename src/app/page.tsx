@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { BeforeAfter } from "@/components/brand/before-after";
+import { HeaderCreditBadge } from "@/components/layout/header-credit-badge";
 import { SiteHeader } from "@/components/layout/site-header";
 import { Button } from "@/components/ui/button";
 import { PAGES } from "@/config/pages";
@@ -17,7 +18,7 @@ export default async function LandingPage() {
   const num = (n: number) => (locale === "bn" ? toBnDigits(n) : String(n));
   return (
     <>
-      <SiteHeader />
+      <SiteHeader rightSlot={<HeaderCreditBadge />} />
       <main className="flex-1">
         {/* Hero */}
         <section

@@ -7,7 +7,7 @@
  * (Awaited<ReturnType<typeof Service.method>>) — these table-level types stay the base.
  */
 import type { users } from "@/db/schemas/auth.schema";
-import type { credits, payments } from "@/db/schemas/billing.schema";
+import type { creditAccounts, payments } from "@/db/schemas/billing.schema";
 import type { categories, vendorCategoryMaps } from "@/db/schemas/category.schema";
 import type { designs, designTags } from "@/db/schemas/design.schema";
 import type { furnitureItems } from "@/db/schemas/furniture.schema";
@@ -22,7 +22,7 @@ export type FurnitureItem = typeof furnitureItems.$inferSelect;
 export type Vendor = typeof vendors.$inferSelect;
 export type Category = typeof categories.$inferSelect;
 export type VendorCategoryMap = typeof vendorCategoryMaps.$inferSelect;
-export type Credit = typeof credits.$inferSelect;
+export type CreditAccount = typeof creditAccounts.$inferSelect;
 export type Payment = typeof payments.$inferSelect;
 export type GenerationLog = typeof generationLogs.$inferSelect;
 
@@ -43,12 +43,4 @@ export type DesignWithTags = Design & {
 export type FurnitureDetail = FurnitureItem & {
   vendor: Vendor | null;
   similar: Pick<FurnitureItem, "id" | "brand" | "priceBdt">[];
-};
-
-/** Credit badge state (e.g. "৫টির মধ্যে ৪টি ফ্রি বাকি"). */
-export type CreditState = {
-  freeUsed: number;
-  freeLimit: number;
-  paidCredits: number;
-  plan: Credit["plan"];
 };

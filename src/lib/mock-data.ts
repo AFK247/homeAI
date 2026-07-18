@@ -4,13 +4,7 @@
  *
  * TEMPORARY: delete once services are wired. Do not import from server code.
  */
-import type {
-  CreditState,
-  DesignWithTags,
-  FurnitureDetail,
-  FurnitureItem,
-  Vendor,
-} from "@/db/types";
+import type { DesignWithTags, FurnitureDetail, FurnitureItem, Vendor } from "@/db/types";
 
 const now = "2026-07-12T09:41:00.000Z";
 
@@ -184,13 +178,6 @@ export const mockUsedAlternative = {
   priceBdt: 24000,
   listingCount: 3,
   url: "https://bikroy.com",
-};
-
-export const mockCreditState: CreditState = {
-  freeUsed: 1,
-  freeLimit: 5,
-  paidCredits: 0,
-  plan: "free",
 };
 
 /** A small gallery of saved designs (reuses the same shape). */

@@ -85,7 +85,7 @@ export function ResultView({ design }: { design: DesignWithTags }) {
         });
         setVersionKey((k) => k + 1);
         setPollsLeft(6); // new render → detect pins again
-        router.refresh();
+        router.refresh(); // re-renders server components → header credit badge reflects the debit
       } catch (err) {
         // Surface abuse-defense denials (free cap / burst / daily cap) with a clear toast;
         // any other failure gets the generic handler. The button re-enables either way.

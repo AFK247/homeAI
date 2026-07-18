@@ -11,6 +11,7 @@ import { sendEmail } from "@/lib/email/resend";
 import { resetPasswordEmail } from "@/lib/email/templates";
 import { env } from "@/lib/env";
 import { logger } from "@/lib/logger";
+import { CreditService } from "@/server/service/credit/credit.service";
 
 // Anonymous session cookie — same name the oRPC handler sets (src/app/api/rpc/.../route.ts).
 // On signup/login we read it to claim the user's anonymous designs.
@@ -92,7 +93,14 @@ export const auth = betterAuth({
     user: {
       // Signup: a new account is created.
       create: {
-        after: async (user) => claimAnonymousDesigns(user.id, "signup"),
+        after: async (user) => {
+          await claimAnonymousDesigns(user.id, "signup");
+          // Signup opening grant — SET balance to 70 free credits, once per account (§5).
+          // Fail-open: a grant error must never block account creation.
+          await CreditService.grantSignup(user.id).catch((err) =>
+            logger.error({ err, userId: user.id }, "signup credit grant failed"),
+          );
+        },
       },
     },
     session: {

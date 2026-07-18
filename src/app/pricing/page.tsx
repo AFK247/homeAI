@@ -1,4 +1,5 @@
 import { Check } from "lucide-react";
+import { HeaderCreditBadge } from "@/components/layout/header-credit-badge";
 import { SiteHeader } from "@/components/layout/site-header";
 import { Button } from "@/components/ui/button";
 import { formatBdt, localeDigits } from "@/lib/format";
@@ -60,7 +61,7 @@ export default async function PricingPage() {
 
   return (
     <>
-      <SiteHeader />
+      <SiteHeader rightSlot={<HeaderCreditBadge />} />
       <main className="mx-auto w-full max-w-5xl flex-1 px-6 py-14 text-center">
         <h1 className="font-serif font-extrabold text-3xl text-foreground md:text-4xl">
           {dict.pricing.title}

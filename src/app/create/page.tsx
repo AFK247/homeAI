@@ -1,3 +1,4 @@
+import { HeaderCreditBadge } from "@/components/layout/header-credit-badge";
 import { SiteHeader } from "@/components/layout/site-header";
 import { getDictionary } from "@/lib/i18n/server";
 import { CreateForm } from "./_components/create-form";
@@ -11,7 +12,7 @@ export default async function CreatePage() {
   const { dict } = await getDictionary();
   return (
     <>
-      <SiteHeader />
+      <SiteHeader rightSlot={<HeaderCreditBadge />} />
       <main className="mx-auto w-full max-w-6xl flex-1 px-4 py-8 md:px-10">
         <h1 className="font-serif font-extrabold text-3xl text-foreground">{dict.upload.title}</h1>
         <p className="mt-1.5 text-brand-body">{dict.upload.subtitle}</p>

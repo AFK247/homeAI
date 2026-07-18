@@ -3,6 +3,7 @@ import "server-only";
 import { ORPCError } from "@orpc/server";
 import { z } from "zod";
 import { CategoryService } from "@/app/admin/categories/_modules/category.service";
+import { DEFAULT_MODEL, type ModelId, modelTier } from "@/config/credits";
 import {
   BUDGET_TIERS,
   type BudgetTier,
@@ -15,6 +16,11 @@ import { logger } from "@/lib/logger";
 import { publicProcedure, type RpcContext } from "@/server/rpc/procedures";
 import { AiService } from "@/server/service/ai/ai.service";
 import { measureImage } from "@/server/service/ai/image-preprocess";
+import {
+  CreditService,
+  InsufficientCreditsError,
+  type Owner,
+} from "@/server/service/credit/credit.service";
 import { GenerationLogService } from "@/server/service/generation-log.service";
 import { checkGuards, recordUsage } from "@/server/service/rate-limit/registry";
 import { StorageService } from "@/server/service/storage/storage.service";
@@ -42,6 +48,48 @@ async function enforceGuards(context: RpcContext, action: "generate" | "regenera
     });
   }
   await recordUsage(guardCtx);
+}
+
+/*
+ * Credit gate (docs/CREDIT_SYSTEM.md §5b) — resolve the model SERVER-SIDE, then reserve credits
+ * BEFORE any AI call. The reservation is refunded if the render fails (see runRedesign), so a
+ * provider error never costs the user. Runs after enforceGuards (anon flood/free-cap) — credits
+ * are the spend layer on top.
+ *
+ * Model resolution: today the app has no model picker, so every render is the free tier
+ * (DEFAULT_MODEL). The gate already enforces the tier rule for when a `model` input is added:
+ * a paid-tier model is only reachable by a user with paid credits; free/anon users are pinned
+ * to the free model. Returns the reservation so the caller can refund on failure.
+ */
+function ownerFrom(context: RpcContext): Owner {
+  return context.user?.id ? { userId: context.user.id } : { anonymousId: context.anonymousId };
+}
+
+async function reserveCredits(context: RpcContext, requested?: string) {
+  // Resolve server-side: only a logged-in user may reach a paid-tier model; everyone else is
+  // pinned to the free default. (No `requested` today → always the free default.)
+  const model: ModelId =
+    requested && modelTier(requested) === "paid" && context.user?.id
+      ? (requested as ModelId)
+      : DEFAULT_MODEL;
+
+  // First-visit anon grant (idempotent) so a new anonymous user has their free credits to spend.
+  // TODO(§5): harden the grant against cookie-clearing with IP/fingerprint composite identity.
+  if (!context.user?.id) await CreditService.grantAnon(context.anonymousId);
+
+  try {
+    return await CreditService.reserve(ownerFrom(context), model);
+  } catch (err) {
+    if (err instanceof InsufficientCreditsError) {
+      throw new ORPCError("FORBIDDEN", {
+        message: context.user?.id
+          ? "You're out of credits. Buy more to keep designing."
+          : "You've used your free credits. Sign in to get more.",
+        data: { code: "no_credits", needed: err.needed },
+      });
+    }
+    throw err;
+  }
 }
 
 /*
@@ -87,6 +135,8 @@ async function runRedesign(opts: {
   sourceMime: string;
   sourceUrl: string;
   budget: BudgetTier;
+  /** Credit reservation to refund if this render fails (docs/CREDIT_SYSTEM.md §5b step 4). */
+  reservation?: Awaited<ReturnType<typeof CreditService.reserve>>;
 }) {
   const { design, anonymousId } = opts;
   const startedAt = performance.now();
@@ -168,6 +218,14 @@ async function runRedesign(opts: {
     return done;
   } catch (err) {
     logger.error({ err, designId: design.id }, "generation failed");
+    // Refund the reserved credits — a provider failure must never cost the user (§5b step 4).
+    if (opts.reservation?.accountId) {
+      await CreditService.refund(
+        opts.reservation.accountId,
+        opts.reservation.fromFree,
+        opts.reservation.fromPaid,
+      ).catch((e) => logger.error({ e, designId: design.id }, "credit refund failed"));
+    }
     await DesignService.setResult({
       id: design.id,
       anonymousId,
@@ -196,6 +254,8 @@ export const designRouter = {
     .handler(async ({ input, context }) => {
       // Abuse defense — before spending any AI budget.
       await enforceGuards(context, "generate");
+      // Credit gate — reserve BEFORE the AI call; refunded by runRedesign on failure (§5b).
+      const reservation = await reserveCredits(context);
 
       const bytes = decodeImage(input.image);
 
@@ -212,8 +272,15 @@ export const designRouter = {
         prompt: input.prompt,
         isPanorama: input.isPanorama,
       });
-      if (!design)
+      if (!design) {
+        // Design creation failed AFTER reserving — refund so the user isn't charged for nothing.
+        await CreditService.refund(
+          reservation.accountId,
+          reservation.fromFree,
+          reservation.fromPaid,
+        ).catch(() => {});
         throw new ORPCError("INTERNAL_SERVER_ERROR", { message: "could not create design" });
+      }
 
       // 3. run the redesign, store the result, persist it on the design.
       const done = await runRedesign({
@@ -228,6 +295,7 @@ export const designRouter = {
         sourceMime: input.imageMime,
         sourceUrl: StorageService.publicUrl(originalKey) ?? "",
         budget: input.budget,
+        reservation,
       });
       return done ?? design;
     }),
@@ -258,6 +326,9 @@ export const designRouter = {
         anonymousId: context.anonymousId,
       });
       if (!existing) throw new ORPCError("NOT_FOUND", { message: "design not found" });
+
+      // Credit gate — regenerate is a fresh render, so it costs credits too (§5b).
+      const reservation = await reserveCredits(context);
 
       // Persist any changed parameters before re-rendering.
       const hasChanges =
@@ -293,6 +364,7 @@ export const designRouter = {
         sourceMime: "image/jpeg",
         sourceUrl: existing.originalImageUrl,
         budget: input.budget,
+        reservation,
       });
 
       return DesignService.getById({ id: input.id, anonymousId: context.anonymousId });

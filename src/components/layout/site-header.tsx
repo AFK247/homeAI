@@ -8,9 +8,9 @@ import { AuthButton } from "./auth-button";
 import { LanguageToggle } from "./language-toggle";
 
 /**
- * Top site header. Shown on every page. Reads translations via useTranslation
- * and includes the working language toggle. `rightSlot` lets a page inject extra
- * controls (e.g. the result page's CreditBadge).
+ * Top site header. Shown on every page. Reads translations via useTranslation and includes the
+ * language toggle + auth control. `rightSlot` lets a page inject server-loaded controls — every
+ * page passes <HeaderCreditBadge /> here so the credit balance shows app-wide.
  */
 export function SiteHeader({
   showNav = true,

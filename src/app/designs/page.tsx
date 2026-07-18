@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { Suspense } from "react";
+import { HeaderCreditBadge } from "@/components/layout/header-credit-badge";
 import { SiteHeader } from "@/components/layout/site-header";
 import { Button } from "@/components/ui/button";
 import { PAGES } from "@/config/pages";
@@ -22,7 +23,7 @@ export default async function DesignsPage() {
   const { dict } = await getDictionary();
   return (
     <>
-      <SiteHeader />
+      <SiteHeader rightSlot={<HeaderCreditBadge />} />
       <main className="mx-auto w-full max-w-5xl flex-1 px-6 py-10">
         <div className="flex items-center justify-between">
           <h1 className="font-serif font-extrabold text-3xl text-foreground">

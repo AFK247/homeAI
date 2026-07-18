@@ -54,6 +54,22 @@ export const billingPlanEnum = pgEnum("billing_plan", BILLING_PLANS);
 export const PAYMENT_STATUSES = ["pending", "success", "failed", "cancelled"] as const;
 export const paymentStatusEnum = pgEnum("payment_status", PAYMENT_STATUSES);
 
+// Credit-ledger kinds (docs/CREDIT_SYSTEM.md §5) — which bucket a transaction moves.
+export const CREDIT_KINDS = ["free", "paid"] as const;
+export const creditKindEnum = pgEnum("credit_kind", CREDIT_KINDS);
+
+// Credit-ledger reasons — why a transaction happened.
+export const CREDIT_REASONS = [
+  "anon_grant",
+  "signup_grant",
+  "purchase",
+  "generation",
+  "refund",
+  "expire",
+  "admin_adjust",
+] as const;
+export const creditReasonEnum = pgEnum("credit_reason", CREDIT_REASONS);
+
 // Region / lane — BD (Bangladesh, ৳) vs INTL (international, $). Same-lane isolation:
 // a BD viewer only sees BD catalog. See docs/marketplace-plan.md §2.6.
 export const REGIONS = ["bd", "intl"] as const;
@@ -92,4 +108,6 @@ export type CategoryStatus = (typeof CATEGORY_STATUSES)[number];
 export type CategorySource = (typeof CATEGORY_SOURCES)[number];
 export type BillingPlan = (typeof BILLING_PLANS)[number];
 export type PaymentStatus = (typeof PAYMENT_STATUSES)[number];
+export type CreditKind = (typeof CREDIT_KINDS)[number];
+export type CreditReason = (typeof CREDIT_REASONS)[number];
 export type EventType = (typeof EVENT_TYPES)[number];

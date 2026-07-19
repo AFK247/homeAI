@@ -3,13 +3,16 @@
 import {
   BarChart3,
   Boxes,
+  Coins,
   Cpu,
+  CreditCard,
   DownloadCloud,
   Image,
   LayoutDashboard,
   Sparkles,
   Store,
   Tags,
+  UserCog,
   Users,
 } from "lucide-react";
 import Link from "next/link";
@@ -31,6 +34,9 @@ const LINKS = [
   { href: PAGES.ADMIN.VENDORS, label: "Vendors", icon: Store },
   { href: PAGES.ADMIN.CATALOG, label: "Catalog scraping", icon: DownloadCloud },
   { href: PAGES.ADMIN.GENERATIONS, label: "Generations", icon: Sparkles },
+  { href: PAGES.ADMIN.USERS, label: "Users & usage", icon: UserCog },
+  { href: PAGES.ADMIN.PAYMENTS, label: "Payments", icon: CreditCard },
+  { href: PAGES.ADMIN.CREDITS, label: "Credit ledger", icon: Coins },
   { href: PAGES.ADMIN.PROVIDER, label: "AI Provider", icon: Cpu },
 ];
 

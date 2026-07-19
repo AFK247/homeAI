@@ -137,8 +137,10 @@ models and never expire (§6).
 
 There is **no separate free-generation counter**. Credits are the SINGLE currency for everyone;
 "free" just means credits we grant at no charge. Every generation debits credits; a balance
-below the model's cost blocks it. This replaces the old `free-cap.guard.ts` counting mechanism
-(the burst/global abuse guards stay).
+below the model's cost blocks it (via `CreditService.reserve` throwing `InsufficientCreditsError`).
+This is now the ONLY free-user limit: the old `free-cap.guard.ts` counting mechanism was **removed**
+(it wrongly assumed a fixed per-render cost) — the credit balance is cost-accurate. The burst +
+daily-global abuse guards stay.
 
 Credits flow IN from three sources, OUT via generation — all one balance, one ledger. **All
 grants/purchases REPLACE the balance (SET), never sum** — this is the deliberate policy (see the
@@ -146,10 +148,12 @@ box below):
 
 1. **Anonymous grant** — **10 `free` credits** on first visit → ~5 free renders (free model = 2
    credits). Tight on purpose.
-   - **Anti-abuse (hardened):** keyed to the **composite identity — anonymousId OR IP OR
-     fingerprint** — the exact pattern `free-cap.guard.ts` already uses. Clearing cookies /
-     incognito does NOT re-grant (IP+fingerprint match blocks a second grant). Trade-off: shared
-     IPs (offices, BD mobile networks) may under-grant; fingerprint disambiguates most cases.
+   - **Anti-abuse (hardened):** `CreditService.grantAnon` keys the grant to the **composite
+     identity — anonymousId OR IP OR fingerprint**, fingerprint-first (device fingerprint from
+     ThumbmarkJS, sent as `x-device-fingerprint`). Clearing cookies / incognito does NOT re-grant —
+     the recomputed fingerprint matches the prior `grant_fingerprint` row → grant 0. Fingerprint-
+     first means shared IPs (offices, BD mobile CGNAT) do NOT under-grant: distinct devices on one
+     IP get their own grant; IP is only a fallback when no fingerprint is sent.
 2. **Signup opening grant** — **SET balance to 20 `free` credits** at account creation (~10 free
    renders), via the claim-on-signup hook (`auth.ts`). **Once per account, ever.** It **REPLACES**
    the leftover anon balance (not summed) — so "farm anon → sign up to stack" gains nothing. A
@@ -237,8 +241,8 @@ model choice — an attacker can call the API directly with `model: "ultra-y"`):
 debit after** — that ordering is the money-leak hole (a scripted burst of premium calls would
 run up the Cloudflare/OpenRouter bill with nothing debited).
 
-This composes with the existing abuse guards (`free-cap.guard.ts`, burst/global caps in
-`src/server/service/rate-limit/`): those still run first for anon flood protection; the
+This composes with the abuse guards (burst + daily-global caps in
+`src/server/service/rate-limit/`): those still run first for flood/cost protection; the
 tier+credit gate is the paid-path equivalent. Premium models are additionally a natural place to
 keep a per-user burst cap (a compromised paid account shouldn't be able to drain its balance in
 one scripted second, and shouldn't be able to spike your provider bill).
@@ -316,17 +320,19 @@ CreditService = {
 // resolveModelForUser(user, requested) → the ACTUALLY-allowed model, enforced server-side (§5b).
 ```
 
-**Phase 1 — Credit system + tier gate (NO payment code):**
-1. `src/config/credits.ts` — `MODELS` (cost + tier), packs, open-top-up rate + min/max.
-2. Schema — add `credit_transactions`; keep `paidCredits` as cache.
-3. `CreditService` — balance / grant / reserve / refund, all ledger-writing in a txn.
-4. `resolveModelForUser` + wire the **§5b gate** into the `generate` handler in order:
-   resolve model server-side → tier check → `reserve()` → call AI → `refund()` on failure.
-   (Free/anon path still runs the existing free-cap + burst guards.)
-5. Replace `mockCreditState` (`src/lib/mock-data.ts`, used in the credit badge) with real
-   `getBalance`.
-6. Seed/admin grant to test end-to-end — incl. a premium-model call that a free user is
-   rejected for and a paid user is charged for. Fully demoable with zero payment code.
+**Phase 1 — Credit system + tier gate (NO payment code):** ✅ DONE (historical checklist).
+1. `src/config/credits.ts` — costs + tier, packs, open-top-up rate + min/max. ✅
+2. Schema — `credit_accounts` (cached balances) + `credit_transactions` (ledger). ✅
+3. `CreditService` — balance / grant / reserve / refund, all ledger-writing in a txn. ✅
+4. Model resolved server-side + the **§5b gate** wired into `generate`/`regenerate` in order:
+   resolve model → tier check → `reserve()` → call AI → `refund()` on failure. ✅
+   (Free/anon path is governed by the credit balance itself + the burst guard — the free-cap
+   guard was removed; see §5.)
+5. Credit badge reads the real balance via `serverRpc.credit.balance` (mock data removed). ✅
+6. Verified end-to-end incl. anon anti-farming (fingerprint) and reserve/refund on AI failure. ✅
+
+**Phase 2 — SSLCommerz payments:** ✅ DONE. Sandbox wired (pack + open top-up checkout, IPN +
+validation-API confirm, idempotent grant); live needs a merchant account + `SSLCOMMERZ_IS_LIVE=true`.
 
 **Phase 2 — SSLCommerz (BD):** init route + IPN webhook → on success calls
 `CreditService.grant(userId, credits, "purchase", { paymentId })`. Wire `/pricing` packs AND the

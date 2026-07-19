@@ -30,8 +30,8 @@ Every feature's server code lives in a colocated `_modules/` dir holding **exact
 - **Client mutations** call `rpc.<entity>.<method>(...)` (`src/server/rpc/client.ts`).
 - Reference implementations to copy: `src/app/admin/categories/_modules/`, `src/app/admin/vendors/_modules/`, and the pages under `src/app/admin/*` (`list.tsx` → `serverRpc.*.getPaginated`).
 
-## Build order (frontend-first — see plan §11)
-Stage A scaffold ✅ → Stage B typed contracts (schemas + validations + inferred types, NO logic) → Stage C all screens (real routes, typed mock data) → Stage D backend (oRPC + services + auth, swap mock → real). **Do not build the backend before the screens.**
+## Build status (all stages ✅ — see `docs/BUILD_STATUS.md`)
+Stage A scaffold → B typed contracts → C all screens → **D backend (oRPC + services + auth + AI + credits + payments + admin) — all done.** The app runs on a real backend (Postgres + Cloudflare/OpenRouter AI + SSLCommerz sandbox + Resend); no mock data. What's LEFT is coverage/depth/go-live, not core features: **furniture matching coverage**, catalog depth, Cloudflare Turnstile, SSLCommerz live. Read `docs/BUILD_STATUS.md` for the current picture before planning work.
 
 ## Commands
 ```bash

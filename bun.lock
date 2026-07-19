@@ -11,6 +11,7 @@
         "@orpc/server": "^1.14.8",
         "@paralleldrive/cuid2": "^3.3.0",
         "@tanstack/react-query": "^5.101.2",
+        "@thumbmarkjs/thumbmarkjs": "^1.10.1",
         "better-auth": "^1.6.23",
         "browser-image-compression": "^2.0.2",
         "class-variance-authority": "^0.7.1",
@@ -487,6 +488,8 @@
     "@tanstack/query-core": ["@tanstack/query-core@5.101.2", "", {}, "sha512-hH5MLoJhF7KaIGd7q3xTXGXvslI+GYlM1Z/35aSHHWaCJWB7XvTSHYuV3eM7tw+aE0mT/xMro4M4Q9rCGHT0lw=="],
 
     "@tanstack/react-query": ["@tanstack/react-query@5.101.2", "", { "dependencies": { "@tanstack/query-core": "5.101.2" }, "peerDependencies": { "react": "^18 || ^19" } }, "sha512-seDkr6kzGzX1okaaTtZPtgA688CDPlXUz1C6xSg0ESqn04Vuc8tlrYms1s3de+znBqhPVxFRfpAfUf+6XvfPWg=="],
+
+    "@thumbmarkjs/thumbmarkjs": ["@thumbmarkjs/thumbmarkjs@1.10.1", "", {}, "sha512-BH7HP3g+NeIXgcYDxtNjx2wfO5cHaH6DjkoDzi4adYe0fknkQZABtKag+2j75p5p8mGMhl9mq2Ee5m1UosYPUw=="],
 
     "@types/d3-array": ["@types/d3-array@3.2.2", "", {}, "sha512-hOLWVbm7uRza0BYXpIIW5pxfrKe0W+D5lrFiAEYR+pb6w3N2SwSMaJbXdUfSEv+dT4MfHBLtn5js0LAWaO6otw=="],
 

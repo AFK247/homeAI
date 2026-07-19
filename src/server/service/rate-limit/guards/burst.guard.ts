@@ -9,12 +9,15 @@ import { ALLOW, type Guard, type GuardContext } from "../types";
 /*
  * Guard 2 — PER-CALLER BURST LIMIT (sliding window).
  *
- * Blocks anyone (human or script) making more than N generations in a short window. The
- * key is a COMPOSITE — a match on ANY of anonymousId / ip / fingerprint counts — so an
- * abuser can't sidestep it by clearing cookies (fingerprint still matches) or the same
- * fingerprint can't burst from one IP. We deliberately do NOT block on IP alone: in
- * Bangladesh many real mobile users share one carrier IP (CGNAT), so IP-only would punish
- * innocent users.
+ * Blocks anyone (human or script) making more than N generations in a short window. The key is
+ * a COMPOSITE identity, keyed FINGERPRINT-FIRST to protect shared WiFi (common in BD — a household
+ * or CGNAT carrier shares one IP across many real users):
+ *   - fingerprint present → match on anonymousId OR fingerprint, and DELIBERATELY NOT on IP. So
+ *     housemates on one WiFi (distinct fingerprints) never count against each other; a farmer
+ *     clearing cookies on the same device (same fingerprint) still matches.
+ *   - fingerprint absent → fall back to anonymousId OR ip (best signal we have).
+ * This mirrors the credit anti-farming logic (credit.service.grantAnon) so every abuse layer keys
+ * identity the same way.
  */
 export const burstGuard: Guard = {
   key: "burst",
@@ -24,11 +27,15 @@ export const burstGuard: Guard = {
     const { windowSeconds, maxPerWindow } = RATE_LIMIT_CONFIG.burst;
     const since = new Date(Date.now() - windowSeconds * 1000).toISOString();
 
-    // Composite match: same session OR same IP OR same fingerprint within the window.
+    // Fingerprint-first composite: session OR fingerprint (ignore IP) when a fingerprint exists;
+    // otherwise session OR IP. Never IP alone — CGNAT/shared-WiFi users would punish each other.
     const keyMatches = [
       eq(usageEvents.anonymousId, ctx.anonymousId),
-      ctx.ip ? eq(usageEvents.ip, ctx.ip) : undefined,
-      ctx.fingerprint ? eq(usageEvents.fingerprint, ctx.fingerprint) : undefined,
+      ctx.fingerprint
+        ? eq(usageEvents.fingerprint, ctx.fingerprint)
+        : ctx.ip
+          ? eq(usageEvents.ip, ctx.ip)
+          : undefined,
     ].filter(Boolean);
 
     const [row] = await db

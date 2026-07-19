@@ -28,9 +28,11 @@ import { TagService } from "@/server/service/vision/tag.service";
 import { DesignService } from "./design.service";
 
 /*
- * Abuse defense: run the guard chain (global cap → burst → free cap) before an AI action
- * and record the (permitted) attempt so it counts next time. Throws a clear oRPC error the
- * UI can show. See src/server/service/rate-limit — adding a layer never touches this code.
+ * Abuse defense: run the guard chain (global daily cap → per-caller burst) before an AI action
+ * and record the (permitted) attempt so it counts next time. The free-user limit is NOT a guard —
+ * it's enforced by the credit system at reserve time (the credit balance is the source of truth,
+ * cost-accurate even when a model's per-render cost changes). Throws a clear oRPC error the UI can
+ * show. See src/server/service/rate-limit — adding a layer never touches this code.
  */
 async function enforceGuards(context: RpcContext, action: "generate" | "regenerate") {
   const guardCtx = {
@@ -86,11 +88,13 @@ async function reserveCredits(context: RpcContext, requested?: string) {
     return await CreditService.reserve(ownerFrom(context), model);
   } catch (err) {
     if (err instanceof InsufficientCreditsError) {
+      const anonymous = !context.user?.id;
       throw new ORPCError("FORBIDDEN", {
-        message: context.user?.id
-          ? "You're out of credits. Buy more to keep designing."
-          : "You've used your free credits. Sign in to get more.",
-        data: { code: "no_credits", needed: err.needed },
+        message: anonymous
+          ? "You've used your free credits. Sign in to get more."
+          : "You're out of credits. Buy more to keep designing.",
+        // `anonymous` tells the client whether to offer "Sign in" (anon) or "Buy more" (logged-in).
+        data: { code: "no_credits", needed: err.needed, anonymous },
       });
     }
     throw err;

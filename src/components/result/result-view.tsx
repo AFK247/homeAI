@@ -87,9 +87,16 @@ export function ResultView({ design }: { design: DesignWithTags }) {
         setPollsLeft(6); // new render → detect pins again
         router.refresh(); // re-renders server components → header credit badge reflects the debit
       } catch (err) {
-        // Surface abuse-defense denials (free cap / burst / daily cap) with a clear toast;
-        // any other failure gets the generic handler. The button re-enables either way.
-        if (!handleRateLimitError(err, dict.rateLimit, () => router.push(PAGES.LOGIN))) {
+        // Surface credit / abuse-defense denials with a clear toast (anon out-of-credits → Sign in,
+        // logged-in → Buy credits, plus burst / daily cap). Anything else → generic handler.
+        if (
+          !handleRateLimitError(
+            err,
+            dict.rateLimit,
+            () => router.push(PAGES.LOGIN),
+            () => router.push(PAGES.PRICING),
+          )
+        ) {
           handleORPCError(err);
         }
       }

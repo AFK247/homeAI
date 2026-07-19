@@ -59,6 +59,9 @@ export const en: Dictionary = {
     dailyCapBody: "We've hit today's free-design limit. Please try again tomorrow.",
     blocked: "Request blocked. Please try again in a little while.",
     signIn: "Sign in",
+    outOfCreditsTitle: "Out of credits",
+    outOfCreditsBody: "You're out of credits. Buy more to keep designing.",
+    buyCredits: "Buy credits",
   },
   generating: {
     title: "Redesigning your room",

@@ -14,7 +14,10 @@ export const RATE_LIMIT_CONFIG = {
     maxPerWindow: 8,
   },
 
-  /** Guard 3 — free-generation cap. Lifetime free generations for an ANONYMOUS session
-   *  before we ask them to sign in / buy credits. Logged-in users bypass this guard. */
-  freeGenerationLimit: 5,
+  /*
+   * Guard 3 — free-render cap: NOT configured here. The anonymous free limit is DERIVED from the
+   * credit system (ANON_GRANT_CREDITS ÷ FREE_MODEL_COST in @/config/credits) inside the guard, so
+   * the pre-flight cap and the authoritative credit debit can never disagree. Change the free
+   * grant / render cost in the credit config, not here.
+   */
 } as const;

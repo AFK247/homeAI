@@ -53,9 +53,16 @@ export function CreateForm() {
         useCreateStore.getState().reset();
         router.replace(PAGES.RESULT.VIEW(design.id));
       } catch (err) {
-        // Abuse-defense denials get a tailored toast (with a Sign-in CTA on the free cap);
-        // anything else falls through to the generic handler.
-        if (!handleRateLimitError(err, dict.rateLimit, () => router.push(PAGES.LOGIN))) {
+        // Credit / abuse-defense denials get a tailored toast: anon out-of-credits → Sign-in CTA,
+        // logged-in out-of-credits → Buy-credits CTA. Anything else → generic handler.
+        if (
+          !handleRateLimitError(
+            err,
+            dict.rateLimit,
+            () => router.push(PAGES.LOGIN),
+            () => router.push(PAGES.PRICING),
+          )
+        ) {
           handleORPCError(err);
         }
       }

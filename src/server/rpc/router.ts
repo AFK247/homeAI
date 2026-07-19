@@ -10,6 +10,7 @@ import { vendorRouter } from "@/app/admin/vendors/_modules/vendor.router";
 import { designRouter } from "@/app/create/_modules/design.router";
 import { furnitureRouter } from "@/app/result/_modules/furniture.router";
 import { creditRouter } from "@/server/service/credit/credit.router";
+import { paymentRouter } from "@/server/service/payment/payment.router";
 
 /*
  * Root router (plan §5.4) — merges every module router into `webRouter`.
@@ -19,6 +20,7 @@ export const webRouter = {
   design: designRouter,
   furniture: furnitureRouter,
   credit: creditRouter,
+  payment: paymentRouter,
   vendor: vendorRouter,
   session: sessionRouter,
   event: eventRouter,

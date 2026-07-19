@@ -221,8 +221,10 @@ export const CreditService = {
   },
 
   /**
-   * Credit a purchase (§4). With RESET_BALANCE_ON_PURCHASE (default true), SETS the paid balance
-   * to `credits` and wipes any leftover (logged as `expire`); otherwise adds. `paid` kind.
+   * Credit a purchase (§4). Default (RESET_BALANCE_ON_PURCHASE=false) ADDS `credits` to the
+   * existing paid balance and preserves free credits — buying tops up, never replaces. When the
+   * flag is true it instead SETS the paid balance and wipes leftover (logged as `expire`). `paid`
+   * kind either way.
    */
   grantPurchase: async (userId: string, credits: number, paymentId?: string) => {
     return db.transaction(async (tx) => {

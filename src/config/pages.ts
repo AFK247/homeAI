@@ -27,6 +27,7 @@ export const PAGES = {
 
   DESIGNS: "/designs",
   PRICING: "/pricing",
+  PAYMENT_RESULT: "/payment/result",
   LOGIN: "/login",
   ACCOUNT: "/account",
   FORGOT_PASSWORD: "/forgot-password",
@@ -50,5 +51,11 @@ export const PAGES = {
 
   API: {
     RPC: "/api/rpc",
+    PAYMENT: {
+      SUCCESS: "/api/payments/sslcommerz/success",
+      FAIL: "/api/payments/sslcommerz/fail",
+      CANCEL: "/api/payments/sslcommerz/cancel",
+      IPN: "/api/payments/sslcommerz/ipn",
+    },
   },
 } as const;

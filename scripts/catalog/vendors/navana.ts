@@ -8,6 +8,8 @@
  * Out:                                 scripts/catalog/output/navana/products.json
  * Ingestion imports `scrapeNavana()` (see scripts/catalog/ingest.ts).
  */
+import { fetchJsonOrThrow } from "../lib/http";
+import { isUsableProduct, productIssue } from "../lib/quality";
 import { writeProducts } from "../lib/save";
 import type { ScrapedProduct, ScrapeOptions } from "../lib/types";
 
@@ -40,17 +42,22 @@ function bestCategory(cats: WcProduct["categories"]): string | null {
   return (specific.at(-1) ?? names.at(-1) ?? null)?.toLowerCase() ?? null;
 }
 
-/** Scrape ~12 Navana products via the WooCommerce Store API (one request). */
+/** Scrape ~12 Navana products via the WooCommerce Store API (one request, retried + guarded). */
 export async function scrapeNavana(opts: ScrapeOptions = {}): Promise<ScrapedProduct[]> {
   console.log("Navana scraper (WooCommerce Store API)…");
-  const res = await fetch(`${API}?per_page=${MAX_PRODUCTS}&orderby=popularity`, {
-    headers: { accept: "application/json" },
-  });
-  if (!res.ok) {
-    console.warn(`API returned ${res.status}`);
+
+  // Guarded + retried: a network error / bad JSON here used to throw and kill the whole run.
+  let products: WcProduct[];
+  try {
+    products = await fetchJsonOrThrow<WcProduct[]>(
+      `${API}?per_page=${MAX_PRODUCTS}&orderby=popularity`,
+    );
+  } catch (err) {
+    console.warn(`Navana API failed: ${(err as Error).message}`);
+    await opts.onFailed?.(API, (err as Error).message);
     return [];
   }
-  let products = (await res.json()) as WcProduct[];
+
   if (opts.skipUrls) products = products.filter((p) => !opts.skipUrls?.has(p.permalink));
   const total = products.length;
   await opts.onUrls?.(total);
@@ -69,9 +76,14 @@ export async function scrapeNavana(opts: ScrapeOptions = {}): Promise<ScrapedPro
       imageUrl: p.images?.[0]?.src ?? null,
       imageFile: null,
     };
+    // Validate before staging: a null-name/price row is a broken parse, not a product.
+    if (!isUsableProduct(item)) {
+      await opts.onFailed?.(p.permalink, productIssue(item) ?? "unusable");
+      continue;
+    }
     out.push(item);
     await opts.onProduct?.(item, out.length, total);
-    console.log(`  [${out.length}/${total}] ${item.name} — ${item.priceBdt ?? "?"} BDT`);
+    console.log(`  [${out.length}/${total}] ${item.name} — ${item.priceBdt} BDT`);
   }
   return out;
 }

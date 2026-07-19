@@ -9,6 +9,7 @@
  * Ingestion imports `scrapeHatil()` instead (see scripts/catalog/ingest-hatil.ts).
  */
 import { closeBrowser, withPage } from "../lib/browser";
+import { productIssue } from "../lib/quality";
 import { writeProducts } from "../lib/save";
 import type { ScrapedProduct, ScrapeOptions } from "../lib/types";
 
@@ -164,9 +165,12 @@ async function scrapePool(
       if (!url) continue;
       try {
         const p = await scrapeOne(url);
+        // Validate before staging: missing name/price = likely a broken selector, not a product.
+        const issue = productIssue(p);
+        if (issue) throw new Error(issue);
         results.push(p);
         await opts.onProduct?.(p, results.length, total);
-        console.log(`  [${results.length}/${total}] ${p.name} — ${p.priceBdt ?? "?"} BDT`);
+        console.log(`  [${results.length}/${total}] ${p.name} — ${p.priceBdt} BDT`);
       } catch (err) {
         await opts.onFailed?.(url, (err as Error).message);
         console.warn(`  FAILED ${url}: ${(err as Error).message}`);

@@ -8,6 +8,7 @@ import { CategoryService } from "@/app/admin/categories/_modules/category.servic
 import { db } from "@/db/client";
 import { furnitureItems } from "@/db/schemas/furniture.schema";
 import { scrapedProducts, scrapeJobs } from "@/db/schemas/scrape.schema";
+import { isRunning, startRun, stopRun } from "@/server/service/catalog/scrape-runner";
 
 /*
  * Admin catalog-scraping service — all Drizzle + orchestration for the /admin/catalog tool.
@@ -56,6 +57,34 @@ export const CatalogService = {
       .where(eq(scrapeJobs.vendor, vendor))
       .orderBy(desc(scrapeJobs.startedAt))
       .limit(10),
+
+  /**
+   * Live run status for one vendor — what the UI POLLS. Returns the newest job (its status +
+   * done/total/failed counters), whether a run is currently in flight in THIS process, and the
+   * newest staged products for the live table. Because it reads the DB, a page refresh mid-run
+   * simply re-polls and picks up wherever the detached run is.
+   */
+  runStatus: async (vendor: string) => {
+    const [job] = await db
+      .select()
+      .from(scrapeJobs)
+      .where(eq(scrapeJobs.vendor, vendor))
+      .orderBy(desc(scrapeJobs.startedAt))
+      .limit(1);
+    const products = await db
+      .select()
+      .from(scrapedProducts)
+      .where(eq(scrapedProducts.vendor, vendor))
+      .orderBy(desc(scrapedProducts.scrapedAt))
+      .limit(60);
+    return { job: job ?? null, running: isRunning(vendor), products };
+  },
+
+  /** Start a detached scrape (returns immediately; runs in the background). `fresh` re-scrapes all. */
+  startScrape: (vendor: string, fresh: boolean) => startRun(vendor, fresh),
+
+  /** Signal the running scrape for a vendor to stop. Returns whether one was actually running. */
+  stopScrape: (vendor: string) => ({ stopped: stopRun(vendor) }),
 
   /**
    * Diff staged rows against the live catalog, keyed by URL (scraped_products.sourceUrl ↔

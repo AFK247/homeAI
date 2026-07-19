@@ -13,6 +13,7 @@
  * Ingestion imports `scrapeBrothers()` (see scripts/catalog/ingest.ts).
  */
 import { closeBrowser, withPage } from "../lib/browser";
+import { productIssue } from "../lib/quality";
 import { writeProducts } from "../lib/save";
 import type { ScrapedProduct, ScrapeOptions } from "../lib/types";
 
@@ -137,9 +138,11 @@ export async function scrapeBrothers(opts: ScrapeOptions = {}): Promise<ScrapedP
     if (opts.signal?.aborted) break;
     try {
       const p = await scrapeOne(url, category);
+      const issue = productIssue(p);
+      if (issue) throw new Error(issue);
       products.push(p);
       await opts.onProduct?.(p, products.length, total);
-      console.log(`  [${products.length}/${total}] ${p.name} — ${p.priceBdt ?? "?"} BDT`);
+      console.log(`  [${products.length}/${total}] ${p.name} — ${p.priceBdt} BDT`);
     } catch (err) {
       await opts.onFailed?.(url, (err as Error).message);
       console.warn(`  [${products.length}/${total}] FAILED ${url}: ${(err as Error).message}`);

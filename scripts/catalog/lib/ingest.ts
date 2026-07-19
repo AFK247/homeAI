@@ -1,4 +1,4 @@
-import { and, eq } from "drizzle-orm";
+import { and, eq, inArray } from "drizzle-orm";
 import { db } from "@/db/client";
 import { vendorCategoryMaps } from "@/db/schemas/category.schema";
 import { furnitureItems } from "@/db/schemas/furniture.schema";
@@ -47,7 +47,13 @@ export interface IngestResult {
   unmatched: number; // ingested but no approved category mapping
 }
 
-/** Upsert scraped products into furnitureItems for a vendor. Dedupe by productUrl. */
+/**
+ * Upsert scraped products into furnitureItems for a vendor, deduped by productUrl. Batched to
+ * avoid the old N+1 (a SELECT + write per product): ONE query fetches all existing rows for this
+ * batch's URLs, then new rows go in a SINGLE bulk insert and existing rows are updated — all inside
+ * one transaction so a mid-ingest failure rolls back cleanly. (productUrl has no unique constraint,
+ * so we pre-resolve existing ids by URL rather than rely on onConflict.)
+ */
 export async function ingestProducts(
   vendorId: string,
   brand: string,
@@ -55,12 +61,12 @@ export async function ingestProducts(
   categoryMap: Map<string, string>,
 ): Promise<IngestResult> {
   const result: IngestResult = { inserted: 0, updated: 0, unmatched: 0 };
+  if (products.length === 0) return result;
 
-  for (const p of products) {
+  const rowFor = (p: ScrapedProduct) => {
     const categoryId = p.category ? (categoryMap.get(p.category) ?? null) : null;
     if (!categoryId) result.unmatched++;
-
-    const values = {
+    return {
       name: p.name,
       brand,
       categoryId,
@@ -72,21 +78,36 @@ export async function ingestProducts(
       vendorId,
       isActive: true,
     };
+  };
 
-    // Dedupe by productUrl (a stable per-product key).
-    const [existing] = await db
-      .select({ id: furnitureItems.id })
+  const urls = products.map((p) => p.sourceUrl);
+
+  await db.transaction(async (tx) => {
+    // ONE query for all existing rows in this batch (was a per-product SELECT).
+    const existing = await tx
+      .select({ id: furnitureItems.id, productUrl: furnitureItems.productUrl })
       .from(furnitureItems)
-      .where(eq(furnitureItems.productUrl, p.sourceUrl));
+      .where(inArray(furnitureItems.productUrl, urls));
+    const idByUrl = new Map(existing.map((e) => [e.productUrl, e.id]));
 
-    if (existing) {
-      await db.update(furnitureItems).set(values).where(eq(furnitureItems.id, existing.id));
-      result.updated++;
-    } else {
-      await db.insert(furnitureItems).values(values);
-      result.inserted++;
+    const toInsert: ReturnType<typeof rowFor>[] = [];
+    for (const p of products) {
+      const values = rowFor(p);
+      const id = idByUrl.get(p.sourceUrl);
+      if (id) {
+        await tx.update(furnitureItems).set(values).where(eq(furnitureItems.id, id));
+        result.updated++;
+      } else {
+        toInsert.push(values);
+      }
     }
-  }
+
+    // Single bulk insert for all new rows.
+    if (toInsert.length > 0) {
+      await tx.insert(furnitureItems).values(toInsert);
+      result.inserted += toInsert.length;
+    }
+  });
 
   return result;
 }

@@ -9,6 +9,7 @@
  * Ingestion imports `scrapeHatim()` (see scripts/catalog/ingest.ts).
  */
 import { fetchHtml, fetchText, parsePrice, sitemapLocs } from "../lib/http";
+import { isUsableProduct, productIssue } from "../lib/quality";
 import { writeProducts } from "../lib/save";
 import type { ScrapedProduct, ScrapeOptions } from "../lib/types";
 
@@ -123,13 +124,14 @@ export async function scrapeHatim(opts: ScrapeOptions = {}): Promise<ScrapedProd
       const url = urls[i];
       if (!url) continue;
       const p = await scrapeOne(url);
-      if (p) {
+      if (p && isUsableProduct(p)) {
         results.push(p);
         await opts.onProduct?.(p, results.length, total);
-        console.log(`  [${results.length}/${total}] ${p.name} — ${p.priceBdt ?? "?"} BDT`);
+        console.log(`  [${results.length}/${total}] ${p.name} — ${p.priceBdt} BDT`);
       } else {
-        await opts.onFailed?.(url, "no product parsed");
-        console.warn(`  FAILED ${url}`);
+        const reason = p ? (productIssue(p) ?? "unusable") : "no product parsed";
+        await opts.onFailed?.(url, reason);
+        console.warn(`  FAILED ${url} — ${reason}`);
       }
     }
   }

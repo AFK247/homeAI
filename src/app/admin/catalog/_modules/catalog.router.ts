@@ -6,12 +6,10 @@ import { adminProcedure } from "@/server/rpc/procedures";
 import { CatalogService } from "./catalog.service";
 
 /*
- * Catalog-scraping oRPC router. Admin-only reads (vendors/staged/jobs/diff) plus the ingest
- * mutation. The live SCRAPE stream is NOT here — it's an SSE route handler
- * (src/app/api/admin/scrape/[vendor]/route.ts), since oRPC returns a value, not a stream.
- *
- * ingest is guarded by assertLocalOnly() too: it's part of the local operator flow and reads
- * from the local scrape staging table.
+ * Catalog-scraping oRPC router. Admin-only. The scrape now runs as a DETACHED background job
+ * (src/server/service/catalog/scrape-runner.ts) — `startScrape` kicks it off and returns instantly,
+ * the UI POLLS `runStatus`, and `stopScrape` aborts it. So the scrape survives a page refresh /
+ * navigation (no SSE stream tied to the request). Local-operator-only mutations assert local.
  */
 const vendorInput = z.object({ vendor: z.string().min(1) });
 
@@ -33,6 +31,28 @@ export const catalogRouter = {
     .input(vendorInput)
     .handler(({ input }) => CatalogService.diff(input.vendor)),
 
+  // ── detached scrape control (polled by the UI) ──────────────────────────────
+  runStatus: adminProcedure
+    .route({ method: "GET" })
+    .input(vendorInput)
+    .handler(({ input }) => CatalogService.runStatus(input.vendor)),
+
+  startScrape: adminProcedure
+    .route({ method: "POST" })
+    .input(vendorInput.extend({ fresh: z.boolean().default(false) }))
+    .handler(({ input }) => {
+      assertLocalOnly();
+      return CatalogService.startScrape(input.vendor, input.fresh);
+    }),
+
+  stopScrape: adminProcedure
+    .route({ method: "POST" })
+    .input(vendorInput)
+    .handler(({ input }) => {
+      assertLocalOnly();
+      return CatalogService.stopScrape(input.vendor);
+    }),
+
   ingest: adminProcedure
     .route({ method: "POST" })
     .input(vendorInput)
@@ -48,3 +68,4 @@ export type StagedRow = Awaited<ReturnType<typeof CatalogService.staged>>[number
 export type ScrapeJobRow = Awaited<ReturnType<typeof CatalogService.jobs>>[number];
 export type CatalogDiff = Awaited<ReturnType<typeof CatalogService.diff>>;
 export type IngestResult = Awaited<ReturnType<typeof CatalogService.ingestVendor>>;
+export type RunStatus = Awaited<ReturnType<typeof CatalogService.runStatus>>;

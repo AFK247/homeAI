@@ -12,17 +12,6 @@
   },
   {
     "vendor": "otobi",
-    "name": "NICOLE - OTOBI DRESSING TABLE-A132WD",
-    "priceBdt": 32500,
-    "currency": "BDT",
-    "category": "table",
-    "dimensions": "Product Code: NICOLE DTDA132WD",
-    "sourceUrl": "https://www.otobi.com/Products.aspx?p=1634",
-    "imageUrl": "https://www.otobi.com/data_images/1634-pimage1-dtda132wd-edit.jpg",
-    "imageFile": null
-  },
-  {
-    "vendor": "otobi",
     "name": "FUSHION-OTOBI WARDROBE- P059",
     "priceBdt": 57800,
     "currency": "BDT",
@@ -45,6 +34,17 @@
   },
   {
     "vendor": "otobi",
+    "name": "MISSISSIPPI-OTOBI BED SIDE CABINET- A037",
+    "priceBdt": 14700,
+    "currency": "BDT",
+    "category": "bed",
+    "dimensions": "Product Code: MISSISSIPPI BCDA037WD",
+    "sourceUrl": "https://www.otobi.com/Products.aspx?p=615",
+    "imageUrl": "https://www.otobi.com/data_images/615-pimage1-otobi-bed-side-cabinet-a037.jpg",
+    "imageFile": null
+  },
+  {
+    "vendor": "otobi",
     "name": "ANGELINA - OTOBI KING BED - A115LB",
     "priceBdt": 20500,
     "currency": "BDT",
@@ -56,13 +56,13 @@
   },
   {
     "vendor": "otobi",
-    "name": "MISSISSIPPI-OTOBI BED SIDE CABINET- A037",
-    "priceBdt": 14700,
+    "name": "NICOLE - OTOBI DRESSING TABLE-A132WD",
+    "priceBdt": 32500,
     "currency": "BDT",
-    "category": "bed",
-    "dimensions": "Product Code: MISSISSIPPI BCDA037WD",
-    "sourceUrl": "https://www.otobi.com/Products.aspx?p=615",
-    "imageUrl": "https://www.otobi.com/data_images/615-pimage1-otobi-bed-side-cabinet-a037.jpg",
+    "category": "table",
+    "dimensions": "Product Code: NICOLE DTDA132WD",
+    "sourceUrl": "https://www.otobi.com/Products.aspx?p=1634",
+    "imageUrl": "https://www.otobi.com/data_images/1634-pimage1-dtda132wd-edit.jpg",
     "imageFile": null
   },
   {
@@ -78,39 +78,6 @@
   },
   {
     "vendor": "otobi",
-    "name": "BERGAMO-OTOBI SOFA SET-A119FF I A119FF",
-    "priceBdt": 137500,
-    "currency": "BDT",
-    "category": "sofa",
-    "dimensions": "Product Code: BERGAMO SDDA119FF I SSDA119FF",
-    "sourceUrl": "https://www.otobi.com/Products.aspx?p=1578",
-    "imageUrl": "https://www.otobi.com/data_images/1578-pimage1-ssda119,sdda119-set.jpg",
-    "imageFile": null
-  },
-  {
-    "vendor": "otobi",
-    "name": "(unknown)",
-    "priceBdt": null,
-    "currency": "BDT",
-    "category": "other",
-    "dimensions": "Product Code: Dimension (WxDxH):",
-    "sourceUrl": "https://www.otobi.com/Products.aspx?p=1003",
-    "imageUrl": null,
-    "imageFile": null
-  },
-  {
-    "vendor": "otobi",
-    "name": "(unknown)",
-    "priceBdt": null,
-    "currency": "BDT",
-    "category": "other",
-    "dimensions": "Product Code: Dimension (WxDxH):",
-    "sourceUrl": "https://www.otobi.com/Products.aspx?p=1642",
-    "imageUrl": null,
-    "imageFile": null
-  },
-  {
-    "vendor": "otobi",
     "name": "NEWPORT-OTOBI DRESSING TABLE- B002",
     "priceBdt": 9700,
     "currency": "BDT",
@@ -118,6 +85,17 @@
     "dimensions": "Product Code: NEWPORT DTDB002LB",
     "sourceUrl": "https://www.otobi.com/Products.aspx?p=1299",
     "imageUrl": "https://www.otobi.com/data_images/1299-pimage1-dtdb002.jpg",
+    "imageFile": null
+  },
+  {
+    "vendor": "otobi",
+    "name": "BERGAMO-OTOBI SOFA SET-A119FF I A119FF",
+    "priceBdt": 137500,
+    "currency": "BDT",
+    "category": "sofa",
+    "dimensions": "Product Code: BERGAMO SDDA119FF I SSDA119FF",
+    "sourceUrl": "https://www.otobi.com/Products.aspx?p=1578",
+    "imageUrl": "https://www.otobi.com/data_images/1578-pimage1-ssda119,sdda119-set.jpg",
     "imageFile": null
   },
   {

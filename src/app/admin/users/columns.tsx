@@ -1,6 +1,6 @@
 "use client";
 
-import { format } from "date-fns";
+import { getCellCurrencyColumn, getCellDateColumn } from "@/components/data-table/column-cells";
 import type { DataTableColumn } from "@/components/data-table/data-table";
 import { Badge } from "@/components/ui/badge";
 import type { UserUsageRow } from "@/server/service/admin-billing/admin-billing.service";
@@ -17,7 +17,6 @@ const TYPE_META: Record<
 };
 
 const num = (n: number) => n.toLocaleString("en-US");
-const taka = (n: number) => `৳${n.toLocaleString("en-US")}`;
 
 /** Plain-English description of what a balance is made of — no "free / paid" notation. */
 function balanceMakeup(free: number, paid: number): string {
@@ -89,17 +88,13 @@ export const columns: DataTableColumn<UserUsageRow>[] = [
     ),
   },
   {
-    header: "Total spent",
-    accessorKey: "spentBdt",
+    header: "Designs",
+    accessorKey: "designCount",
     sortable: true,
     className: "tabular-nums text-foreground",
-    // Money paid (successful payments). Dash when they've never bought.
-    cell: (r) => (r.spentBdt > 0 ? taka(Math.round(r.spentBdt)) : "—"),
+    cell: (r) => num(r.designCount),
   },
-  {
-    header: "Last active",
-    accessorKey: "lastActive",
-    className: "text-muted-foreground text-xs",
-    cell: (r) => format(new Date(r.lastActive), "d MMM yyyy"),
-  },
+  // Money paid (successful payments). Zero → dash, right-aligned ৳ (getCellCurrencyColumn).
+  getCellCurrencyColumn({ header: "Total spent", accessorKey: "spentBdt", sortable: true }),
+  getCellDateColumn({ header: "Last active", accessorKey: "lastActive", date: { preset: "date" } }),
 ];

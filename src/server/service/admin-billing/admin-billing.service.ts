@@ -6,6 +6,7 @@ import { db } from "@/db/client";
 import type { SearchParams } from "@/db/helpers/search-params";
 import { users } from "@/db/schemas/auth.schema";
 import { creditAccounts, creditTransactions, payments } from "@/db/schemas/billing.schema";
+import { designs } from "@/db/schemas/design.schema";
 
 /*
  * Admin BILLING service — read-only reporting over the credit + payment tables. Admin scope:
@@ -64,6 +65,30 @@ function perUserPaymentAgg() {
     .as("per_user_payment");
 }
 
+/** Designs count per signed-up user (designs owned by userId). */
+function designsByUserAgg() {
+  return db
+    .select({
+      userId: designs.userId,
+      designCount: sql<number>`count(*)::int`.as("design_count"),
+    })
+    .from(designs)
+    .groupBy(designs.userId)
+    .as("designs_by_user");
+}
+
+/** Designs count per anonymous session (designs owned by anonymousId). */
+function designsByAnonAgg() {
+  return db
+    .select({
+      anonymousId: designs.anonymousId,
+      designCount: sql<number>`count(*)::int`.as("design_count"),
+    })
+    .from(designs)
+    .groupBy(designs.anonymousId)
+    .as("designs_by_anon");
+}
+
 export const AdminBillingService = {
   /**
    * Per-owner usage table, paginated. Two typed selects unioned: every signed-up user (users
@@ -73,6 +98,8 @@ export const AdminBillingService = {
   usersUsage: async (params: SearchParams) => {
     const acc = perAccountAgg();
     const pay = perUserPaymentAgg();
+    const dpu = designsByUserAgg();
+    const dpa = designsByAnonAgg();
 
     // Owner type as a typed SQL case, shared by both halves of the union.
     const userType = sql<OwnerType>`case
@@ -91,13 +118,15 @@ export const AdminBillingService = {
         paidBalance: sql<number>`coalesce(${creditAccounts.paidBalance}, 0)`.as("paid_balance"),
         consumed: sql<number>`coalesce(${acc.consumed}, 0)`.as("consumed"),
         spentBdt: sql<number>`coalesce(${pay.spentBdt}, 0)`.as("spent_bdt"),
+        designCount: sql<number>`coalesce(${dpu.designCount}, 0)`.as("design_count"),
         type: userType.as("type"),
         lastActive: sql<string>`coalesce(${acc.lastTxnAt}, ${users.createdAt})`.as("last_active"),
       })
       .from(users)
       .leftJoin(creditAccounts, eq(creditAccounts.userId, users.id))
       .leftJoin(acc, eq(acc.accountId, creditAccounts.id))
-      .leftJoin(pay, eq(pay.userId, users.id));
+      .leftJoin(pay, eq(pay.userId, users.id))
+      .leftJoin(dpu, eq(dpu.userId, users.id));
 
     const anonHalf = db
       .select({
@@ -110,6 +139,7 @@ export const AdminBillingService = {
         paidBalance: creditAccounts.paidBalance,
         consumed: sql<number>`coalesce(${acc.consumed}, 0)`.as("consumed"),
         spentBdt: sql<number>`0`.as("spent_bdt"),
+        designCount: sql<number>`coalesce(${dpa.designCount}, 0)`.as("design_count"),
         type: sql<OwnerType>`'anonymous'`.as("type"),
         lastActive: sql<string>`coalesce(${acc.lastTxnAt}, ${creditAccounts.createdAt})`.as(
           "last_active",
@@ -117,6 +147,7 @@ export const AdminBillingService = {
       })
       .from(creditAccounts)
       .leftJoin(acc, eq(acc.accountId, creditAccounts.id))
+      .leftJoin(dpa, eq(dpa.anonymousId, creditAccounts.anonymousId))
       .where(isNull(creditAccounts.userId));
 
     // Union both halves into a subquery we can filter/sort/paginate as one set.

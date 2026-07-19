@@ -1,8 +1,8 @@
 "use client";
 
-import { format } from "date-fns";
 import { Check, Eye, X } from "lucide-react";
 import Link from "next/link";
+import { getCellDateColumn } from "@/components/data-table/column-cells";
 import type { DataTableColumn } from "@/components/data-table/data-table";
 import { Badge } from "@/components/ui/badge";
 import { PAGES } from "@/config/pages";
@@ -106,13 +106,7 @@ export const columns: DataTableColumn<GenerationLogRow>[] = [
     className: "text-muted-foreground text-xs",
     cell: (g) => (g.providersTried?.length ? g.providersTried.join(" → ") : "—"),
   },
-  {
-    header: "Created",
-    accessorKey: "createdAt",
-    sortable: true,
-    className: "text-muted-foreground text-xs",
-    cell: (g) => format(new Date(g.createdAt), "d MMM, HH:mm"),
-  },
+  getCellDateColumn({ header: "Created", accessorKey: "createdAt" }),
   {
     header: "",
     accessorKey: "id",

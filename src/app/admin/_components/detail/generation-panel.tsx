@@ -1,8 +1,8 @@
-import { format } from "date-fns";
 import { Check, ImageOff, X } from "lucide-react";
 import Image from "next/image";
 import { Badge } from "@/components/ui/badge";
 import type { GenerationLog } from "@/db/types";
+import { formatDateTime } from "@/lib/date";
 
 function Field({ label, value }: { label: string; value: React.ReactNode }) {
   return (
@@ -87,7 +87,10 @@ export function GenerationPanel({ log }: { log: GenerationLog }) {
             label="Fallback chain"
             value={log.providersTried?.length ? log.providersTried.join(" → ") : "—"}
           />
-          <Field label="Created" value={format(new Date(log.createdAt), "d MMM yyyy, HH:mm")} />
+          <Field
+            label="Created"
+            value={formatDateTime(log.createdAt, { preset: "datetimeYear" })}
+          />
         </dl>
       </div>
 

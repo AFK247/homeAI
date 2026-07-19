@@ -3,6 +3,10 @@ import "server-only";
 import { ORPCError } from "@orpc/server";
 import { z } from "zod";
 import { searchParamsSchema } from "@/db/helpers/search-params";
+import {
+  CreateFurnitureSchema,
+  UpdateFurnitureSchema,
+} from "@/db/validations/furniture.validation";
 import { adminProcedure, publicProcedure } from "@/server/rpc/procedures";
 import { EventService } from "@/server/service/event.service";
 import { FurnitureService } from "@/server/service/furniture.service";
@@ -20,6 +24,27 @@ export const furnitureRouter = {
     .route({ method: "GET" })
     .input(searchParamsSchema)
     .handler(({ input }) => FurnitureService.list(input)),
+
+  // Admin CRUD — one item by id + create/update/delete. Admin-only.
+  getById: adminProcedure
+    .route({ method: "GET" })
+    .input(z.object({ id: z.string().min(1) }))
+    .handler(({ input }) => FurnitureService.getById(input.id)),
+
+  create: adminProcedure
+    .route({ method: "POST" })
+    .input(CreateFurnitureSchema)
+    .handler(({ input }) => FurnitureService.create(input)),
+
+  update: adminProcedure
+    .route({ method: "POST" })
+    .input(UpdateFurnitureSchema)
+    .handler(({ input }) => FurnitureService.update(input)),
+
+  delete: adminProcedure
+    .route({ method: "POST" })
+    .input(z.object({ id: z.string().min(1) }))
+    .handler(({ input }) => FurnitureService.remove(input.id)),
 
   // Tap a pin: return the full detail AND log a tag_click (side effect ⇒ POST).
   getDetail: publicProcedure

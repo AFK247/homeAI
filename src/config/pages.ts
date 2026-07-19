@@ -36,7 +36,6 @@ export const PAGES = {
   ADMIN: {
     INDEX: "/admin",
     DESIGNS: "/admin/designs",
-    SESSIONS: "/admin/sessions",
     EVENTS: "/admin/events",
     FURNITURE: "/admin/furniture",
     CATEGORIES: "/admin/categories",

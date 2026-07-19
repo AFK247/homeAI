@@ -1,7 +1,7 @@
 "use client";
 
-import { format } from "date-fns";
 import type { EventRow } from "@/app/admin/events/_modules/event.router";
+import { getCellDateColumn } from "@/components/data-table/column-cells";
 import type { DataTableColumn } from "@/components/data-table/data-table";
 
 export const columns: DataTableColumn<EventRow>[] = [
@@ -22,11 +22,5 @@ export const columns: DataTableColumn<EventRow>[] = [
     className: "font-mono text-muted-foreground text-xs",
     cell: (e) => (e.metadata ? JSON.stringify(e.metadata) : "—"),
   },
-  {
-    header: "When",
-    accessorKey: "createdAt",
-    sortable: true,
-    className: "text-muted-foreground text-xs",
-    cell: (e) => format(new Date(e.createdAt), "d MMM, HH:mm"),
-  },
+  getCellDateColumn({ header: "When", accessorKey: "createdAt" }),
 ];

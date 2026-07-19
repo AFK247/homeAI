@@ -1,6 +1,10 @@
 "use client";
 
-import { format } from "date-fns";
+import {
+  getCellCurrencyColumn,
+  getCellDateColumn,
+  getCellNumericColumn,
+} from "@/components/data-table/column-cells";
 import type { DataTableColumn } from "@/components/data-table/data-table";
 import { Badge } from "@/components/ui/badge";
 import type { PaymentRow } from "@/server/service/admin-billing/admin-billing.service";
@@ -27,18 +31,8 @@ export const columns: DataTableColumn<PaymentRow>[] = [
       </div>
     ),
   },
-  {
-    header: "Amount",
-    accessorKey: "amountBdt",
-    className: "tabular-nums text-foreground",
-    cell: (p) => `৳${p.amountBdt.toLocaleString("en-US")}`,
-  },
-  {
-    header: "Credits",
-    accessorKey: "credits",
-    className: "tabular-nums",
-    cell: (p) => p.credits.toLocaleString("en-US"),
-  },
+  getCellCurrencyColumn({ header: "Amount", accessorKey: "amountBdt" }),
+  getCellNumericColumn({ header: "Credits", accessorKey: "credits" }),
   {
     header: "Status",
     accessorKey: "status",
@@ -53,10 +47,5 @@ export const columns: DataTableColumn<PaymentRow>[] = [
     className: "font-mono text-muted-foreground text-xs",
     cell: (p) => p.tranId,
   },
-  {
-    header: "Date",
-    accessorKey: "createdAt",
-    className: "text-muted-foreground text-xs",
-    cell: (p) => format(new Date(p.createdAt), "d MMM yyyy, HH:mm"),
-  },
+  getCellDateColumn({ header: "Date", accessorKey: "createdAt" }),
 ];

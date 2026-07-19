@@ -16,6 +16,10 @@ import { furnitureItems } from "@/db/schemas/furniture.schema";
 import type { Region } from "@/db/schemas/shared.schema";
 import { vendors } from "@/db/schemas/vendor.schema";
 import type { FurnitureDetail, FurnitureItem } from "@/db/types";
+import type {
+  CreateFurnitureInput,
+  UpdateFurnitureInput,
+} from "@/db/validations/furniture.validation";
 
 /*
  * Furniture service — catalog reads.
@@ -124,5 +128,35 @@ export const FurnitureService = {
           .limit(limit)
           .offset(offset),
     );
+  },
+
+  // ── admin CRUD ─────────────────────────────────────────────────────────────
+
+  /** One furniture item by id, or null. */
+  getById: async (id: string) => {
+    const [row] = await db.select().from(furnitureItems).where(eq(furnitureItems.id, id));
+    return row ?? null;
+  },
+
+  /** Create a furniture item; returns the new row. */
+  create: async (input: CreateFurnitureInput) => {
+    const [row] = await db.insert(furnitureItems).values(input).returning();
+    return row ?? null;
+  },
+
+  /** Update a furniture item by id; returns the updated row (null if it didn't exist). */
+  update: async ({ id, ...input }: UpdateFurnitureInput) => {
+    const [row] = await db
+      .update(furnitureItems)
+      .set(input)
+      .where(eq(furnitureItems.id, id))
+      .returning();
+    return row ?? null;
+  },
+
+  /** Delete a furniture item by id; returns the removed row (null if it didn't exist). */
+  remove: async (id: string) => {
+    const [row] = await db.delete(furnitureItems).where(eq(furnitureItems.id, id)).returning();
+    return row ?? null;
   },
 };

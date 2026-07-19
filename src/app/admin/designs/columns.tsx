@@ -1,9 +1,9 @@
 "use client";
 
-import { format } from "date-fns";
 import { Eye } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
+import { getCellDateColumn } from "@/components/data-table/column-cells";
 import type { DataTableColumn } from "@/components/data-table/data-table";
 import { Badge } from "@/components/ui/badge";
 import { PAGES } from "@/config/pages";
@@ -60,13 +60,7 @@ export const columns: DataTableColumn<Design>[] = [
         <span className="text-muted-foreground">{d.userId ? "user" : "—"}</span>
       ),
   },
-  {
-    header: "Created",
-    accessorKey: "createdAt",
-    sortable: true,
-    className: "text-muted-foreground text-xs",
-    cell: (d) => format(new Date(d.createdAt), "d MMM, HH:mm"),
-  },
+  getCellDateColumn({ header: "Created", accessorKey: "createdAt" }),
   {
     header: "",
     accessorKey: "id",

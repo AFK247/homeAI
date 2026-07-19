@@ -4,6 +4,7 @@ import type { DataTableColumn } from "@/components/data-table/data-table";
 import { Badge } from "@/components/ui/badge";
 import { formatBdt } from "@/lib/format";
 import type { FurnitureRow } from "../../result/_modules/furniture.router";
+import { FurnitureRowActions } from "./row-actions";
 
 /*
  * Furniture table columns (reference convention: columns.tsx per feature).
@@ -31,4 +32,12 @@ export const columns: DataTableColumn<FurnitureRow>[] = [
     ),
   },
   { header: "Source", accessorKey: "source" },
+  {
+    header: "",
+    accessorKey: "id",
+    id: "actions",
+    stickyRight: true,
+    className: "w-20 text-right",
+    cell: (r) => <FurnitureRowActions item={r} />,
+  },
 ];

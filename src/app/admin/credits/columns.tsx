@@ -1,6 +1,6 @@
 "use client";
 
-import { format } from "date-fns";
+import { getCellDateColumn } from "@/components/data-table/column-cells";
 import type { DataTableColumn } from "@/components/data-table/data-table";
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
@@ -55,10 +55,5 @@ export const columns: DataTableColumn<LedgerRow>[] = [
     className: "text-muted-foreground text-xs",
     cell: (r) => r.modelId ?? "—",
   },
-  {
-    header: "Date",
-    accessorKey: "createdAt",
-    className: "text-muted-foreground text-xs",
-    cell: (r) => format(new Date(r.createdAt), "d MMM yyyy, HH:mm"),
-  },
+  getCellDateColumn({ header: "Date", accessorKey: "createdAt" }),
 ];

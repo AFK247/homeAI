@@ -1,16 +1,15 @@
-import { ArrowLeft, Waypoints } from "lucide-react";
-import Link from "next/link";
+import { Tags } from "lucide-react";
 import { Suspense } from "react";
 import { DataTableSkeleton } from "@/components/data-table/data-table-skeleton";
 import { PageHeader } from "@/components/layout/page-header";
-import { PAGES } from "@/config/pages";
 import type { PageSearchParams } from "@/db/helpers/search-params";
+import { CategoryTabs } from "../category-tabs";
 import { MappingsList } from "./list";
 
 /*
- * Admin — vendor→master category mappings (docs/marketplace-plan.md §3). Review/approve
- * AI-proposed mappings and REMAP any bad guesses to the right master category before they
- * go live. Ingestion only uses ACTIVE (approved) mappings.
+ * Admin — vendor→master category mappings (docs/marketplace-plan.md §3). A real sibling route of
+ * Categories (not a query-param tab), reached via the shared CategoryTabs bar. Review/approve/
+ * remap AI-proposed mappings; ingestion only uses ACTIVE ones. Backend-paginated.
  */
 export default async function AdminCategoryMappingsPage({ searchParams }: PageSearchParams) {
   const params = await searchParams;
@@ -18,18 +17,13 @@ export default async function AdminCategoryMappingsPage({ searchParams }: PageSe
   return (
     <>
       <PageHeader
-        title="Category mappings"
+        title="Categories"
         description="How each vendor's raw category resolves to a master category. Approve or remap AI proposals."
-        icon={<Waypoints className="size-5" />}
-        actions={
-          <Link
-            href={PAGES.ADMIN.CATEGORIES}
-            className="inline-flex items-center gap-1 text-brand-body text-sm hover:text-foreground"
-          >
-            <ArrowLeft className="size-4" /> Categories
-          </Link>
-        }
+        icon={<Tags className="size-5" />}
       />
+
+      <CategoryTabs active="mappings" />
+
       <Suspense fallback={<DataTableSkeleton />}>
         <MappingsList searchParams={params} />
       </Suspense>

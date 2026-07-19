@@ -1,7 +1,7 @@
-import { format } from "date-fns";
 import Image from "next/image";
 import { Badge } from "@/components/ui/badge";
 import type { Design, DesignTag } from "@/db/types";
+import { formatDateTime } from "@/lib/date";
 
 const STATUS_VARIANT: Record<string, "default" | "secondary" | "destructive"> = {
   done: "default",
@@ -123,7 +123,10 @@ export function DesignPanel({ design, tags = [] }: { design: Design; tags?: Desi
               </span>
             }
           />
-          <Field label="Created" value={format(new Date(design.createdAt), "d MMM yyyy, HH:mm")} />
+          <Field
+            label="Created"
+            value={formatDateTime(design.createdAt, { preset: "datetimeYear" })}
+          />
         </dl>
 
         {design.prompt && (

@@ -16,6 +16,9 @@ const vendorInput = z.object({ vendor: z.string().min(1) });
 export const catalogRouter = {
   vendors: adminProcedure.route({ method: "GET" }).handler(() => CatalogService.vendors()),
 
+  // Live status of ALL vendors at once (overview cards' badges — see every concurrent scrape).
+  allStatus: adminProcedure.route({ method: "GET" }).handler(() => CatalogService.allStatus()),
+
   staged: adminProcedure
     .route({ method: "GET" })
     .input(vendorInput)
@@ -69,3 +72,4 @@ export type ScrapeJobRow = Awaited<ReturnType<typeof CatalogService.jobs>>[numbe
 export type CatalogDiff = Awaited<ReturnType<typeof CatalogService.diff>>;
 export type IngestResult = Awaited<ReturnType<typeof CatalogService.ingestVendor>>;
 export type RunStatus = Awaited<ReturnType<typeof CatalogService.runStatus>>;
+export type VendorStatus = Awaited<ReturnType<typeof CatalogService.allStatus>>[number];

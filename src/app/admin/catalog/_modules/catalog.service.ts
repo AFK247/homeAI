@@ -41,6 +41,26 @@ export const CatalogService = {
     }));
   },
 
+  /**
+   * Live status for EVERY vendor at once — powers the overview cards' per-vendor badges. For each
+   * registered vendor: its staged/ingested counts, whether a scrape is running in THIS process, and
+   * its latest job (status + counters). Lets the operator see all concurrent scrapes at a glance and
+   * supports running many vendors simultaneously (each is independent server-side).
+   */
+  allStatus: async () => {
+    const vendors = await CatalogService.vendors();
+    // Latest job per vendor: one indexed query, then keep the newest per vendor in memory.
+    const jobs = await db.select().from(scrapeJobs).orderBy(desc(scrapeJobs.startedAt));
+    const latestByVendor = new Map<string, (typeof jobs)[number]>();
+    for (const j of jobs) if (!latestByVendor.has(j.vendor)) latestByVendor.set(j.vendor, j);
+
+    return vendors.map((v) => ({
+      ...v,
+      running: isRunning(v.slug),
+      job: latestByVendor.get(v.slug) ?? null,
+    }));
+  },
+
   /** Staged (scraped) rows for one vendor, newest first. */
   staged: (vendor: string) =>
     db

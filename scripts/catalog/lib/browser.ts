@@ -43,10 +43,15 @@ export async function withPage<T>(
   return withRetry(
     async () => {
       const page = await b.newPage({ userAgent: UA });
+      // Instant stop: closing the page CANCELS any in-flight goto()/fn() immediately (they reject),
+      // so a Stop during a ~20s page load takes effect at once instead of waiting for the timeout.
+      const onAbort = () => void page.close().catch(() => {});
+      opts.signal?.addEventListener("abort", onAbort, { once: true });
       try {
         await page.goto(url, { waitUntil: "domcontentloaded", timeout: NAV_TIMEOUT_MS });
         return await fn(page);
       } finally {
+        opts.signal?.removeEventListener("abort", onAbort);
         await page.close().catch(() => {});
       }
     },

@@ -42,6 +42,7 @@ export const PAGES = {
     CATEGORY_MAPPINGS: "/admin/categories/mappings",
     VENDORS: "/admin/vendors",
     CATALOG: "/admin/catalog",
+    CATALOG_VENDOR: (vendor: string) => `/admin/catalog/${vendor}`,
     USERS: "/admin/users",
     PAYMENTS: "/admin/payments",
     CREDITS: "/admin/credits",

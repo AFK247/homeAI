@@ -37,8 +37,8 @@ const POLL_MS = 1500;
 type LiveProduct = RunStatus["products"][number];
 type JobRow = NonNullable<RunStatus["job"]>;
 
-export function CatalogClient({ vendors }: { vendors: CatalogVendor[] }) {
-  const [selected, setSelected] = useState(vendors[0]?.slug ?? "");
+export function CatalogClient({ vendor }: { vendor: CatalogVendor }) {
+  const selected = vendor.slug;
   const [status, setStatus] = useState<RunStatus | null>(null);
   const [diff, setDiff] = useState<CatalogDiff | null>(null);
   const [comparing, setComparing] = useState(false);
@@ -48,7 +48,6 @@ export function CatalogClient({ vendors }: { vendors: CatalogVendor[] }) {
   const prevRunning = useRef(false);
   const { openModal, closeModal } = useModal();
 
-  const vendor = vendors.find((v) => v.slug === selected);
   const job: JobRow | null = status?.job ?? null;
   const running = status?.running ?? false;
   const products: LiveProduct[] = status?.products ?? [];
@@ -58,28 +57,49 @@ export function CatalogClient({ vendors }: { vendors: CatalogVendor[] }) {
   const nothingToPublish = diff !== null && diff.created.length === 0 && diff.changed.length === 0;
   const hasStaged = (vendor?.staged ?? 0) > 0;
 
-  // One status fetch.
-  const poll = useCallback(async (v: string) => {
+  // One status fetch. Returns the fetched status so the tick loop can read the FINAL job outcome.
+  const poll = useCallback(async (v: string): Promise<RunStatus | null> => {
     try {
       const s = await rpc.catalog.runStatus({ vendor: v });
       setStatus(s);
-      return s.running;
+      return s;
     } catch {
-      return false;
+      return null;
     }
   }, []);
 
-  // Recurring poll — polls WHILE a run is in flight and STOPS once idle (so the status API isn't
-  // hammered forever at rest). Called on mount / vendor change (to reconnect to any in-progress
-  // run) and again when a scrape is started. Self-cancels the previous loop before starting.
+  // Recurring poll — polls WHILE a run is in flight and STOPS once idle. `expectRunning` (set when
+  // WE just started a scrape) makes the loop keep polling until the detached run has actually
+  // appeared as running, so we never fire a premature "finished — 0" before the background job's
+  // insert/increments have landed. Called on mount and when a scrape starts. Self-cancels first.
   const startPolling = useCallback(
-    (v: string) => {
+    (v: string, expectRunning = false) => {
       if (pollRef.current) clearTimeout(pollRef.current);
+      let sawRunning = false; // did we OBSERVE it running in a real poll?
+      let waited = 0; // ms spent waiting for an expected run to appear
       const tick = async () => {
-        const isRunning = await poll(v);
-        if (prevRunning.current && !isRunning) toast.info("Scrape finished.");
-        prevRunning.current = isRunning;
-        pollRef.current = isRunning ? setTimeout(tick, POLL_MS) : null;
+        const s = await poll(v);
+        const isRunning = s?.running ?? false;
+        if (isRunning) {
+          sawRunning = true;
+          prevRunning.current = true;
+        }
+
+        // Only announce a finish for a run we actually SAW running — never on the first transient
+        // poll before the detached job appeared.
+        if (prevRunning.current && sawRunning && !isRunning) {
+          const st = s?.job?.status;
+          if (st === "cancelled") toast.info(`Stopped — ${s?.job?.doneUrls ?? 0} saved.`);
+          else if (st === "interrupted") toast.error(s?.job?.error || "Scrape interrupted.");
+          else toast.success(`Scrape finished — ${s?.job?.doneUrls ?? 0} products.`);
+          prevRunning.current = false;
+        }
+
+        // Keep polling while running, OR while we're still waiting for a just-started run to appear
+        // (up to ~5s) — this closes the start race that caused the false "0 products" toast.
+        const stillWaiting = expectRunning && !sawRunning && waited < 5000;
+        if (stillWaiting) waited += POLL_MS;
+        pollRef.current = isRunning || stillWaiting ? setTimeout(tick, POLL_MS) : null;
       };
       tick();
     },
@@ -102,8 +122,9 @@ export function CatalogClient({ vendors }: { vendors: CatalogVendor[] }) {
         toast.error(r.reason === "already_running" ? "Already running." : "Could not start.");
       } else {
         toast.info(fresh ? "Fresh re-scrape started." : "Scrape started.");
-        prevRunning.current = true;
-        startPolling(selected); // restart the poll loop for the new run
+        // expectRunning=true: keep polling until the detached run actually shows as running, so we
+        // never fire a premature "finished — 0" before it appears.
+        startPolling(selected, true);
       }
     } catch {
       toast.error("Could not start the scrape.");
@@ -191,48 +212,8 @@ export function CatalogClient({ vendors }: { vendors: CatalogVendor[] }) {
     });
   }
 
-  if (vendors.length === 0) {
-    return <p className="text-brand-body text-sm">No vendors registered.</p>;
-  }
-
   return (
     <div className="flex flex-col gap-6">
-      {/* Plain-English explanation of the 3-stage flow, so the buttons aren't cryptic. */}
-      <div className="rounded-2xl border border-border bg-muted/40 p-4 text-brand-body text-sm">
-        <span className="font-semibold text-foreground">How this works — 3 steps:</span>{" "}
-        <span className="font-medium text-foreground">1. Scrape</span> downloads products from the
-        vendor's website into a staging area (not live yet).{" "}
-        <span className="font-medium text-foreground">2. Preview changes</span> shows what would
-        change vs the live catalog — safe, read-only.{" "}
-        <span className="font-medium text-foreground">3. Publish to catalog</span> writes the staged
-        products into the live catalog shoppers see (overwrites existing items).
-      </div>
-
-      {/* Vendor picker */}
-      <div className="flex flex-wrap gap-2">
-        {vendors.map((v) => (
-          <button
-            key={v.slug}
-            type="button"
-            onClick={() => {
-              setSelected(v.slug);
-              setDiff(null);
-            }}
-            className={cn(
-              "flex flex-col items-start gap-0.5 rounded-xl border px-4 py-2.5 text-left transition-colors",
-              v.slug === selected
-                ? "border-primary bg-secondary"
-                : "border-border bg-card hover:bg-muted",
-            )}
-          >
-            <span className="font-semibold text-foreground text-sm">{v.name}</span>
-            <span className="text-brand-body text-xs">
-              {v.staged} staged · {v.ingested} live{v.usesBrowser ? " · browser" : ""}
-            </span>
-          </button>
-        ))}
-      </div>
-
       {/* Action bar */}
       <div className="flex flex-wrap items-center gap-3">
         {running ? (
